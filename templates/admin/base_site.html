@@ -1,0 +1,15 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}SCMD Admin{% endblock %}
+
+{% block extrastyle %}
+    {{ block.super }}
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&family=Saira:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'admin/css/scmd_admin_sidebar.css' %}?v=3.0">
+{% endblock %}
+
+{% block extrahead %}
+    {{ block.super }}
+    <script src="{% static 'admin/js/scmd_admin_scroll.js' %}?v=3.0"></script>
+{% endblock %}

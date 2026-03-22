@@ -1,0 +1,220 @@
+{# file: operations/templates/operations/mobile/dashboard.html #}
+{# -*- coding: utf-8 -*- #}
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+{% load static %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* CSS Nút SOS Thông minh */
+    .sos-container { position: fixed; bottom: 90px; right: 20px; z-index: 50; display: flex; flex-direction: column; align-items: center; }
+    .sos-wrapper { position: relative; width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; }
+    .sos-btn { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(145deg, #ef4444, #b91c1c); color: white; border: none; box-shadow: 0 5px 15px rgba(220, 38, 38, 0.5); position: relative; z-index: 2; display: flex; align-items: center; justify-content: center; transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); touch-action: none; user-select: none; cursor: pointer; }
+    .sos-btn:active { transform: scale(0.9); }
+    .sos-label { font-weight: 900; font-size: 16px; letter-spacing: 1px; }
+    .sos-progress-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform: rotate(-90deg); z-index: 1; pointer-events: none; }
+    .sos-circle-bg { fill: none; stroke: rgba(239, 68, 68, 0.2); stroke-width: 4; }
+    .sos-circle-bar { fill: none; stroke: #fbbf24; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 240; stroke-dashoffset: 240; transition: stroke-dashoffset 0s; }
+    .sos-wrapper.holding .sos-btn { transform: scale(1.1); box-shadow: 0 0 30px rgba(251, 191, 36, 0.6); }
+    .sos-wrapper.holding .sos-circle-bar { stroke-dashoffset: 0; transition: stroke-dashoffset 2s linear; }
+    .sos-pulse { position: absolute; inset: 10px; border-radius: 50%; border: 2px solid #ef4444; opacity: 0; z-index: 0; }
+    .sos-wrapper.holding .sos-pulse { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+    @keyframes ping { 75%, 100% { transform: scale(1.8); opacity: 0; } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="loading-overlay" class="fixed inset-0 bg-gray-900/60 z-[100] hidden flex flex-col items-center justify-center text-white backdrop-blur-sm transition-opacity duration-300">
+    <div class="loading loading-spinner loading-lg text-white"></div>
+    <p id="loading-text" class="mt-4 font-medium text-sm tracking-wide">Đang xử lý dữ liệu...</p>
+</div>
+
+<div class="flex justify-between items-center mb-6 fade-in">
+    <div class="flex items-center gap-3">
+        <img src="{% static 'img/logo_moi.png' %}" alt="SCMD" class="h-10 w-auto object-contain">
+        <div class="flex flex-col">
+            <span class="text-xs text-gray-500 font-medium">{{ greeting }},</span>
+            <h1 class="text-lg font-bold text-gray-900 leading-none">{{ nhan_vien.ho_ten }}</h1>
+            <span class="text-[10px] font-mono text-red-600 bg-red-50 px-1.5 rounded w-fit mt-1 border border-red-100">ID: {{ nhan_vien.ma_nhan_vien }}</span>
+        </div>
+    </div>
+    <a href="{% url 'users:mobile_profile' %}" class="avatar active:scale-95 transition-transform block">
+        <div class="w-10 h-10 rounded-full bg-gray-200 ring-2 ring-white shadow-sm overflow-hidden">
+            {% if nhan_vien.anh_the %}
+                <img src="{{ nhan_vien.anh_the.url }}" class="object-cover w-full h-full" />
+            {% else %}
+                <img src="{% static 'img/default_avatar.png' %}" class="object-cover w-full h-full" />
+            {% endif %}
+        </div>
+    </a>
+</div>
+
+<div class="card w-full bg-white shadow-sm border border-gray-200 rounded-2xl mb-6 overflow-hidden fade-in">
+    {% if ca_truc_hom_nay %}
+        <div class="card-body p-5">
+            <div class="flex justify-between items-start mb-3">
+                <div>
+                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wide">Ca trực hiện tại</span>
+                    <div class="text-lg font-bold text-gray-800">{{ ca_truc_hom_nay.ca_lam_viec.ten_ca }}</div>
+                </div>
+                {% if trang_thai_checkin == True %}
+                    <span class="badge bg-green-50 text-green-700 border-green-100 font-semibold px-2.5 py-3 h-auto gap-1"><span class="w-1.5 h-1.5 bg-green-600 rounded-full animate-pulse"></span> Đang trực</span>
+                {% elif trang_thai_checkin == 'DONE' %}
+                    <span class="badge bg-gray-100 text-gray-500 border-none font-medium px-3 py-3 h-auto">Đã xong</span>
+                {% else %}
+                    <span class="badge bg-yellow-50 text-yellow-700 border-yellow-100 font-medium px-3 py-3 h-auto">Chưa vào</span>
+                {% endif %}
+            </div>
+
+            <div class="space-y-2 mb-5">
+                <div class="flex items-start gap-2.5">
+                    <i class="fas fa-map-marker-alt text-red-500 mt-1 w-4 text-center"></i>
+                    <div>
+                        <p class="font-bold text-gray-800 text-sm leading-snug">{{ ca_truc_hom_nay.vi_tri_chot.muc_tieu.ten_muc_tieu }}</p>
+                        <p class="text-xs text-gray-500">{{ ca_truc_hom_nay.vi_tri_chot.ten_vi_tri }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <i class="far fa-clock text-blue-500 w-4 text-center"></i>
+                    <span class="font-mono font-medium text-gray-600 text-sm">{{ ca_truc_hom_nay.ca_lam_viec.gio_bat_dau|date:"H:i" }} - {{ ca_truc_hom_nay.ca_lam_viec.gio_ket_thuc|date:"H:i" }}</span>
+                </div>
+            </div>
+
+            <div class="w-full">
+                {% if trang_thai_checkin == True %}
+                    <form id="form-checkout" action="{% url 'operations:check_out' ca_truc_hom_nay.id %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="lat" id="lat-out"><input type="hidden" name="lng" id="lng-out">
+                        <input type="hidden" name="note" id="note-out">
+                        <input type="file" name="anh_check_out" id="checkout-cam" class="hidden" accept="image/*" capture="user" onchange="processCheck('form-checkout', 'lat-out', 'lng-out')">
+                        <label for="checkout-cam" class="btn w-full h-12 bg-white border-2 border-red-100 text-red-600 hover:bg-red-50 hover:border-red-200 rounded-xl text-sm font-bold shadow-sm flex justify-between px-4 items-center">
+                            <span>KẾT THÚC CA</span><i class="fas fa-chevron-right text-xs"></i>
+                        </label>
+                    </form>
+                {% elif trang_thai_checkin == 'DONE' %}
+                    <div class="w-full h-12 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 font-medium text-sm border border-gray-100"><i class="fas fa-check-circle mr-2"></i> Hoàn thành</div>
+                {% else %}
+                    <form id="form-checkin" action="{% url 'operations:check_in' ca_truc_hom_nay.id %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="lat" id="lat-in"><input type="hidden" name="lng" id="lng-in">
+                        <input type="hidden" name="note" id="note-in">
+                        <input type="file" name="anh_check_in" id="checkin-cam" class="hidden" accept="image/*" capture="user" onchange="processCheck('form-checkin', 'lat-in', 'lng-in')">
+                        <label for="checkin-cam" class="btn w-full h-12 bg-red-700 hover:bg-red-800 text-white border-none rounded-xl shadow-md shadow-red-200 text-sm font-bold flex justify-between px-4 items-center">
+                            <span>BẮT ĐẦU CA</span><i class="fas fa-fingerprint text-lg opacity-80"></i>
+                        </label>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="card-body p-6 text-center opacity-60">
+            <i class="fas fa-mug-hot text-3xl text-gray-300 mb-2"></i>
+            <p class="text-gray-500 font-medium text-sm">Hôm nay không có lịch trực</p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="grid grid-cols-2 gap-3 mb-24 fade-in">
+    <a href="{% url 'inspection:mobile_tuan_tra_list' %}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start justify-between h-24 active:scale-95 transition-transform">
+        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center mb-2 border border-blue-100"><i class="fas fa-qrcode"></i></div>
+        <div><h3 class="font-bold text-gray-700 text-sm">Tuần Tra</h3></div>
+    </a>
+    
+    <a href="{% url 'operations:bao_cao_su_co' %}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start justify-between h-24 active:scale-95 transition-transform">
+        <div class="w-8 h-8 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center mb-2 border border-orange-100"><i class="fas fa-exclamation-triangle"></i></div>
+        <div><h3 class="font-bold text-gray-700 text-sm">Báo Sự Cố</h3></div>
+    </a>
+
+    <a href="{% url 'operations:mobile_lich_su_cham_cong' %}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start justify-between h-24 active:scale-95 transition-transform">
+        <div class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center mb-2 border border-green-100"><i class="fas fa-history"></i></div>
+        <div><h3 class="font-bold text-gray-700 text-sm">Lịch Sử</h3></div>
+    </a>
+    <a href="{% url 'operations:mobile_de_xuat_list' %}" class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-col items-start justify-between h-24 active:scale-95 transition-transform">
+        <div class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center mb-2 border border-purple-100"><i class="fas fa-file-signature"></i></div>
+        <div><h3 class="font-bold text-gray-700 text-sm">Đề Xuất</h3></div>
+    </a>
+</div>
+
+<div class="sos-container">
+    <form id="form-sos" action="{% url 'operations:trigger_sos' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="lat" id="sos-lat"><input type="hidden" name="lng" id="sos-lng">
+        <div class="sos-wrapper" id="sosWrapper">
+            <button type="button" class="sos-btn" id="sosBtn" 
+                    onmousedown="startHold(event)" onmouseup="endHold(event)" onmouseleave="endHold(event)" 
+                    ontouchstart="startHold(event)" ontouchend="endHold(event)">
+                <span class="sos-label">SOS</span>
+            </button>
+            <svg class="sos-progress-svg" width="80" height="80">
+                <circle class="sos-circle-bg" cx="40" cy="40" r="38"></circle>
+                <circle class="sos-circle-bar" cx="40" cy="40" r="38"></circle>
+            </svg>
+            <div class="sos-pulse"></div>
+        </div>
+    </form>
+    <p class="text-[10px] text-gray-400 mt-2 font-medium bg-white/90 px-2 py-0.5 rounded shadow-sm backdrop-blur">
+        Giữ 2s để báo động
+    </p>
+</div>
+
+<script>
+    function processCheck(formId, latId, lngId) {
+        document.getElementById('loading-overlay').classList.remove('hidden');
+        document.getElementById('loading-text').innerText = "Đang định vị...";
+        const noteId = formId === 'form-checkin' ? 'note-in' : 'note-out';
+        const doSubmit = () => { document.getElementById(formId).submit(); };
+        const useFakeGPS = (msg) => {
+            if (confirm(`⚠️ ${msg}\n\nBạn có muốn dùng TỌA ĐỘ GIẢ LẬP (Tại mục tiêu) để tiếp tục Demo không?`)) {
+                {% if ca_truc_hom_nay %}
+                    const fakeLat = "{{ ca_truc_hom_nay.vi_tri_chot.muc_tieu.vi_do|default:'21.028511' }}";
+                    const fakeLng = "{{ ca_truc_hom_nay.vi_tri_chot.muc_tieu.kinh_do|default:'105.854444' }}";
+                    document.getElementById(latId).value = fakeLat;
+                    document.getElementById(lngId).value = fakeLng;
+                    const noteInput = document.getElementById(noteId);
+                    if(noteInput) noteInput.value = "[DEMO] Fake GPS Used";
+                    doSubmit();
+                {% else %}
+                    alert("Lỗi: Không tìm thấy ca trực.");
+                    document.getElementById('loading-overlay').classList.add('hidden');
+                {% endif %}
+            } else { document.getElementById('loading-overlay').classList.add('hidden'); }
+        };
+        if (navigator.geolocation) {
+            let done = false;
+            setTimeout(() => { if (!done) { done = true; useFakeGPS("Timeout GPS"); } }, 4000);
+            navigator.geolocation.getCurrentPosition(
+                (pos) => { if (!done) { done = true; document.getElementById(latId).value = pos.coords.latitude; document.getElementById(lngId).value = pos.coords.longitude; doSubmit(); } },
+                (err) => { if (!done) { done = true; useFakeGPS("Lỗi GPS"); } }, 
+                { timeout: 3500 }
+            );
+        } else { useFakeGPS("Thiết bị không hỗ trợ GPS"); }
+    }
+    
+    // --- SOS LOGIC ---
+    let holdTimer;
+    const sosWrapper = document.getElementById('sosWrapper');
+    function startHold(e) {
+        if(e.cancelable && e.type.startsWith('touch')) e.preventDefault();
+        sosWrapper.classList.add('holding');
+        if(navigator.vibrate) navigator.vibrate(50);
+        holdTimer = setTimeout(() => {
+            if(navigator.vibrate) navigator.vibrate([500, 200, 500]);
+            {% if ca_truc_hom_nay %}
+                document.getElementById('sos-lat').value = "{{ ca_truc_hom_nay.vi_tri_chot.muc_tieu.vi_do|default:'21.0285' }}";
+                document.getElementById('sos-lng').value = "{{ ca_truc_hom_nay.vi_tri_chot.muc_tieu.kinh_do|default:'105.8544' }}";
+            {% else %}
+                document.getElementById('sos-lat').value = "21.028511";
+                document.getElementById('sos-lng').value = "105.854444";
+            {% endif %}
+            document.getElementById('form-sos').submit();
+        }, 2000);
+    }
+    function endHold(e) { clearTimeout(holdTimer); sosWrapper.classList.remove('holding'); }
+
+    const checkinCam = document.getElementById('checkin-cam');
+    if(checkinCam) checkinCam.onchange = () => processCheck('form-checkin', 'lat-in', 'lng-in');
+    const checkoutCam = document.getElementById('checkout-cam');
+    if(checkoutCam) checkoutCam.onchange = () => { if(confirm('Xác nhận kết thúc ca?')) processCheck('form-checkout', 'lat-out', 'lng-out'); };
+</script>
+{% endblock %}

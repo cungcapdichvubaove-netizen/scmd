@@ -1,0 +1,19 @@
+{% extends "operations/mobile/base_mobile.html" %}
+{% load django_bootstrap5 %}
+
+{% block title %}Đăng nhập{% endblock %}
+
+{% block header %}Hệ thống An ninh XYZ{% endblock %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title text-center mb-4">Đăng nhập</h5>
+            <form method="post">
+                {% csrf_token %}
+                {% bootstrap_form form %}
+                {% bootstrap_button button_type="submit" content="Đăng nhập" button_class="btn-primary w-100" %}
+            </form>
+        </div>
+    </div>
+{% endblock %}

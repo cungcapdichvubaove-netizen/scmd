@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Chi tiết: {{ proposal.tieu_de }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto pb-10">
+    
+    <div class="mb-6 flex items-center justify-between">
+        <a href="{% url 'workflow:proposal_list' %}" class="flex items-center gap-2 text-slate-500 hover:text-blue-600 transition-colors font-medium text-sm">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        </a>
+        <div class="flex gap-3">
+            <a href="{% url 'workflow:proposal_print' proposal.id %}" target="_blank" class="btn bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg shadow-sm font-bold text-sm flex items-center gap-2">
+                <i class="fas fa-print"></i> In Tờ trình
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <div class="lg:col-span-2 space-y-6">
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="p-8 border-b border-slate-100 bg-slate-50/50">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-700 border border-blue-200 uppercase tracking-wide">
+                            {{ proposal.get_loai_de_xuat_display }}
+                        </span>
+                        <span class="text-slate-400 text-sm">|</span>
+                        <span class="text-slate-500 text-sm">Ngày tạo: {{ proposal.ngay_tao|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    <h1 class="text-3xl font-bold text-slate-900 leading-snug mb-2">{{ proposal.tieu_de }}</h1>
+                    <div class="flex items-center gap-2 mt-4 text-sm text-slate-600">
+                        <span class="font-bold">Người đề xuất:</span>
+                        <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-sm">
+                            <div class="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold">
+                                {{ proposal.nguoi_de_xuat.ho_ten|slice:":1" }}
+                            </div>
+                            {{ proposal.nguoi_de_xuat.ho_ten }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-8">
+                    <div class="prose max-w-none text-slate-800 text-base leading-7">
+                        {{ proposal.noi_dung|linebreaks }}
+                    </div>
+
+                    {% if proposal.file_dinh_kem %}
+                    <div class="mt-8 pt-6 border-t border-slate-100">
+                        <h4 class="text-sm font-bold text-slate-900 mb-3">Tài liệu đính kèm:</h4>
+                        <a href="{{ proposal.file_dinh_kem.url }}" target="_blank" class="inline-flex items-center gap-3 p-3 bg-slate-50 border border-slate-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all group">
+                            <div class="w-10 h-10 rounded bg-white border border-slate-200 flex items-center justify-center text-red-500 text-xl shadow-sm">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm font-bold text-slate-700 group-hover:text-blue-700">File đính kèm</p>
+                                <p class="text-xs text-slate-500">Nhấn để tải về</p>
+                            </div>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if approval_form %}
+            <div class="bg-blue-50 rounded-xl border border-blue-200 p-6 shadow-inner">
+                <h3 class="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-blue-200 text-blue-800 flex items-center justify-center"><i class="fas fa-pen-nib"></i></span>
+                    Xử lý hồ sơ
+                </h3>
+                <form action="{% url 'workflow:proposal_action' proposal.id %}" method="post" class="space-y-4">
+                    {% csrf_token %}
+                    <div class="bg-white p-4 rounded-lg border border-blue-100 shadow-sm">
+                        <label class="block text-xs font-bold text-slate-400 uppercase mb-2">Quyết định</label>
+                        <div class="space-y-2">
+                            {{ approval_form.hanh_dong }}
+                        </div>
+                    </div>
+                    
+                    <div>{{ approval_form.y_kien }}</div>
+
+                    <div id="next_person_div" class="hidden animate-fade-in">
+                        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                            <label class="block text-sm font-bold text-yellow-800 mb-2">Chuyển tiếp đến Lãnh đạo:</label>
+                            {{ approval_form.nguoi_tiep_theo }}
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle"></i> Xác nhận Xử lý
+                    </button>
+                </form>
+            </div>
+            
+            <script>
+                // Logic JS đơn giản để hiện ô chọn người khi chọn "Chuyển tiếp"
+                document.querySelectorAll('input[name="hanh_dong"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        const div = document.getElementById('next_person_div');
+                        if (this.value === 'CHUYEN_TIEP') div.classList.remove('hidden');
+                        else div.classList.add('hidden');
+                    });
+                });
+            </script>
+            {% endif %}
+        </div>
+
+        <div class="space-y-6">
+            
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Trạng thái hiện tại</h3>
+                
+                {% if proposal.trang_thai == 'CHO_DUYET' %}
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-orange-50 text-orange-500 flex items-center justify-center text-xl animate-pulse">
+                            <i class="fas fa-hourglass-half"></i>
+                        </div>
+                        <div>
+                            <p class="text-xl font-black text-slate-800">Đang chờ duyệt</p>
+                            <p class="text-sm text-slate-500">Tại bước: <strong class="text-orange-600">{{ proposal.nguoi_duyet_hien_tai.ho_ten }}</strong></p>
+                        </div>
+                    </div>
+                {% elif proposal.trang_thai == 'DA_DUYET' %}
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div>
+                            <p class="text-xl font-black text-emerald-700">Đã phê duyệt</p>
+                            <p class="text-sm text-slate-500">Hồ sơ đã hoàn tất.</p>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <div>
+                            <p class="text-xl font-black text-red-700">{{ proposal.get_trang_thai_display }}</p>
+                            <p class="text-sm text-slate-500">Hồ sơ bị trả về hoặc từ chối.</p>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-6 border-b border-slate-100 pb-2">
+                    Lịch sử xử lý
+                </h3>
+                
+                <div class="relative border-l-2 border-slate-200 ml-3 space-y-8 pb-2">
+                    {% for log in proposal.logs.all %}
+                    <div class="relative pl-8">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full border-2 border-white shadow-sm 
+                            {% if log.hanh_dong == 'GUI' %}bg-blue-500
+                            {% elif log.hanh_dong == 'DUYET' %}bg-emerald-500
+                            {% elif log.hanh_dong == 'TU_CHOI' %}bg-red-500
+                            {% else %}bg-orange-400{% endif %}"></div>
+                        
+                        <div class="flex flex-col">
+                            <span class="text-[10px] font-mono text-slate-400 mb-0.5">{{ log.thoi_gian|date:"H:i - d/m/Y" }}</span>
+                            <span class="text-sm font-bold text-slate-800">{{ log.nguoi_xu_ly.ho_ten }}</span>
+                            <span class="text-xs font-semibold uppercase tracking-wide my-1
+                                {% if log.hanh_dong == 'DUYET' %}text-emerald-600
+                                {% elif log.hanh_dong == 'TU_CHOI' %}text-red-600
+                                {% else %}text-blue-600{% endif %}">
+                                {{ log.get_hanh_dong_display }}
+                            </span>
+                            
+                            {% if log.y_kien %}
+                            <div class="text-sm text-slate-600 bg-slate-50 p-3 rounded border border-slate-200 italic mt-1 relative">
+                                <i class="fas fa-quote-left text-slate-300 absolute top-2 left-2 text-xs"></i>
+                                <span class="pl-4 block">{{ log.y_kien }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<style>
+    input[type="radio"] {
+        width: 1.1em; height: 1.1em;
+        vertical-align: text-bottom; margin-right: 6px;
+        accent-color: #2563eb; /* Blue-600 */
+    }
+</style>
+{% endblock %}

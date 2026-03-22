@@ -1,0 +1,113 @@
+{# file: templates/base_public.html #}
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    {# Chống cache để tránh lỗi 405 khi nhấn Back sau khi logout #}
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>{% block title %}SCMD Security{% endblock %}</title>
+    
+    <link rel="icon" type="image/png" href="{% static 'img/logo_moi.png' %}">
+    <meta name="theme-color" content="#0f172a">
+
+    {% tailwind_css %}
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        :root { --bg-dark: #0f172a; --bg-light: #1e293b; }
+        body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+        .security-bg {
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-light) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-enter { animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="security-bg p-4 md:p-6">
+
+    <div id="global-loader" class="loader-overlay">
+        <div class="flex flex-col items-center">
+            <i class="fas fa-shield-halved fa-beat text-blue-500 text-4xl mb-4"></i>
+            <p class="text-white text-sm font-bold tracking-[0.2em]">HỆ THỐNG ĐANG XỬ LÝ</p>
+        </div>
+    </div>
+
+    <div class="w-full max-w-md animate-enter">
+        <header class="text-center mb-8">
+            <div class="inline-block relative">
+                <img src="{% static 'img/logo_moi.png' %}" alt="Logo" class="w-20 h-20 mx-auto mb-4 drop-shadow-2xl">
+                <div class="absolute inset-0 bg-blue-500/10 blur-2xl -z-10 rounded-full"></div>
+            </div>
+            <h1 class="text-3xl font-black text-white tracking-tight">SECURITY COMMAND</h1>
+            <p class="text-slate-400 text-xs mt-1 uppercase tracking-[0.3em]">SCMD Central System</p>
+        </header>
+
+        <main class="glass-card rounded-[2.5rem] p-8 md:p-10">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="text-center mt-12">
+            <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
+                &copy; 2026 SCMD Enterprise Security System
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Hiển thị loader khi gửi form
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                document.getElementById('global-loader').style.display = 'flex';
+            });
+        });
+
+        // Xử lý logic xóa session triệt để
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            
+            // Nếu đang ở trang logout mà bị lỗi hoặc treo, tự động đẩy về login sau 1 giây
+            if (currentPath.includes('logout')) {
+                window.sessionStorage.clear();
+                window.localStorage.clear();
+                setTimeout(() => {
+                    window.location.href = "{% url 'main:login' %}";
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+/* file: static/css/admin_tweaks.css */
+/* Security Command (SCMD) System
+Author: Mr. Anh (CTO)
+Description: CSS tinh chỉnh giao diện Admin (Clean Version).
+             Chỉ tập trung vào Layout & Input Styles.
+             Các tiêu đề (Headers) sẽ do admin.py quản lý qua fieldsets.
+*/
+
+/* ==========================================================================
+   CẤU TRÚC CHUNG (LAYOUT & INPUTS)
+   ========================================================================== */
+
+/* Reset Form Row để thẳng hàng tăm tắp */
+.form-row {
+    border-bottom: 1px solid #f1f5f9;
+    padding: 12px 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap; /* Cho phép xuống dòng nếu màn hình bé */
+}
+
+/* Label bên trái: Đậm, màu tối, rộng cố định */
+.form-row > div > label {
+    width: 220px; 
+    display: inline-block;
+    font-weight: 600;
+    color: #334155; /* Slate-700 */
+}
+
+/* Tinh chỉnh các ô nhập liệu chung */
+input[type="text"], input[type="email"], input[type="number"], select, textarea {
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+/* ==========================================================================
+   CÁC CLASS ĐỊNH DẠNG ĐỘ RỘNG (HELPER CLASSES)
+   ========================================================================== */
+/* Dùng attrs={'class': '...'} trong forms.py hoặc formfield_overrides */
+
+.fix-gps-input { width: 250px !important; font-family: monospace; font-weight: bold; color: #2980b9; }
+.fix-num-input { width: 150px !important; }
+.fix-money-input { width: 200px !important; text-align: right; font-weight: bold; color: #27ae60; }
+.vTextField { width: 300px; } /* Class mặc định của Django */
+
+/* Fix các ô Readonly */
+.readonly {
+    font-weight: bold;
+    color: #64748b;
+    padding-left: 10px;
+}

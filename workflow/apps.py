@@ -1,0 +1,7 @@
+# workflow/apps.py
+from django.apps import AppConfig
+
+class WorkflowConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'workflow'
+    verbose_name = "5. VĂN PHÒNG SỐ"

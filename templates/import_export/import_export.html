@@ -1,0 +1,15 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+{% load admin_urls %}
+
+{% block object-tools-items %}
+    <div class="btn-group">
+        <a href="import/" class="btn btn-success">
+            <i class="fas fa-upload"></i> {% trans "Import" %}
+        </a>
+        <a href="export/{{ request.GET.urlencode }}" class="btn btn-info">
+            <i class="fas fa-download"></i> {% trans "Export" %}
+        </a>
+    </div>
+    {{ block.super }}
+{% endblock %}

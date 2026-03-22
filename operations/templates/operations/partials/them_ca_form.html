@@ -1,0 +1,120 @@
+<div class="p-1">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600 shadow-sm">
+            <i class="fas fa-calendar-plus text-xl"></i>
+        </div>
+        <div>
+            <h3 class="font-black text-xl text-slate-800 tracking-tight">Phân công Ca trực</h3>
+            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest uppercase">Thiết lập lịch vận hành mới</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-2 bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-6 shadow-inner text-sm">
+        <div class="text-center border-r border-slate-200">
+            <span class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Vị trí</span>
+            <span class="text-xs font-black text-slate-700 truncate block">{{ vi_tri.ten_vi_tri }}</span>
+        </div>
+        <div class="text-center border-r border-slate-200">
+            <span class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Ca trực</span>
+            <span class="text-xs font-black text-indigo-600 block">{{ ca.ten_ca }}</span>
+        </div>
+        <div class="text-center">
+            <span class="block text-[10px] text-slate-400 uppercase font-bold mb-1">Ngày</span>
+            <span class="text-xs font-black text-slate-700 block">{{ ngay_truc|date:"d/m/Y" }}</span>
+        </div>
+    </div>
+
+    <form hx-post="{% url 'operations:luu_ca' %}" 
+          hx-target="#cell-{{ vi_tri.id }}-{{ ngay_truc|date:'Ymd' }}" 
+          class="space-y-5"
+          id="form-phan-cong-{{ vi_tri.id }}-{{ ca.id }}">
+        {% csrf_token %}
+        <input type="hidden" name="vi_tri_id" value="{{ vi_tri.id }}">
+        <input type="hidden" name="ca_id" value="{{ ca.id }}">
+        <input type="hidden" name="ngay_truc" value="{{ ngay_truc|date:'Y-m-d' }}">
+        
+        <div class="form-control w-full">
+            <label class="label py-1">
+                <span class="label-text font-black text-slate-600 text-xs uppercase">Tìm & Chọn Nhân viên</span>
+            </label>
+            
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                    <i class="fas fa-search text-xs"></i>
+                </div>
+                
+                <input type="text" 
+                       list="staff-list-{{ vi_tri.id }}-{{ ca.id }}"
+                       placeholder="Gõ mã NV hoặc tên..." 
+                       class="employee-search-input input input-bordered w-full pl-10 h-12 bg-white font-medium text-sm border-slate-200 focus:border-blue-500"
+                       required
+                       autocomplete="off"
+                       oninput="syncEmployeeId(this, '{{ vi_tri.id }}-{{ ca.id }}')">
+                
+                <datalist id="staff-list-{{ vi_tri.id }}-{{ ca.id }}">
+                    {% for nv in nhan_vien_list %}
+                        <option data-id="{{ nv.id }}" value="{{ nv.ho_ten }} ({{ nv.ma_nhan_vien }})"></option>
+                    {% endfor %}
+                </datalist>
+
+                <input type="hidden" name="nhan_vien_id" id="hidden-nv-id-{{ vi_tri.id }}-{{ ca.id }}">
+            </div>
+            <p id="error-{{ vi_tri.id }}-{{ ca.id }}" class="text-[10px] text-red-500 mt-1 hidden font-bold italic">! Bạn phải chọn đúng nhân viên từ danh sách gợi ý</p>
+        </div>
+        
+        <div class="flex gap-3 pt-2">
+            <button type="button" class="btn flex-1 bg-slate-100 text-slate-500 border-none" onclick="document.getElementById('htmx-modal').close()">Hủy</button>
+            <button type="submit" 
+                    class="btn flex-[2] btn-primary shadow-lg border-none"
+                    onclick="return finalCheck('{{ vi_tri.id }}-{{ ca.id }}')">
+                <i class="fas fa-save mr-2"></i> Xác nhận
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+/**
+ * Hàm đồng bộ ID ngay khi người dùng thao tác
+ */
+function syncEmployeeId(inputEl, suffix) {
+    const datalist = document.getElementById('staff-list-' + suffix);
+    const hiddenInput = document.getElementById('hidden-nv-id-' + suffix);
+    const errorMsg = document.getElementById('error-' + suffix);
+    
+    const val = inputEl.value.trim();
+    const option = Array.from(datalist.options).find(opt => opt.value === val);
+    
+    if (option) {
+        hiddenInput.value = option.getAttribute('data-id');
+        inputEl.classList.remove('border-red-500');
+        errorMsg.classList.add('hidden');
+    } else {
+        hiddenInput.value = ""; // Quan trọng: Reset nếu không khớp
+    }
+}
+
+/**
+ * Kiểm tra cuối cùng trước khi gửi đi
+ */
+function finalCheck(suffix) {
+    const hiddenInput = document.getElementById('hidden-nv-id-' + suffix);
+    const inputEl = document.querySelector(`#form-phan-cong-${suffix} .employee-search-input`);
+    const errorMsg = document.getElementById('error-' + suffix);
+
+    if (!hiddenInput.value) {
+        inputEl.classList.add('border-red-500');
+        errorMsg.classList.remove('hidden');
+        inputEl.focus();
+        return false; // Chặn submit
+    }
+    
+    // Đóng modal sau khi HTMX bắt đầu gửi dữ liệu
+    setTimeout(() => {
+        const modal = document.getElementById('htmx-modal');
+        if(modal) modal.close();
+    }, 150);
+    
+    return true;
+}
+</script>

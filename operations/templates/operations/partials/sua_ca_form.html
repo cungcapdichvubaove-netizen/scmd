@@ -1,0 +1,71 @@
+<div class="p-1">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-orange-600 shadow-sm">
+            <i class="fas fa-user-edit text-xl"></i>
+        </div>
+        <div>
+            <h3 class="font-black text-xl text-slate-800 tracking-tight">Điều chỉnh Ca trực</h3>
+            <p class="text-[10px] text-slate-400 uppercase font-bold tracking-widest">Thay đổi nhân sự hoặc xóa ca</p>
+        </div>
+    </div>
+
+    <form hx-post="{% url 'operations:luu_ca' %}" 
+          hx-target="#cell-{{ phan_cong.vi_tri_chot.id }}-{{ phan_cong.ngay_truc|date:'Ymd' }}" 
+          onsubmit="document.getElementById('htmx-modal').close()"
+          class="space-y-5">
+        {% csrf_token %}
+        <input type="hidden" name="vi_tri_id" value="{{ phan_cong.vi_tri_chot.id }}">
+        <input type="hidden" name="ca_id" value="{{ phan_cong.ca_lam_viec.id }}">
+        <input type="hidden" name="ngay_truc" value="{{ phan_cong.ngay_truc|date:'Y-m-d' }}">
+        <input type="hidden" name="delete_old" value="{{ phan_cong.id }}">
+
+        <div class="form-control w-full">
+            <label class="label py-1">
+                <span class="label-text font-black text-slate-600 text-xs uppercase">Thay đổi Nhân viên</span>
+            </label>
+            
+            <div class="relative group">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-orange-500">
+                    <i class="fas fa-user-friends text-xs"></i>
+                </div>
+                
+                <input type="text" 
+                       name="nhan_vien_search"
+                       list="staff-datalist-edit"
+                       value="{{ phan_cong.nhan_vien.ho_ten }} ({{ phan_cong.nhan_vien.ma_nhan_vien }})"
+                       placeholder="Tìm nhân viên thay thế..." 
+                       class="input input-bordered w-full pl-10 h-12 bg-white focus:ring-4 focus:ring-orange-100 transition-all font-medium text-sm border-slate-200"
+                       required
+                       onchange="updateHiddenId(this, 'staff-datalist-edit', 'edit-nhan-vien-id')">
+                
+                <datalist id="staff-datalist-edit">
+                    {% for nv in nhan_vien_list %}
+                        <option data-id="{{ nv.id }}" value="{{ nv.ho_ten }} ({{ nv.ma_nhan_vien }})"></option>
+                    {% endfor %}
+                </datalist>
+
+                <input type="hidden" name="nhan_vien_id" id="edit-nhan-vien-id" value="{{ phan_cong.nhan_vien.id }}" required>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-2 pt-4">
+            <button type="submit" class="btn btn-primary w-full shadow-lg shadow-blue-200 border-none order-1">
+                <i class="fas fa-check-circle mr-2 text-lg"></i> Cập nhật thay đổi
+            </button>
+            
+            <div class="grid grid-cols-2 gap-2 order-2">
+                <button type="button" class="btn bg-white border-slate-200 text-slate-500 hover:bg-slate-50 border-none" 
+                        onclick="document.getElementById('htmx-modal').close()">
+                    Hủy bỏ
+                </button>
+                <button type="button" class="btn btn-ghost text-red-500 hover:bg-red-50" 
+                        hx-post="{% url 'operations:xoa_ca' phan_cong.id %}"
+                        hx-target="#cell-{{ phan_cong.vi_tri_chot.id }}-{{ phan_cong.ngay_truc|date:'Ymd' }}"
+                        hx-confirm="Bạn có chắc chắn muốn XÓA ca trực này khỏi lịch?"
+                        onclick="document.getElementById('htmx-modal').close()">
+                    <i class="fas fa-trash-alt mr-1 text-xs"></i> Xóa ca
+                </button>
+            </div>
+        </div>
+    </form>
+</div>

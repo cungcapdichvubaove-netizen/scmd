@@ -1,0 +1,238 @@
+{# file: users/templates/users/profile.html #}
+{% extends "base.html" %}
+{% load static %}
+{% load django_bootstrap5 humanize %}
+
+{% block title %}Hồ sơ nhân viên{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+    
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Hồ sơ của tôi</h1>
+            <p class="text-sm text-slate-500">Quản lý thông tin cá nhân, xem công & lương</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'users:export-ly-lich-options' nhan_vien.id %}" class="btn bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 shadow-sm">
+                <i class="fas fa-file-pdf text-red-500 mr-2"></i> Xuất Lý Lịch
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden sticky top-6">
+                <div class="h-32 bg-gradient-to-r from-slate-800 to-slate-900 relative">
+                    <div class="absolute inset-0 bg-white/5 bg-pattern"></div>
+                </div>
+                
+                <div class="px-6 pb-6 text-center -mt-12 relative">
+                    <div class="relative inline-block group">
+                        <div class="w-24 h-24 rounded-full border-4 border-white shadow-md overflow-hidden bg-slate-100">
+                            {% if nhan_vien.anh_the %}
+                                <img src="{{ nhan_vien.anh_the.url }}" alt="Avatar" class="w-full h-full object-cover">
+                            {% else %}
+                                <img src="{% static 'img/default_avatar.png' %}" alt="Default" class="w-full h-full object-cover">
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <h2 class="text-xl font-bold text-slate-800 mt-3">{{ nhan_vien.ho_ten }}</h2>
+                    <p class="text-sm text-blue-600 font-mono font-medium bg-blue-50 inline-block px-2 py-0.5 rounded border border-blue-100 mt-1">
+                        {{ nhan_vien.ma_nhan_vien }}
+                    </p>
+
+                    <div class="mt-4 border-t border-slate-100 pt-4 grid grid-cols-2 gap-4 text-left">
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold">Chức danh</p>
+                            <p class="text-sm font-medium text-slate-700">{{ nhan_vien.chuc_danh.ten_chuc_danh|default:"--" }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400 uppercase font-bold">Phòng ban</p>
+                            <p class="text-sm font-medium text-slate-700">{{ nhan_vien.phong_ban.ten_phong_ban|default:"--" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-6">
+                        <a href="{% url 'main:password_change' %}" class="btn w-full bg-slate-100 text-slate-600 hover:bg-slate-200 border-none font-medium">
+                            <i class="fas fa-key mr-2"></i> Đổi mật khẩu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2">
+            
+            <div class="bg-white rounded-t-xl border-b border-slate-200 px-4 pt-4">
+                <div class="flex space-x-6">
+                    <button onclick="switchTab('tab-info', this)" class="tab-btn pb-3 px-1 border-b-2 border-blue-600 text-blue-600 font-bold text-sm transition-colors">
+                        <i class="fas fa-user-edit mr-2"></i>Thông tin cá nhân
+                    </button>
+                    <button onclick="switchTab('tab-attendance', this)" class="tab-btn pb-3 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-medium text-sm transition-colors">
+                        <i class="fas fa-history mr-2"></i>Nhật ký chấm công
+                    </button>
+                    <button onclick="switchTab('tab-payroll', this)" class="tab-btn pb-3 px-1 border-b-2 border-transparent text-slate-500 hover:text-slate-700 font-medium text-sm transition-colors">
+                        <i class="fas fa-money-check-alt mr-2"></i>Lương & Công
+                    </button>
+                </div>
+            </div>
+
+            <div id="tab-info" class="tab-content bg-white rounded-b-xl shadow-sm border border-t-0 border-slate-200 p-6">
+                <form method="post" enctype="multipart/form-data" class="space-y-6">
+                    {% csrf_token %}
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% bootstrap_field form.email show_label=True placeholder="Nhập email..." %}
+                        {% bootstrap_field form.sdt_chinh show_label=True placeholder="Nhập số điện thoại..." %}
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% bootstrap_field form.ngay_sinh show_label=True %}
+                        {% bootstrap_field form.gioi_tinh show_label=True %}
+                        {% bootstrap_field form.so_cccd show_label=True %}
+                        {% bootstrap_field form.dia_chi_thuong_tru show_label=True %}
+                        <div class="md:col-span-2">
+                            {% bootstrap_field form.dia_chi_tam_tru show_label=True %}
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t border-slate-100 pt-4">
+                        {% bootstrap_field form.so_tai_khoan show_label=True %}
+                        {% bootstrap_field form.ngan_hang show_label=True %}
+                    </div>
+
+                    <div>
+                        <label class="form-label fw-bold">Ảnh đại diện</label>
+                        {% bootstrap_field form.anh_the show_label=False %}
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
+                        <button type="submit" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 shadow-md shadow-blue-200">
+                            <i class="fas fa-save mr-2"></i> Lưu thay đổi
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="tab-attendance" class="tab-content hidden bg-white rounded-b-xl shadow-sm border border-t-0 border-slate-200 overflow-hidden">
+                <div class="p-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 text-sm">30 ca trực gần nhất</h3>
+                    <span class="text-xs text-slate-500"><i class="fas fa-info-circle"></i> Dữ liệu realtime</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-slate-50 text-slate-500 font-bold text-xs uppercase">
+                            <tr>
+                                <th class="px-4 py-3">Ngày</th>
+                                <th class="px-4 py-3">Ca trực</th>
+                                <th class="px-4 py-3">Mục tiêu</th>
+                                <th class="px-4 py-3 text-center">Vào</th>
+                                <th class="px-4 py-3 text-center">Ra</th>
+                                <th class="px-4 py-3 text-center">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100">
+                            {% for log in attendance_logs %}
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-4 py-3 font-mono text-slate-700">{{ log.ngay_truc|date:"d/m/Y" }}</td>
+                                <td class="px-4 py-3">{{ log.ca_lam_viec.ten_ca }}</td>
+                                <td class="px-4 py-3 text-slate-600 truncate max-w-[150px]" title="{{ log.vi_tri_chot.muc_tieu.ten_muc_tieu }}">
+                                    {{ log.vi_tri_chot.muc_tieu.ten_muc_tieu }}
+                                </td>
+                                
+                                <td class="px-4 py-3 text-center">
+                                    {# FIX: Dùng cham_cong_safe #}
+                                    {% if log.cham_cong_safe and log.cham_cong_safe.thoi_gian_check_in %}
+                                        <span class="text-emerald-600 font-bold">{{ log.cham_cong_safe.thoi_gian_check_in|date:"H:i" }}</span>
+                                    {% else %}
+                                        <span class="text-slate-300">--:--</span>
+                                    {% endif %}
+                                </td>
+                                
+                                <td class="px-4 py-3 text-center">
+                                    {% if log.cham_cong_safe and log.cham_cong_safe.thoi_gian_check_out %}
+                                        <span class="text-slate-700 font-bold">{{ log.cham_cong_safe.thoi_gian_check_out|date:"H:i" }}</span>
+                                    {% else %}
+                                        <span class="text-slate-300">--:--</span>
+                                    {% endif %}
+                                </td>
+
+                                <td class="px-4 py-3 text-center">
+                                    {% if log.cham_cong_safe and log.cham_cong_safe.thoi_gian_check_in %}
+                                        {% if log.cham_cong_safe.vi_tri_hop_le %}
+                                            <span class="badge bg-green-100 text-green-700 border-none text-[10px]">OK</span>
+                                        {% else %}
+                                            <span class="badge bg-red-100 text-red-700 border-none text-[10px]" title="Check-in sai vị trí">Sai VT</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-gray-100 text-gray-400 border-none text-[10px]">Chưa chấm</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-slate-400 italic">Chưa có dữ liệu chấm công.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-payroll" class="tab-content hidden bg-white rounded-b-xl shadow-sm border border-t-0 border-slate-200">
+                <div class="p-4 bg-slate-50 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-700 text-sm">Phiếu lương các tháng (6 tháng gần nhất)</h3>
+                </div>
+                <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% for slip in salary_logs %}
+                    <div class="border border-slate-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <p class="text-xs text-slate-500 uppercase font-bold">Tháng {{ slip.bang_luong.thang }}/{{ slip.bang_luong.nam }}</p>
+                                <h4 class="text-lg font-bold text-blue-600">{{ slip.thuc_lanh|intcomma }} VNĐ</h4>
+                            </div>
+                            <span class="badge bg-green-50 text-green-700 border border-green-200">Đã chốt</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm border-t border-slate-100 pt-2 mt-2">
+                            <span class="text-slate-600">Ngày công: <b>{{ slip.tong_ngay_cong_thuc_te|default:"0" }}</b></span>
+                            <a href="#" class="text-blue-500 hover:underline text-xs" onclick="alert('Chức năng xem chi tiết đang phát triển')">Xem chi tiết <i class="fas fa-arrow-right ml-1"></i></a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-2 py-8 text-center">
+                        <div class="inline-block p-4 rounded-full bg-slate-50 mb-3">
+                            <i class="fas fa-file-invoice-dollar text-3xl text-slate-300"></i>
+                        </div>
+                        <p class="text-slate-500">Chưa có dữ liệu lương.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(tabId, btn) {
+        // 1. Ẩn tất cả tab content
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+        
+        // 2. Hiện tab được chọn
+        document.getElementById(tabId).classList.remove('hidden');
+        
+        // 3. Reset style nút bấm
+        document.querySelectorAll('.tab-btn').forEach(el => {
+            el.classList.remove('border-blue-600', 'text-blue-600');
+            el.classList.add('border-transparent', 'text-slate-500');
+        });
+        
+        // 4. Highlight nút được chọn
+        btn.classList.remove('border-transparent', 'text-slate-500');
+        btn.classList.add('border-blue-600', 'text-blue-600');
+    }
+</script>
+{% endblock %}

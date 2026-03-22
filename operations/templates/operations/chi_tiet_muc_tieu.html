@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ muc_tieu.ten_muc_tieu }}{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-6 md:p-8 flex flex-col md:flex-row justify-between items-start gap-6 bg-gradient-to-r from-white to-slate-50">
+            <div class="flex items-start gap-5">
+                <div class="w-16 h-16 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-3xl shadow-lg shadow-indigo-200">
+                    <i class="fas fa-building"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800">{{ muc_tieu.ten_muc_tieu }}</h1>
+                    <div class="flex flex-col gap-1 mt-2 text-slate-500 text-sm">
+                        <p><i class="fas fa-map-marker-alt w-5 text-center mr-1"></i> {{ muc_tieu.dia_chi }}</p>
+                        <p><i class="fas fa-briefcase w-5 text-center mr-1"></i> Khách hàng: <strong>{{ muc_tieu.hop_dong.co_hoi.khach_hang_tiem_nang.ten_cong_ty|default:"--" }}</strong></p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col items-end gap-3 w-full md:w-auto">
+                <div class="text-right">
+                    <p class="text-xs text-slate-400 uppercase font-bold mb-1">Chỉ huy trưởng</p>
+                    <div class="flex items-center gap-2 justify-end">
+                        {% if muc_tieu.quan_ly_muc_tieu.anh_the %}
+                            <img src="{{ muc_tieu.quan_ly_muc_tieu.anh_the.url }}" class="w-8 h-8 rounded-full object-cover border border-slate-200">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+                                {{ muc_tieu.quan_ly_muc_tieu.ho_ten|slice:":1"|default:"?" }}
+                            </div>
+                        {% endif %}
+                        <span class="font-bold text-slate-700">{{ muc_tieu.quan_ly_muc_tieu.ho_ten|default:"Chưa bổ nhiệm" }}</span>
+                    </div>
+                </div>
+                
+                <div class="flex gap-2 mt-2">
+                    <a href="{% url 'operations:xep_lich' %}?muc_tieu={{ muc_tieu.id }}" class="btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg shadow-md transition-all">
+                        <i class="fas fa-calendar-alt mr-2"></i> Lịch trực
+                    </a>
+                    <a href="/admin/operations/vitrichot/add/?muc_tieu={{ muc_tieu.id }}" class="btn btn-sm bg-white border border-slate-300 hover:bg-slate-50 text-slate-700">
+                        <i class="fas fa-map-pin mr-2"></i> Thêm Vị trí
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 space-y-6">
+            
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 text-sm uppercase flex items-center gap-2">
+                        <i class="fas fa-map-signs text-blue-500"></i> Cấu hình Vị trí
+                    </h3>
+                    <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ vi_tris.count }}</span>
+                </div>
+                <div class="divide-y divide-slate-50">
+                    {% for vt in vi_tris %}
+                    <div class="px-5 py-4 flex justify-between items-center hover:bg-slate-50 transition-colors">
+                        <div>
+                            <div class="font-bold text-slate-800">{{ vt.ten_vi_tri }}</div>
+                            <div class="text-xs text-slate-400">ID: #{{ vt.id }}</div>
+                        </div>
+                        <button class="btn btn-xs btn-ghost text-slate-400 hover:text-blue-600">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </div>
+                    {% empty %}
+                    <div class="p-6 text-center text-slate-400 italic">Chưa có vị trí nào được cấu hình.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-5 py-3 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 text-sm uppercase flex items-center gap-2">
+                        <i class="fas fa-users text-green-500"></i> Nhân viên Hôm nay
+                    </h3>
+                    <span class="bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">{{ nhan_viens.count }}</span>
+                </div>
+                <div class="divide-y divide-slate-50">
+                    {% for nv in nhan_viens %}
+                    <div class="px-5 py-3 flex items-center gap-4 hover:bg-slate-50 transition-colors">
+                        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center overflow-hidden border border-slate-200">
+                            {% if nv.anh_the %}
+                                <img src="{{ nv.anh_the.url }}" class="w-full h-full object-cover">
+                            {% else %}
+                                <span class="font-bold text-slate-500 text-sm">{{ nv.ho_ten|slice:":1" }}</span>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <div class="font-bold text-slate-800">{{ nv.ho_ten }}</div>
+                            <div class="text-xs text-slate-500">{{ nv.ma_nhan_vien }} • {{ nv.chuc_danh.ten_chuc_danh|default:"Nhân viên" }}</div>
+                        </div>
+                        <div class="ml-auto">
+                            <span class="px-2 py-1 rounded text-[10px] font-bold bg-green-50 text-green-600 border border-green-100">
+                                Đang trực
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-8 text-center text-slate-400">
+                        <i class="fas fa-user-clock text-3xl mb-2 opacity-30"></i>
+                        <p class="text-sm">Hôm nay chưa có lịch trực nào.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden h-full flex flex-col">
+                <div class="px-5 py-3 bg-red-50 border-b border-red-100 flex justify-between items-center">
+                    <h3 class="font-bold text-red-800 text-sm uppercase flex items-center gap-2">
+                        <i class="fas fa-exclamation-triangle"></i> Sự cố Gần đây
+                    </h3>
+                </div>
+                
+                <div class="flex-1 overflow-y-auto max-h-[500px] divide-y divide-slate-50">
+                    {% for sc in su_co_list %}
+                    <div class="p-4 hover:bg-red-50/30 transition-colors">
+                        <div class="flex justify-between items-start mb-1">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold border 
+                                {% if sc.muc_do == 'CAO' %}bg-red-100 text-red-600 border-red-200
+                                {% else %}bg-yellow-100 text-yellow-600 border-yellow-200{% endif %}">
+                                {{ sc.get_muc_do_display }}
+                            </span>
+                            <span class="text-[10px] text-slate-400">{{ sc.created_at|date:"d/m" }}</span>
+                        </div>
+                        <h4 class="text-sm font-bold text-slate-800 line-clamp-2">{{ sc.tieu_de }}</h4>
+                        <p class="text-xs text-slate-500 mt-1">Bởi: {{ sc.nhan_vien_bao_cao.ho_ten }}</p>
+                        
+                        <div class="mt-2 flex justify-between items-center">
+                            <span class="text-[10px] {% if sc.trang_thai == 'DA_XU_LY' %}text-green-600{% else %}text-orange-600{% endif %} font-bold">
+                                {{ sc.get_trang_thai_display }}
+                            </span>
+                            <a href="/admin/operations/baocaosuco/{{ sc.id }}/change/" class="text-blue-600 hover:underline text-xs">Xem &rarr;</a>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="p-8 text-center text-slate-400 flex flex-col items-center justify-center h-full">
+                        <i class="fas fa-shield-check text-4xl mb-3 text-green-200"></i>
+                        <p class="text-sm">Mục tiêu an toàn.<br>Không có sự cố gần đây.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

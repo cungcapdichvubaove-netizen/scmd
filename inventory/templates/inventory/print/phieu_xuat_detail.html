@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Phiếu Xuất Kho - {{ phieu.ma_phieu }}</title>
+    <style>
+        body { font-family: "Times New Roman", Times, serif; font-size: 13pt; line-height: 1.4; max-width: 210mm; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .company-info { font-size: 11pt; text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
+        .title { font-size: 18pt; font-weight: bold; text-transform: uppercase; margin: 15px 0 5px 0; }
+        .meta { font-style: italic; margin-bottom: 20px; }
+        
+        .info-section { margin-bottom: 20px; }
+        .info-row { display: flex; margin-bottom: 5px; }
+        .label { width: 150px; font-weight: bold; }
+        
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th, td { border: 1px solid #000; padding: 8px; text-align: center; }
+        th { background-color: #f0f0f0; }
+        .text-left { text-align: left; }
+        
+        .signatures { display: flex; justify-content: space-between; margin-top: 50px; text-align: center; }
+        .sig-block { width: 25%; }
+        .sig-title { font-weight: bold; text-transform: uppercase; font-size: 11pt; }
+        .sig-space { height: 80px; }
+        
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+            @page { margin: 2cm; }
+        }
+        
+        .btn-print {
+            position: fixed; top: 20px; right: 20px;
+            padding: 10px 20px; background: #2563eb; color: white;
+            border: none; border-radius: 5px; cursor: pointer; font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="window.print()" class="btn-print no-print">🖨️ In Phiếu</button>
+
+    <div class="header">
+        <div class="company-info">CÔNG TY CỔ PHẦN DỊCH VỤ BẢO VỆ SECURITY STARTUP</div>
+        <div style="font-size: 10pt;">Địa chỉ: Số 123, Đường ABC, Quận XYZ, TP. Hà Nội</div>
+        <hr style="width: 50%; margin: 10px auto; border-top: 1px solid #000;">
+        
+        <div class="title">PHIẾU XUẤT KHO</div>
+        <div class="meta">Số: {{ phieu.ma_phieu }}</div>
+        <div class="meta">Ngày {{ phieu.ngay_xuat|date:"d" }} tháng {{ phieu.ngay_xuat|date:"m" }} năm {{ phieu.ngay_xuat|date:"Y" }}</div>
+    </div>
+
+    <div class="info-section">
+        <div class="info-row">
+            <span class="label">Người/Nơi nhận:</span>
+            <span>
+                {% if phieu.loai_xuat == 'CA_NHAN' %}
+                    {{ phieu.nhan_vien_nhan.ho_ten }} (Mã NV: {{ phieu.nhan_vien_nhan.ma_nhan_vien }})
+                {% elif phieu.loai_xuat == 'MUC_TIEU' %}
+                    Mục tiêu: {{ phieu.muc_tieu_nhan.ten_muc_tieu }}
+                {% else %}
+                    Khác / Hủy
+                {% endif %}
+            </span>
+        </div>
+        <div class="info-row">
+            <span class="label">Lý do xuất:</span>
+            <span>{{ phieu.get_loai_xuat_display }} - {{ phieu.ghi_chu|default:"Xuất dùng cho công việc" }}</span>
+        </div>
+        <div class="info-row">
+            <span class="label">Kho xuất:</span>
+            <span>Kho Tổng Công ty</span>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 50px;">STT</th>
+                <th>Tên nhãn hiệu, quy cách, phẩm chất vật tư</th>
+                <th style="width: 80px;">ĐVT</th>
+                <th style="width: 80px;">Số lượng</th>
+                <th>Ghi chú</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in phieu.chi_tiet.all %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td class="text-left">
+                    <b>{{ item.vat_tu.ten_vat_tu }}</b><br>
+                    <span style="font-size: 10pt; font-style: italic;">Mã: {{ item.vat_tu.id }}</span>
+                </td>
+                <td>{{ item.vat_tu.don_vi_tinh }}</td>
+                <td><b>{{ item.so_luong }}</b></td>
+                <td></td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td></td>
+                <td class="text-left" style="height: 30px;"></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="margin-bottom: 20px;">
+        Số khoản: <b>{{ phieu.chi_tiet.count }}</b> loại hàng hóa.
+    </div>
+
+    <div class="signatures">
+        <div class="sig-block">
+            <div class="sig-title">Người lập phiếu</div>
+            <div class="meta">(Ký, họ tên)</div>
+            <div class="sig-space"></div>
+        </div>
+        <div class="sig-block">
+            <div class="sig-title">Người nhận hàng</div>
+            <div class="meta">(Ký, họ tên)</div>
+            <div class="sig-space"></div>
+        </div>
+        <div class="sig-block">
+            <div class="sig-title">Thủ kho</div>
+            <div class="meta">(Ký, họ tên)</div>
+            <div class="sig-space"></div>
+        </div>
+        <div class="sig-block">
+            <div class="sig-title">Giám đốc</div>
+            <div class="meta">(Ký, họ tên, đóng dấu)</div>
+            <div class="sig-space"></div>
+        </div>
+    </div>
+</body>
+</html>

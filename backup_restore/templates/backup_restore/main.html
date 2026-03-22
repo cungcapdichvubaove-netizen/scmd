@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<h1>Sao lưu & Phục hồi Dữ liệu</h1>
+
+<div style="margin-top: 2rem;">
+    <h2>Tạo Sao lưu Dữ liệu</h2>
+    <p>Nhấn nút dưới đây để tải về một file sao lưu (.json) chứa toàn bộ dữ liệu của hệ thống hiện tại.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" name="backup" class="button">Tạo và Tải về File Sao lưu</button>
+    </form>
+</div>
+
+<div style="margin-top: 4rem; border-top: 2px solid #dc3545; padding-top: 1rem;">
+    <h2 style="color: #dc3545;">Phục hồi Dữ liệu</h2>
+    <p style="font-weight: bold; color: #dc3545;">CẢNH BÁO: Hành động này sẽ XÓA SẠCH toàn bộ dữ liệu hiện tại và thay thế bằng dữ liệu từ file anh tải lên. Hành động này không thể hoàn tác.</p>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <p>
+            <label for="restore_file">Chọn file sao lưu (.json):</label>
+            <input type="file" name="restore_file" accept=".json" required>
+        </p>
+        <button type="submit" name="restore" class="button" style="background-color: #dc3545;" onclick="return confirm('Anh có chắc chắn muốn XÓA TOÀN BỘ DỮ LIỆU HIỆN TẠI và phục hồi lại không?');">Bắt đầu Phục hồi</button>
+    </form>
+</div>
+{% endblock %}

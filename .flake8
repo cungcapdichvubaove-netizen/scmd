@@ -1,0 +1,11 @@
+[flake8]
+# Bỏ qua các thư mục không cần kiểm tra
+exclude = .git,__pycache__,venv/,migrations/
+
+# Bỏ qua một số lỗi không quá quan trọng (ví dụ: dòng quá dài)
+# E501: line too long
+# W503: line break before binary operator
+ignore = E501, W503
+
+# Tăng độ dài tối đa của một dòng code từ 79 lên 88 (tiêu chuẩn của Black)
+max-line-length = 88

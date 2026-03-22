@@ -1,0 +1,74 @@
+{# file: inspection/templates/inspection/mobile/tuan_tra_list.html #}
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+{% load static %}
+
+{% block title %}Tuần tra & Thanh tra{% endblock %}
+
+{% block content %}
+<div class="space-y-4 fade-in">
+    <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-circle btn-ghost btn-sm"><i class="fas fa-arrow-left"></i></a>
+            <div>
+                <h1 class="text-lg font-bold text-slate-800">Nhiệm Vụ</h1>
+                <span class="text-xs text-slate-500">Tuần tra & Kiểm soát</span>
+            </div>
+        </div>
+        <div class="w-10 h-10 bg-slate-50 rounded-lg p-1 border border-slate-100 flex items-center justify-center">
+            <img src="{% static 'img/logo_moi.png' %}" class="w-full h-full object-contain">
+        </div>
+    </div>
+
+    {% if luot_dang_di %}
+    <div class="alert alert-warning shadow-md flex items-center gap-4">
+        <i class="fas fa-person-walking text-2xl"></i>
+        <div>
+            <h3 class="font-bold text-sm">Chưa hoàn thành!</h3>
+            <div class="text-xs">Tuyến: {{ luot_dang_di.loai_tuan_tra.ten_loai }}</div>
+        </div>
+        <a href="{% url 'inspection:thuc_hien_tuan_tra' luot_dang_di.id %}" class="btn btn-sm btn-ghost border-slate-800">Tiếp tục</a>
+    </div>
+    {% endif %}
+
+    <div class="space-y-2">
+        <h3 class="font-bold text-slate-500 text-xs uppercase pl-2">Tuyến tuần tra khả dụng</h3>
+        {% for lt in lo_trinhs %}
+        <div class="card bg-white shadow-sm border border-slate-100">
+            <div class="card-body p-4 flex-row items-center justify-between">
+                <div>
+                    <h2 class="card-title text-base font-bold text-slate-800">{{ lt.ten_loai }}</h2>
+                    <p class="text-xs text-slate-400">{{ lt.cac_diem.count }} điểm check • {{ lt.thoi_gian_quy_dinh }} phút</p>
+                </div>
+                {% if not luot_dang_di %}
+                <a href="{% url 'inspection:bat_dau_tuan_tra' lt.id %}" class="btn btn-primary btn-sm rounded-full gap-2 shadow-lg shadow-blue-200">
+                    <i class="fas fa-play"></i> Bắt đầu
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-8 opacity-50">
+            <p class="text-sm">Không có tuyến tuần tra nào được gán.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="divider text-xs font-bold text-slate-400 uppercase mt-8">Dành cho Thanh tra</div>
+    
+    <div class="grid grid-cols-2 gap-4">
+        <a href="{% url 'inspection:mobile_lap_bien_ban' %}" class="btn h-24 flex-col bg-white border border-red-100 shadow-sm hover:bg-red-50">
+            <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center mb-2 text-red-600">
+                <i class="fas fa-file-contract text-xl"></i>
+            </div>
+            <span class="text-xs font-bold text-slate-600">Lập Biên Bản</span>
+        </a>
+        
+        <button class="btn h-24 flex-col bg-white border border-purple-100 shadow-sm hover:bg-purple-50" onclick="alert('Chức năng chọn mục tiêu kiểm tra đang phát triển')">
+            <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2 text-purple-600">
+                <i class="fas fa-clipboard-check text-xl"></i>
+            </div>
+            <span class="text-xs font-bold text-slate-600">Kiểm tra Mục tiêu</span>
+        </button>
+    </div>
+</div>
+{% endblock %}

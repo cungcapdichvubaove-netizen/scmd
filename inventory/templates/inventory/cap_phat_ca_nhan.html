@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Cấp phát Vật tư cho Cá nhân{% endblock %}
+{% block page_title %}Cấp phát Vật tư cho Cá nhân{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Tạo phiếu cấp phát</h2>
+            {% if messages %}
+                {% for message in messages %}
+                <div role="alert" class="alert alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="card-actions justify-end">
+                    <button type="submit" class="btn btn-primary">Xác nhận Cấp phát</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+            <h2 class="card-title">Lịch sử Cấp phát Gần đây</h2>
+            <div class="overflow-x-auto">
+                <table class="table table-sm">
+                    <tbody>
+                        {% for item in lich_su_cap_phat %}
+                        <tr>
+                            <td>
+                                <div class="font-bold">{{ item.nguoi_nhan.ho_ten }}</div>
+                                <div class="text-xs opacity-70">Nhận {{ item.so_luong }} {{ item.vat_tu.don_vi_tinh }} {{ item.vat_tu.ten_vat_tu }}</div>
+                            </td>
+                            <td class="text-right">
+                                <span class="text-xs">{{ item.ngay_cap_phat|timesince }} trước</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td>Chưa có lịch sử.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

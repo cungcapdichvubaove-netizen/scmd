@@ -1,0 +1,74 @@
+{# file: operations/templates/operations/mobile/lich_su_cham_cong.html #}
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+{% load static humanize %}
+
+{% block title %}Bảng công tháng {{ thang }}{% endblock %}
+
+{% block content %}
+<div class="space-y-4 fade-in">
+    <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-circle btn-ghost btn-sm">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <div class="flex-1">
+            <h1 class="text-lg font-bold text-slate-800">Bảng Công Tháng {{ thang }}</h1>
+            <p class="text-xs text-slate-500">Tổng công thực tế: <span class="font-bold text-blue-600">{{ tong_cong }}</span> ca</p>
+        </div>
+        <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+            <i class="fas fa-calendar-check text-lg"></i>
+        </div>
+    </div>
+
+    <div class="space-y-3">
+        {% for item in lich_su %}
+        <div class="card bg-white shadow-sm border border-slate-100">
+            <div class="card-body p-4">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <div class="font-bold text-slate-700">{{ item.ngay_truc|date:"d/m/Y" }}</div>
+                        <div class="text-xs text-slate-400">{{ item.ngay_truc|date:"l" }}</div>
+                    </div>
+                    {% if item.chamcong.thoi_gian_check_out %}
+                        <span class="badge badge-success badge-sm text-white">Hoàn thành</span>
+                    {% elif item.chamcong.thoi_gian_check_in %}
+                        <span class="badge badge-warning badge-sm text-white animate-pulse">Đang làm</span>
+                    {% else %}
+                        <span class="badge badge-ghost badge-sm text-slate-400">Chưa trực</span>
+                    {% endif %}
+                </div>
+                
+                <div class="divider my-2"></div>
+                
+                <div class="grid grid-cols-2 gap-2 text-sm">
+                    <div class="flex flex-col">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">Vào ca</span>
+                        {% if item.chamcong.thoi_gian_check_in %}
+                            <span class="font-mono font-bold text-emerald-600">{{ item.chamcong.thoi_gian_check_in|date:"H:i" }}</span>
+                        {% else %}
+                            <span class="text-slate-300">--:--</span>
+                        {% endif %}
+                    </div>
+                    <div class="flex flex-col text-right">
+                        <span class="text-[10px] uppercase text-slate-400 font-bold">Ra ca</span>
+                        {% if item.chamcong.thoi_gian_check_out %}
+                            <span class="font-mono font-bold text-red-500">{{ item.chamcong.thoi_gian_check_out|date:"H:i" }}</span>
+                        {% else %}
+                            <span class="text-slate-300">--:--</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="mt-2 text-xs text-slate-500 bg-slate-50 p-2 rounded flex items-center gap-1">
+                    <i class="fas fa-map-marker-alt"></i> {{ item.vi_tri_chot.muc_tieu.ten_muc_tieu }}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="text-center py-10 opacity-50">
+            <i class="fas fa-history text-4xl mb-2"></i>
+            <p>Chưa có dữ liệu chấm công tháng này.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

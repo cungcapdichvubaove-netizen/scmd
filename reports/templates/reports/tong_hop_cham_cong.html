@@ -1,0 +1,167 @@
+{# file: reports/templates/reports/tong_hop_cham_cong.html #}
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}Bảng công Tổng hợp{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Tối ưu bảng Ma trận dữ liệu lớn */
+    .matrix-container {
+        max-width: 100%;
+        overflow-x: auto;
+        position: relative;
+        max-height: 75vh;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.5rem;
+        background: white;
+    }
+    
+    .table-matrix {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: max-content;
+    }
+
+    /* Sticky Header */
+    .table-matrix thead th {
+        position: sticky;
+        top: 0;
+        background: #f8fafc;
+        z-index: 20;
+        border-bottom: 2px solid #e2e8f0;
+        color: #64748b;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.75rem 0.5rem;
+        font-weight: 700;
+    }
+
+    /* Sticky Columns (Cố định Mã & Tên NV) */
+    .table-matrix td:nth-child(1), .table-matrix th:nth-child(1) {
+        position: sticky; left: 0; z-index: 15;
+        background: #fff; border-right: 1px solid #e2e8f0;
+    }
+    .table-matrix td:nth-child(2), .table-matrix th:nth-child(2) {
+        position: sticky; left: 80px; z-index: 15;
+        background: #fff; border-right: 2px solid #e2e8f0;
+    }
+    
+    /* Fix z-index cho góc trên cùng bên trái */
+    .table-matrix thead th:nth-child(1), .table-matrix thead th:nth-child(2) {
+        z-index: 30; background: #f8fafc;
+    }
+
+    /* Cell Styling */
+    .table-matrix td {
+        border-bottom: 1px solid #f1f5f9;
+        border-right: 1px solid #f1f5f9;
+        padding: 0.5rem;
+        font-size: 0.8rem;
+        text-align: center;
+        vertical-align: middle;
+    }
+
+    .cell-data { min-width: 40px; height: 32px; }
+    .bg-success-subtle { background-color: #dcfce7 !important; color: #166534 !important; font-weight: 600; }
+    .text-danger { color: #dc2626 !important; font-weight: 700; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-4">
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-end gap-4">
+        <div>
+            <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fas fa-table text-blue-600"></i> Bảng Công Tổng Hợp
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">Dữ liệu chấm công toàn hệ thống tháng {{ thang }}/{{ nam }}</p>
+        </div>
+        
+        <form method="get" class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+            <div class="relative flex-1 md:w-64">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" name="q" value="{{ search_query }}" placeholder="Tìm tên/mã nhân viên..." 
+                       class="input input-sm pl-9 border-slate-300 w-full rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <select name="muc_tieu_id" class="select select-sm border-slate-300 rounded-lg max-w-xs" onchange="this.form.submit()">
+                <option value="">-- Tất cả Mục tiêu --</option>
+                {% for mt in muc_tieu_list %}
+                    <option value="{{ mt.id }}" {% if selected_muc_tieu == mt.id %}selected{% endif %}>{{ mt.ten_muc_tieu }}</option>
+                {% endfor %}
+            </select>
+            
+            <div class="join">
+                <select name="thang" class="select select-sm border-slate-300 join-item">
+                    {% for m in thang_range %}
+                        <option value="{{ m }}" {% if m == thang %}selected{% endif %}>Tháng {{ m }}</option>
+                    {% endfor %}
+                </select>
+                <select name="nam" class="select select-sm border-slate-300 join-item">
+                    {% for y in nam_range %}
+                        <option value="{{ y }}" {% if y == nam %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none gap-2">
+                <i class="fas fa-filter"></i> Lọc
+            </button>
+            
+            <button type="submit" name="export" value="csv" class="btn btn-sm bg-emerald-600 hover:bg-emerald-700 text-white border-none gap-2">
+                <i class="fas fa-file-excel"></i> Xuất CSV
+            </button>
+        </form>
+    </div>
+
+    <div class="matrix-container custom-scrollbar">
+        <table class="table-matrix w-full">
+            <thead>
+                <tr>
+                    <th style="min-width: 80px;">Mã NV</th>
+                    <th style="min-width: 180px;">Họ và Tên</th>
+                    {% for d in matrix_data.0.days %}
+                        <th class="text-center" style="min-width: 40px;">{{ forloop.counter }}</th>
+                    {% endfor %}
+                    <th style="min-width: 80px;" class="bg-slate-100 text-slate-700 border-l border-slate-200">T.Giờ</th>
+                    <th style="min-width: 80px;" class="bg-slate-100 text-slate-700">Vi phạm</th>
+                </tr>
+            </thead>
+            <tbody class="text-slate-700">
+                {% for row in matrix_data %}
+                <tr class="hover:bg-slate-50 transition-colors group">
+                    <td class="font-mono font-bold text-blue-600 bg-white group-hover:bg-slate-50">
+                        {{ row.nhan_vien.ma_nhan_vien }}
+                    </td>
+                    <td class="font-medium bg-white group-hover:bg-slate-50">
+                        <div class="truncate w-40" title="{{ row.nhan_vien.ho_ten }}">{{ row.nhan_vien.ho_ten }}</div>
+                    </td>
+                    
+                    {% for cell in row.days %}
+                    <td class="{{ cell.class }}" title="{{ cell.title }}">
+                        {{ cell.val }}
+                    </td>
+                    {% endfor %}
+
+                    <td class="font-bold text-center bg-slate-50 border-l border-slate-200 text-slate-800">
+                        {{ row.tong_gio|floatformat:1 }}
+                    </td>
+                    <td class="text-center bg-slate-50 {% if row.tong_muon > 0 %}text-danger{% else %}text-slate-300{% endif %}">
+                        {{ row.tong_muon }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="40" class="text-center py-12 text-slate-400">
+                        <i class="fas fa-search text-4xl mb-3 opacity-20"></i>
+                        <p>Không tìm thấy dữ liệu phù hợp.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

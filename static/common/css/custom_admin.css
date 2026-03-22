@@ -1,0 +1,148 @@
+/* * SCMD System - Custom Admin Stylesheet
+ * -------------------------------------
+ * Copyright (c) 2026 SCMD Security Co., Ltd.
+ * Updated: 2026-03-22
+ * Description: Tối ưu hiển thị Sidebar SOC, Font Inter và phân cấp danh mục.
+ * FIX: Đồng bộ Font chữ cho toàn bộ Menu Cha và Menu Con, tối ưu hóa Render Tiếng Việt.
+ * Author: SCMD Optimization Engine
+ */
+
+/* 1. Import Font Inter chuẩn Google */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* 2. Global Reset - Áp dụng Font cho toàn bộ UI SCMD */
+html, body, h1, h2, h3, h4, h5, h6, 
+.nav-link, .nav-link p, .nav-header,
+.brand-text, .brand-link,
+input, select, textarea, .table, 
+.btn, .info-box-text, .info-box-number,
+.main-sidebar, .sidebar, .os-content,
+.content-header h1, .breadcrumb-item,
+.card-title, .modal-title {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+}
+
+/* 3. Tinh chỉnh Sidebar SOC */
+.nav-sidebar .nav-link p {
+    white-space: nowrap !important;
+    overflow: hidden !important; /* Fixed: Removed incorrect character */
+    text-overflow: ellipsis;
+    transition: all 0.3s ease;
+    margin-bottom: 0; 
+    max-width: 190px;
+    font-family: 'Inter', sans-serif !important; 
+}
+
+.nav-sidebar .nav-link {
+    font-weight: 400;
+    font-size: 0.88rem !important; 
+    letter-spacing: 0.01em;
+    padding: 0.5rem 0.8rem !important;
+    display: flex;
+    align-items: center;
+}
+
+/* Phân cấp Menu Cha */
+.nav-flat .nav-item > .nav-link > p,
+.nav-sidebar .nav-item > .nav-link > p {
+    font-weight: 500 !important;
+}
+
+/* Tinh chỉnh Icon Sidebar */
+.nav-sidebar .nav-link i {
+    margin-right: 12px !important;
+    width: 20px;
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+/* Phân cách Nhóm Danh Mục */
+.nav-sidebar > .nav-item.has-treeview {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 2px;
+}
+
+.nav-sidebar > .nav-item.has-treeview > .nav-link {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    color: #e0e0e0 !important;
+}
+
+/* Trạng thái Active - SCMD Identity Color */
+.nav-sidebar .nav-item.menu-open > .nav-link, 
+.nav-sidebar .nav-link.active {
+    background-color: #007bff !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+}
+
+/* 4. Tối ưu hóa Data Tables (Mật độ thông tin cao) */
+.table th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem; 
+    letter-spacing: 0.05em;
+    background-color: #f4f6f9;
+    color: #495057;
+    vertical-align: middle !important;
+    border-top: none !important;
+    border-bottom: 2px solid #dee2e6 !important;
+    padding: 12px 8px !important;
+}
+
+.table td {
+    font-size: 0.9rem;
+    vertical-align: middle !important;
+    padding: 10px 8px !important;
+    color: #333;
+}
+
+/* 5. Render Tiếng Việt chuyên nghiệp */
+* {
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 6. Sidebar Layout Config */
+.main-sidebar, .main-sidebar::before {
+    width: 270px !important; 
+    transition: width 0.3s ease-in-out;
+}
+
+.content-wrapper, .main-footer, .main-header {
+    margin-left: 270px !important;
+    transition: margin-left 0.3s ease-in-out;
+}
+
+.sidebar-collapse .main-sidebar, 
+.sidebar-collapse .main-sidebar::before {
+    width: 4.6rem !important;
+}
+
+.sidebar-collapse .content-wrapper, 
+.sidebar-collapse .main-footer, 
+.sidebar-collapse .main-header {
+    margin-left: 4.6rem !important;
+}
+
+@media (max-width: 991.98px) {
+    .main-sidebar, .main-sidebar::before {
+        width: 250px !important;
+    }
+    .content-wrapper, .main-footer, .main-header {
+        margin-left: 0 !important;
+    }
+}
+
+/* Modern Scrollbar */
+.sidebar::-webkit-scrollbar {
+    width: 5px;
+}
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+.sidebar:hover::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+}

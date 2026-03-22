@@ -1,0 +1,109 @@
+{# file: reports/templates/reports/bao_cao_su_co.html #}
+{% extends "base.html" %}
+{% block title %}Báo cáo Sự cố{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+            <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fas fa-shield-alt text-red-600"></i> Nhật ký Sự cố An ninh
+            </h1>
+            <p class="text-xs text-slate-500 mt-1">Theo dõi và xử lý các vấn đề phát sinh tại mục tiêu.</p>
+        </div>
+        
+        <form method="get" class="flex flex-wrap gap-2 items-center">
+            <div class="join">
+                <select name="thang" class="select select-sm border-slate-300 join-item focus:border-blue-500">
+                    {% for m in thang_range %}
+                        <option value="{{ m }}" {% if m == thang %}selected{% endif %}>Tháng {{ m }}</option>
+                    {% endfor %}
+                </select>
+                <select name="nam" class="select select-sm border-slate-300 join-item focus:border-blue-500">
+                    {% for y in nam_range %}
+                        <option value="{{ y }}" {% if y == nam %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-sm bg-blue-600 hover:bg-blue-700 text-white border-none px-4">
+                <i class="fas fa-filter mr-1"></i> Xem
+            </button>
+            <button type="submit" name="export" value="csv" class="btn btn-sm btn-outline border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-800">
+                <i class="fas fa-download"></i> Xuất
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table w-full">
+                <thead class="bg-slate-50 text-slate-500 text-xs uppercase font-bold tracking-wider">
+                    <tr>
+                        <th class="py-4 pl-6 w-32">Thời gian</th>
+                        <th>Sự cố</th>
+                        <th>Mục tiêu / Vị trí</th>
+                        <th class="text-center">Mức độ</th>
+                        <th class="text-center">Trạng thái</th>
+                        <th class="text-right pr-6">Tác vụ</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-slate-100">
+                    {% for sc in data %}
+                    <tr class="hover:bg-slate-50 transition-colors group">
+                        <td class="pl-6 py-4">
+                            <div class="font-bold text-slate-700">{{ sc.created_at|date:"d/m/Y" }}</div>
+                            <div class="text-xs text-slate-400 font-mono">{{ sc.created_at|date:"H:i" }}</div>
+                        </td>
+                        <td class="py-4">
+                            <div class="font-bold text-slate-800 text-base">{{ sc.tieu_de }}</div>
+                            <div class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                                <i class="fas fa-user-edit text-slate-300"></i> Người báo: {{ sc.nhan_vien_bao_cao.ho_ten|default:"N/A" }}
+                            </div>
+                        </td>
+                        <td class="py-4">
+                            <div class="badge badge-ghost badge-sm gap-1 text-slate-600">
+                                <i class="fas fa-map-pin text-xs"></i> {{ sc.muc_tieu.ten_muc_tieu }}
+                            </div>
+                        </td>
+                        <td class="text-center py-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold border
+                                {% if sc.muc_do == 'NGUY_HIEM' %}bg-red-50 text-red-600 border-red-100
+                                {% elif sc.muc_do == 'CAO' %}bg-orange-50 text-orange-600 border-orange-100
+                                {% elif sc.muc_do == 'TB' %}bg-yellow-50 text-yellow-600 border-yellow-100
+                                {% else %}bg-blue-50 text-blue-600 border-blue-100{% endif %}">
+                                {{ sc.get_muc_do_display }}
+                            </span>
+                        </td>
+                        <td class="text-center py-4">
+                            <span class="badge badge-sm font-medium
+                                {% if sc.trang_thai == 'HOAN_TAT' or sc.trang_thai == 'DA_XU_LY' %}badge-success text-white
+                                {% elif sc.trang_thai == 'HUY' %}badge-ghost
+                                {% else %}badge-warning text-white animate-pulse{% endif %}">
+                                {{ sc.get_trang_thai_display }}
+                            </span>
+                        </td>
+                        <td class="text-right pr-6 py-4">
+                            <a href="/admin/operations/baocaosuco/{{ sc.id }}/change/" target="_blank" class="btn btn-xs btn-ghost text-blue-600 hover:bg-blue-50">
+                                Chi tiết <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="py-12 text-center text-slate-400">
+                            <div class="flex flex-col items-center justify-center">
+                                <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-3">
+                                    <i class="fas fa-check-circle text-3xl text-emerald-400"></i>
+                                </div>
+                                <p class="font-medium">Không có sự cố nào trong tháng này.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,129 @@
+{# file: reports/templates/reports/cham_cong_ca_nhan.html #}
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}Báo cáo Cá nhân{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800">Chi tiết Chấm công Cá nhân</h1>
+                <p class="text-sm text-slate-500">Kiểm tra giờ công, đi muộn và về sớm.</p>
+            </div>
+        </div>
+
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end bg-slate-50 p-4 rounded-lg border border-slate-100">
+            {% if user.is_superuser or user.is_staff %}
+            <div class="form-control md:col-span-2">
+                <label class="label text-xs font-bold text-slate-500 uppercase">Nhân viên</label>
+                <select name="nhan_vien_id" class="select select-sm select-bordered w-full bg-white" onchange="this.form.submit()">
+                    {% for nv in nhan_vien_list %}
+                    <option value="{{ nv.id }}" {% if selected_nhan_vien.id == nv.id %}selected{% endif %}>
+                        {{ nv.ma_nhan_vien }} - {{ nv.ho_ten }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+
+            <div class="form-control">
+                <label class="label text-xs font-bold text-slate-500 uppercase">Tháng</label>
+                <select name="thang" class="select select-sm select-bordered w-full bg-white" onchange="this.form.submit()">
+                    {% for t in thang_range %}
+                    <option value="{{ t }}" {% if t == selected_thang %}selected{% endif %}>Tháng {{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-control">
+                <label class="label text-xs font-bold text-slate-500 uppercase">Năm</label>
+                <select name="nam" class="select select-sm select-bordered w-full bg-white" onchange="this.form.submit()">
+                    {% for n in nam_range %}
+                    <option value="{{ n }}" {% if n == selected_nam %}selected{% endif %}>{{ n }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+
+    {% if selected_nhan_vien %}
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <h3 class="font-bold text-slate-700">Kết quả: <span class="text-blue-600">{{ selected_nhan_vien.ho_ten }}</span></h3>
+            <div class="text-xs text-slate-400 font-mono">ID: {{ selected_nhan_vien.ma_nhan_vien }}</div>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="table w-full">
+                <thead class="bg-white text-slate-500 text-xs uppercase">
+                    <tr>
+                        <th class="pl-6 w-32">Ngày</th>
+                        <th>Ca / Mục tiêu</th>
+                        <th class="text-center">Giờ vào</th>
+                        <th class="text-center">Giờ ra</th>
+                        <th class="text-center text-red-500">Đi muộn</th>
+                        <th class="text-center text-orange-500">Về sớm</th>
+                        <th class="text-right pr-6 font-bold text-slate-800">Tổng giờ</th>
+                    </tr>
+                </thead>
+                <tbody class="text-sm divide-y divide-slate-50">
+                    {% for item in report_data %}
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="pl-6 py-3">
+                            <div class="font-bold text-slate-700">{{ item.ngay|date:"d/m/Y" }}</div>
+                            <div class="text-xs text-slate-400">{{ item.thu }}</div>
+                        </td>
+                        <td>
+                            <div class="font-medium text-slate-800">{{ item.ca }}</div>
+                            <div class="text-xs text-slate-500"><i class="fas fa-map-marker-alt mr-1"></i> {{ item.muc_tieu }}</div>
+                        </td>
+                        <td class="text-center font-mono text-slate-600">
+                            {% if item.vao %}{{ item.vao|date:"H:i" }}{% else %}-{% endif %}
+                        </td>
+                        <td class="text-center font-mono text-slate-600">
+                            {% if item.ra %}{{ item.ra|date:"H:i" }}{% else %}-{% endif %}
+                        </td>
+                        
+                        <td class="text-center">
+                            {% if item.di_muon > 0 %}
+                                <span class="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs font-bold">{{ item.di_muon }}p</span>
+                            {% else %}
+                                <span class="text-slate-300 text-xs">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-center">
+                            {% if item.ve_som > 0 %}
+                                <span class="px-2 py-0.5 bg-orange-100 text-orange-700 rounded text-xs font-bold">{{ item.ve_som }}p</span>
+                            {% else %}
+                                <span class="text-slate-300 text-xs">-</span>
+                            {% endif %}
+                        </td>
+
+                        <td class="text-right pr-6 font-bold font-mono text-blue-600 text-base">
+                            {{ item.gio_lam }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-slate-400">
+                            <i class="fas fa-coffee text-3xl mb-2 opacity-50"></i>
+                            <p>Chưa có dữ liệu chấm công.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-info shadow-sm">
+        <i class="fas fa-info-circle"></i>
+        <span>Vui lòng chọn nhân viên để xem báo cáo.</span>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

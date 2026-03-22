@@ -1,0 +1,130 @@
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+{% load static humanize %}
+
+{% block title %}Phiếu lương T{{ salary.bang_luong.thang }}/{{ salary.bang_luong.nam }}{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-white px-4 py-5 text-slate-900 font-sans">
+  <!-- header (minimal: back + title + print) -->
+  <div class="flex items-center justify-between mb-3" role="banner">
+    <a href="{% url 'users:mobile_profile' %}" aria-label="Quay lại" class="p-2">
+      <i class="fas fa-arrow-left" aria-hidden="true"></i>
+    </a>
+
+    <div class="text-center flex-1">
+      <div class="text-[12px] font-semibold">PHIẾU LƯƠNG ĐIỆN TỬ</div>
+      <div class="text-[11px] text-slate-500">Tháng {{ salary.bang_luong.thang }}/{{ salary.bang_luong.nam }}</div>
+    </div>
+
+    <button onclick="window.print()" aria-label="In/Download" class="p-2 print:hidden">
+      <i class="fas fa-download" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- single flat flow: avatar + all info inline (no cards) -->
+  <div class="flex items-center gap-3 mb-3">
+    <div class="w-12 h-12 rounded-full overflow-hidden bg-slate-100 flex-shrink-0">
+      {% if salary.nhan_vien.anh_the %}
+        <img src="{{ salary.nhan_vien.anh_the.url }}" alt="Ảnh {{ salary.nhan_vien.ho_ten }}" loading="lazy" class="w-full h-full object-cover">
+      {% else %}
+        <img src="{% static 'img/default_avatar.png' %}" alt="Avatar" loading="lazy" class="w-full h-full object-cover">
+      {% endif %}
+    </div>
+
+    <div class="min-w-0">
+      <div class="text-base font-bold truncate">{{ salary.nhan_vien.ho_ten }}</div>
+      <div class="text-[12px] text-slate-500 truncate">{{ salary.nhan_vien.chuc_danh.ten_chuc_danh }} • ID: {{ salary.nhan_vien.ma_nhan_vien }}</div>
+    </div>
+  </div>
+
+  <!-- flat list: label — value on single flowing column -->
+  <div class="text-sm leading-7">
+    <div class="flex justify-between">
+      <div class="text-[12px] text-slate-500">Kỳ lương</div>
+      <div class="font-medium">Tháng {{ salary.bang_luong.thang }}/{{ salary.bang_luong.nam }}</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px] text-slate-500">Thực lĩnh</div>
+      <div class="font-bold text-lg">{{ salary.thuc_lanh|default:"0"|intcomma }} đ</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px] text-slate-500">Trạng thái</div>
+      <div class="text-[12px] {% if salary.thuc_lanh > 0 %}text-emerald-700{% else %}text-slate-500{% endif %}">
+        {% if salary.thuc_lanh > 0 %}Đã thanh toán{% else %}Chưa chốt số liệu{% endif %}
+      </div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px] text-slate-500">Tổng thu nhập</div>
+      <div class="font-medium">+ {{ salary.tong_thu_nhap|default:"0"|intcomma }}</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px] text-slate-500">Tổng khấu trừ</div>
+      <div class="font-medium">- {{ salary.tong_khau_tru|default:"0"|intcomma }}</div>
+    </div>
+
+    <!-- show detailed items as simple inline rows (still flat) -->
+    <div class="mt-2 text-[12px] text-slate-500">Chi tiết (hiện lần lượt):</div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px]">Lương cơ bản</div>
+      <div class="font-medium">{{ salary.luong_co_ban|default:"0"|intcomma }}</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px]">Lương ngày công ({{ salary.tong_ngay_cong_thuc_te|default:"0" }})</div>
+      <div class="font-medium">{{ salary.luong_ngay_cong|default:"0"|intcomma }}</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px]">Phụ cấp</div>
+      <div class="font-medium">{{ salary.tong_phu_cap|default:"0"|intcomma }}</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px]">Thưởng & Khác</div>
+      <div class="font-medium">{{ salary.tong_thu_nhap_khac|default:"0"|intcomma }}</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px]">Bảo hiểm</div>
+      <div class="font-medium">{{ salary.khau_tru_bao_hiem|default:"0"|intcomma }}</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px]">Tạm ứng</div>
+      <div class="font-medium">{{ salary.tam_ung|default:"0"|intcomma }}</div>
+    </div>
+
+    <div class="flex justify-between">
+      <div class="text-[12px]">Phạt & Khác</div>
+      <div class="font-medium">{{ salary.cac_khoan_tru_khac|default:"0"|intcomma }}</div>
+    </div>
+
+    <!-- final summary line, still flat -->
+    <div class="mt-3 flex justify-between items-center">
+      <div class="text-[13px] font-semibold">Tổng kết</div>
+      <div class="text-[13px] font-semibold">{{ salary.thuc_lanh|intcomma }} đ</div>
+    </div>
+  </div>
+
+  <!-- footer note (tiny) -->
+  <p class="text-[11px] text-slate-400 mt-4">
+    Phiếu lương được tạo tự động bởi hệ thống SCMD.<br>
+            Mọi thắc mắc vui lòng liên hệ phòng Kế toán.
+  </p>
+</main>
+
+<!-- print styles: hide interactive UI -->
+<style>
+  @media print {
+    .print\\:hidden { display: none !important; }
+    /* remove icons if needed */
+    a[aria-label="Quay lại"], button[aria-label="In/Download"] { display: none !important; }
+    body { background: white; }
+  }
+</style>
+{% endblock %}

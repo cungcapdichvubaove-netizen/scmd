@@ -1,0 +1,58 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bảo vệ{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    {% tailwind_css %}
+</head>
+<body class="bg-base-100">
+    <div class="container mx-auto max-w-lg min-h-screen flex flex-col pb-16">
+        <main class="flex-grow p-4">
+            {% block content %}
+            {% endblock %}
+        </main>
+        
+        <div class="btm-nav">
+            <a href="{% url 'operations:mobile_dashboard' %}" class="{% if request.resolver_match.url_name == 'mobile_dashboard' %}active text-primary{% endif %}">
+                <i class="fas fa-home text-xl"></i>
+                <span class="btm-nav-label">Trang chủ</span>
+            </a>
+            
+            <a href="{% url 'operations:mobile_lich_truc' %}" class="{% if request.resolver_match.url_name == 'mobile_lich_truc' %}active text-primary{% endif %}">
+                <i class="fas fa-calendar-alt text-xl"></i>
+                <span class="btm-nav-label">Ca trực</span>
+            </a>
+
+            <a href="{% url 'operations:bao_cao_su_co' %}" class="{% if request.resolver_match.url_name == 'bao_cao_su_co' %}active text-primary{% endif %}">
+                <i class="fas fa-flag text-xl"></i>
+                <span class="btm-nav-label">Báo cáo</span>
+            </a>
+
+            <label for="logout-modal" class="cursor-pointer">
+                <i class="fas fa-sign-out-alt text-xl"></i>
+                <span class="btm-nav-label">Đăng xuất</span>
+            </label>
+        </div>
+    </div>
+
+    <input type="checkbox" id="logout-modal" class="modal-toggle" />
+    <div class="modal modal-bottom sm:modal-middle" role="dialog">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Xác nhận Đăng xuất</h3>
+        <p class="py-4">Bạn có chắc chắn muốn đăng xuất khỏi hệ thống?</p>
+        <div class="modal-action">
+          <form action="{% url 'main:logout' %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-error">Đăng xuất</button>
+          </form>
+          <label for="logout-modal" class="btn">Hủy</label>
+        </div>
+      </div>
+    </div>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

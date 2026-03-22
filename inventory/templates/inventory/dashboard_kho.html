@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Quản lý Kho & Vật tư{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto space-y-6">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Tổng quan Tài sản</h1>
+            <p class="text-slate-500 text-sm mt-1">Quản lý nhập xuất và in phiếu kho.</p>
+        </div>
+        <div class="flex gap-3">
+            <a href="/admin/inventory/phieunhap/add/" class="btn bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 font-medium">
+                <i class="fas fa-download"></i> Nhập kho
+            </a>
+            <a href="/admin/inventory/phieuxuat/add/" class="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2 font-bold">
+                <i class="fas fa-upload"></i> Xuất kho
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <p class="text-xs font-bold text-slate-400 uppercase">Tổng giá trị kho</p>
+            <h3 class="text-2xl font-black text-slate-800 mt-2">{{ tong_gia_tri|intcomma }} VNĐ</h3>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <p class="text-xs font-bold text-slate-400 uppercase">Cần nhập hàng</p>
+            <h3 class="text-2xl font-black text-red-600 mt-2">{{ sap_het_hang.count }} món</h3>
+        </div>
+        <div class="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
+            <p class="text-xs font-bold text-slate-400 uppercase">Phiếu xuất tháng này</p>
+            <h3 class="text-2xl font-black text-blue-600 mt-2">{{ phieu_xuat_trong_thang }} phiếu</h3>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div class="xl:col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+                <h3 class="font-bold text-slate-700"><i class="fas fa-bell text-red-500 mr-2"></i>Cảnh báo Tồn kho</h3>
+            </div>
+            <div class="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
+                {% for item in sap_het_hang %}
+                <div class="p-4 flex justify-between items-center hover:bg-red-50 transition-colors">
+                    <div>
+                        <div class="font-bold text-slate-800 text-sm">{{ item.ten_vat_tu }}</div>
+                        <div class="text-xs text-slate-500">Định mức: {{ item.muc_canh_bao }}</div>
+                    </div>
+                    <span class="px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-600">Còn: {{ item.so_luong_ton }}</span>
+                </div>
+                {% empty %}
+                <div class="p-8 text-center text-slate-400 text-sm">Kho ổn định.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="xl:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-white">
+                <h3 class="font-bold text-slate-800 text-lg">Lịch sử Xuất kho</h3>
+                <a href="/admin/inventory/phieuxuat/" class="text-sm text-blue-600 hover:underline">Xem tất cả</a>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-slate-50 text-slate-500 uppercase text-xs font-bold">
+                        <tr>
+                            <th class="px-6 py-3">Mã phiếu</th>
+                            <th class="px-6 py-3">Ngày xuất</th>
+                            <th class="px-6 py-3">Nơi nhận</th>
+                            <th class="px-6 py-3 text-right">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for px in lich_su_xuat %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-4 font-bold text-slate-700">{{ px.ma_phieu }}</td>
+                            <td class="px-6 py-4">{{ px.ngay_xuat|date:"d/m/Y H:i" }}</td>
+                            <td class="px-6 py-4">
+                                {% if px.loai_xuat == 'CA_NHAN' %}
+                                    <span class="text-purple-600 font-medium"><i class="fas fa-user mr-1"></i> {{ px.nhan_vien_nhan.ho_ten }}</span>
+                                {% elif px.loai_xuat == 'MUC_TIEU' %}
+                                    <span class="text-blue-600 font-medium"><i class="fas fa-building mr-1"></i> {{ px.muc_tieu_nhan.ten_muc_tieu }}</span>
+                                {% else %}
+                                    <span class="text-slate-400">Hủy/Khác</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-right whitespace-nowrap">
+                                <a href="{% url 'inventory:phieu_xuat_detail' px.id %}" target="_blank" class="inline-flex items-center justify-center px-3 py-1.5 bg-slate-100 text-slate-600 rounded-md hover:bg-blue-600 hover:text-white transition-all mr-2 shadow-sm" title="In phiếu">
+                                    <i class="fas fa-print mr-1"></i> In
+                                </a>
+                                
+                                <a href="/admin/inventory/phieuxuat/{{ px.id }}/change/" class="text-slate-400 hover:text-blue-600 p-2" title="Chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-6 py-12 text-center text-slate-400">
+                                Chưa có phiếu xuất nào. Hãy tạo phiếu mới!
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

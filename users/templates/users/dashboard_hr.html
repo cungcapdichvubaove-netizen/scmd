@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Quản trị Nhân sự{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fas fa-id-card-alt text-blue-600"></i> QUẢN TRỊ NHÂN SỰ
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">Quản lý hồ sơ, hợp đồng và cơ cấu tổ chức.</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="/admin/users/phongban/" class="btn bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 transition-colors">
+                <i class="fas fa-sitemap"></i> Phòng ban
+            </a>
+            <a href="/admin/users/nhanvien/add/" class="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2 transition-colors">
+                <i class="fas fa-user-plus"></i> Thêm Nhân viên
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 group hover:border-blue-300 transition-all">
+            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Tổng nhân sự</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ total_staff }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 group hover:border-green-300 transition-all">
+            <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                <i class="fas fa-user-plus"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Tuyển mới (Tháng)</p>
+                <h3 class="text-2xl font-black text-slate-800">+{{ new_staff }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 group hover:border-yellow-300 transition-all">
+            <div class="w-12 h-12 rounded-full bg-yellow-100 text-yellow-600 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                <i class="fas fa-user-clock"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Đang thử việc</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ probation_staff }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 border-l-4 {% if expiring_certs %}border-l-red-500{% else %}border-l-green-500{% endif %}">
+            <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl">
+                <i class="fas fa-certificate"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Chứng chỉ sắp hết hạn</p>
+                <h3 class="text-2xl font-black {% if expiring_certs %}text-red-600{% else %}text-slate-800{% endif %}">
+                    {{ expiring_certs.count }}
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+            <h3 class="font-bold text-slate-700 mb-6 text-sm uppercase flex items-center gap-2">
+                <i class="fas fa-chart-pie text-blue-500"></i> Cơ cấu Phòng ban
+            </h3>
+            <div class="relative h-64 w-full flex-1 flex items-center justify-center">
+                <canvas id="deptChart"></canvas>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h3 class="font-bold text-slate-700 text-sm uppercase">
+                    <i class="fas fa-list mr-2 text-indigo-500"></i> Nhân sự mới gia nhập
+                </h3>
+                <a href="/admin/users/nhanvien/" class="text-xs font-medium text-blue-600 hover:underline">Xem danh sách đầy đủ &rarr;</a>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-white text-slate-500 font-semibold border-b border-slate-100 uppercase text-xs">
+                        <tr>
+                            <th class="px-5 py-3">Nhân viên</th>
+                            <th class="px-5 py-3">Chức danh / Phòng ban</th>
+                            <th class="px-5 py-3">Ngày vào</th>
+                            <th class="px-5 py-3 text-center">Trạng thái</th>
+                            <th class="px-5 py-3 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for nv in recent_staff %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-5 py-3">
+                                <div class="flex items-center gap-3">
+                                    {% if nv.anh_the %}
+                                        <img src="{{ nv.anh_the.url }}" class="w-8 h-8 rounded-full object-cover border border-slate-200">
+                                    {% else %}
+                                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs text-slate-600">
+                                            {{ nv.ho_ten|slice:":1" }}
+                                        </div>
+                                    {% endif %}
+                                    <div>
+                                        <div class="font-bold text-slate-800">{{ nv.ho_ten }}</div>
+                                        <div class="text-xs text-slate-500">{{ nv.ma_nhan_vien }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-5 py-3">
+                                <div class="font-medium text-slate-700">{{ nv.chuc_danh.ten_chuc_danh|default:"-" }}</div>
+                                <div class="text-xs text-slate-500">{{ nv.phong_ban.ten_phong_ban|default:"Chưa phân phòng" }}</div>
+                            </td>
+                            <td class="px-5 py-3 text-slate-600 font-mono text-xs">{{ nv.ngay_vao_lam|date:"d/m/Y" }}</td>
+                            <td class="px-5 py-3 text-center">
+                                {% if nv.trang_thai_lam_viec == 'CHINHTHUC' %}
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold bg-green-100 text-green-700 border border-green-200">Chính thức</span>
+                                {% elif nv.trang_thai_lam_viec == 'THUVIEC' %}
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold bg-yellow-100 text-yellow-700 border border-yellow-200">Thử việc</span>
+                                {% else %}
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">{{ nv.get_trang_thai_lam_viec_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-3 text-right">
+                                <a href="{% url 'users:export-ly-lich-options' nv.id %}" class="text-blue-600 hover:text-blue-800" title="Xuất lý lịch">
+                                    <i class="fas fa-file-pdf"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="p-8 text-center text-slate-400">Chưa có nhân sự mới trong tháng này.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3 bg-red-50 border-b border-red-100 flex justify-between items-center">
+                <h3 class="font-bold text-red-700 text-sm uppercase"><i class="fas fa-exclamation-circle mr-2"></i>Chứng chỉ sắp hết hạn</h3>
+                <span class="bg-white text-red-600 text-xs font-bold px-2 py-0.5 rounded border border-red-200">{{ expiring_certs.count }}</span>
+            </div>
+            <div class="p-0 max-h-[250px] overflow-y-auto divide-y divide-slate-100">
+                {% for cc in expiring_certs %}
+                <div class="flex justify-between items-center p-4 hover:bg-slate-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 rounded bg-red-100 flex items-center justify-center text-red-600 shadow-sm">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm text-slate-800">{{ cc.ten_bang_cap }}</div>
+                            <div class="text-xs text-slate-500">{{ cc.nhan_vien.ho_ten }} • {{ cc.nhan_vien.ma_nhan_vien }}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs font-bold text-red-600">{{ cc.ngay_het_han|date:"d/m/Y" }}</div>
+                        <div class="text-[10px] text-slate-400 italic">Hết hạn</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-slate-400 text-sm py-8 flex flex-col items-center">
+                    <i class="fas fa-check-circle text-3xl mb-2 text-green-300"></i>
+                    Không có chứng chỉ nào sắp hết hạn.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-3 bg-pink-50 border-b border-pink-100 flex justify-between items-center">
+                <h3 class="font-bold text-pink-700 text-sm uppercase"><i class="fas fa-birthday-cake mr-2"></i>Sinh nhật Tháng {{ now|date:"m" }}</h3>
+                <span class="bg-white text-pink-600 text-xs font-bold px-2 py-0.5 rounded border border-pink-200">{{ birthdays.count }}</span>
+            </div>
+            <div class="p-0 max-h-[250px] overflow-y-auto divide-y divide-slate-100">
+                {% for nv in birthdays %}
+                <div class="flex justify-between items-center p-4 hover:bg-pink-50/50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        {% if nv.anh_the %}
+                            <img src="{{ nv.anh_the.url }}" class="w-8 h-8 rounded-full object-cover border-2 border-white shadow-sm">
+                        {% else %}
+                            <div class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-500 font-bold text-xs">{{ nv.ho_ten|slice:":1" }}</div>
+                        {% endif %}
+                        <div>
+                            <div class="font-bold text-sm text-slate-800">{{ nv.ho_ten }}</div>
+                            <div class="text-xs text-slate-500">{{ nv.phong_ban.ten_phong_ban }}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 bg-white px-2 py-1 rounded-full border border-pink-100">
+                        <i class="fas fa-gift text-pink-400 text-xs"></i>
+                        <span class="text-xs font-bold text-slate-700">{{ nv.ngay_sinh|date:"d/m" }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="text-center text-slate-400 text-sm py-8 flex flex-col items-center">
+                    <i class="fas fa-calendar-times text-3xl mb-2 text-slate-200"></i>
+                    Không có sinh nhật nào trong tháng.
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('deptChart');
+        if (ctx) {
+            new Chart(ctx.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: {{ chart_labels|safe }},
+                    datasets: [{
+                        data: {{ chart_data|safe }},
+                        backgroundColor: [
+                            '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#64748b'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { 
+                            position: 'right', 
+                            labels: { 
+                                boxWidth: 10, 
+                                usePointStyle: true,
+                                font: { size: 11 }
+                            } 
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

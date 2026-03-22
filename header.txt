@@ -1,0 +1,14 @@
+# -*- coding: utf-8 -*-
+"""
+Security Command (SCMD) System
+------------------------------
+Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
+
+File: {path_to_file}
+Author: Mr. Anh
+Created Date: {date}
+Description: {description}
+
+NOTICE: This file is part of a proprietary system. 
+Unauthorized copying of this file, via any medium is strictly prohibited.
+"""

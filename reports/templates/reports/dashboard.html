@@ -1,0 +1,58 @@
+{# file: reports/templates/reports/dashboard.html #}
+{% extends "base.html" %}
+{% block title %}Trung tâm Báo cáo{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Trung tâm Báo cáo & Thống kê</h1>
+            <p class="text-sm text-slate-500">Trích xuất dữ liệu và xuất Excel.</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <a href="{% url 'reports:cham_cong_ca_nhan' %}" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-blue-500 hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fas fa-user-clock"></i>
+                </div>
+                <h3 class="font-bold text-lg text-slate-800">Chấm công Cá nhân</h3>
+            </div>
+            <p class="text-sm text-slate-500">Xem chi tiết giờ công, đi muộn, về sớm của từng nhân viên.</p>
+        </a>
+
+        <a href="{% url 'reports:cham_cong_muc_tieu' %}" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-indigo-500 hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3 class="font-bold text-lg text-slate-800">Tổng hợp Mục tiêu</h3>
+            </div>
+            <p class="text-sm text-slate-500">Thống kê tổng giờ cung cấp dịch vụ tại từng mục tiêu.</p>
+        </a>
+
+        <a href="{% url 'reports:tong_hop_cham_cong' %}" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-green-500 hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fas fa-table"></i>
+                </div>
+                <h3 class="font-bold text-lg text-slate-800">Ma trận Công</h3>
+            </div>
+            <p class="text-sm text-slate-500">Bảng chấm công tổng hợp dạng lưới (Ngày 1-31).</p>
+        </a>
+
+        <a href="{% url 'reports:su_co' %}" class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 hover:border-red-500 hover:shadow-md transition-all group">
+            <div class="flex items-center gap-4 mb-4">
+                <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="font-bold text-lg text-slate-800">Thống kê Sự cố</h3>
+            </div>
+            <p class="text-sm text-slate-500">Danh sách sự cố, vi phạm và tình trạng xử lý.</p>
+        </a>
+
+    </div>
+</div>
+{% endblock %}

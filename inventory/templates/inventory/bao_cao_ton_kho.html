@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}Báo cáo Tồn kho{% endblock %}
+{% block page_title %}Báo cáo Tồn kho Vật tư{% endblock %}
+
+{% block content %}
+<div class="card bg-base-100 shadow-xl">
+    <div class="card-body">
+        <div class="mb-4">
+            <form method="get">
+                <div class="form-control">
+                    <div class="input-group">
+                        <input type="text" name="q" placeholder="Tìm theo tên hoặc mã vật tư..." class="input input-bordered w-full" value="{{ query }}" />
+                        <button class="btn btn-square">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+                <thead>
+                    <tr>
+                        <th>Tên vật tư</th>
+                        <th>Mã VT</th>
+                        <th>Loại</th>
+                        <th class="text-center">Tình trạng</th>
+                        <th class="text-right">Tồn kho</th>
+                        <th class="text-right">Định mức TT</th>
+                        <th>Đơn vị</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vt in vat_tu_list %}
+                    <tr>
+                        <td>
+                            <div class="font-bold">{{ vt.ten_vat_tu }}</div>
+                            <div class="text-sm opacity-70">{{ vt.nha_cung_cap|default_if_none:"" }}</div>
+                        </td>
+                        <td>{{ vt.ma_vat_tu|default_if_none:"" }}</td>
+                        <td>{{ vt.loai.ten_loai|default_if_none:"" }}</td>
+                        <td class="text-center">
+                            {% if vt.so_luong_ton <= 0 %}
+                                <span class="badge badge-error">Hết hàng</span>
+                            {% elif vt.so_luong_ton < vt.dinh_muc_toi_thieu %}
+                                <span class="badge badge-warning">Dưới định mức</span>
+                            {% else %}
+                                <span class="badge badge-success">An toàn</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-right font-bold">{{ vt.so_luong_ton }}</td>
+                        <td class="text-right">{{ vt.dinh_muc_toi_thieu }}</td>
+                        <td>{{ vt.don_vi_tinh }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center">Không tìm thấy vật tư nào.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

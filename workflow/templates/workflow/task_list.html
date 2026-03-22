@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Danh sách Công việc{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Danh sách Công việc</h1>
+            <p class="text-sm text-slate-500">Quản lý toàn bộ nhiệm vụ được giao và cần làm.</p>
+        </div>
+        <a href="{% url 'workflow:task_create' %}" class="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2 transition-colors">
+            <i class="fas fa-plus"></i> Giao việc mới
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200 uppercase text-xs">
+                    <tr>
+                        <th class="px-6 py-4">Công việc</th>
+                        <th class="px-6 py-4">Người thực hiện</th>
+                        <th class="px-6 py-4">Hạn chót</th>
+                        <th class="px-6 py-4 text-center">Tiến độ</th>
+                        <th class="px-6 py-4 text-center">Trạng thái</th>
+                        <th class="px-6 py-4 text-center">Ưu tiên</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for task in tasks %}
+                    <tr class="hover:bg-slate-50 transition-colors group">
+                        <td class="px-6 py-4">
+                            <a href="{% url 'workflow:task_detail' task.id %}" class="font-bold text-slate-800 group-hover:text-blue-600 transition-colors block">
+                                {{ task.tieu_de }}
+                            </a>
+                            <span class="text-xs text-slate-500">Giao bởi: {{ task.nguoi_giao.ho_ten }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-600">
+                                    {{ task.nguoi_nhan.ho_ten|slice:":1" }}
+                                </div>
+                                <span>{{ task.nguoi_nhan.ho_ten }}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if task.han_chot %}
+                                <div class="{% if task.han_chot < now and task.trang_thai != 'HOAN_THANH' %}text-red-500 font-bold{% else %}text-slate-600{% endif %}">
+                                    {{ task.han_chot|date:"d/m/Y H:i" }}
+                                </div>
+                            {% else %}
+                                <span class="text-slate-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 w-32">
+                            <div class="flex items-center gap-2">
+                                <div class="w-full bg-slate-200 rounded-full h-1.5">
+                                    <div class="bg-blue-600 h-1.5 rounded-full" style="width: {{ task.tien_do }}%"></div>
+                                </div>
+                                <span class="text-xs font-bold text-blue-600">{{ task.tien_do }}%</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="px-2 py-1 rounded text-[10px] font-bold border
+                                {% if task.trang_thai == 'HOAN_THANH' %}bg-green-50 text-green-700 border-green-200
+                                {% elif task.trang_thai == 'MOI' %}bg-blue-50 text-blue-700 border-blue-200
+                                {% else %}bg-yellow-50 text-yellow-700 border-yellow-200{% endif %}">
+                                {{ task.get_trang_thai_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            {% if task.uu_tien == 'KHAN' or task.uu_tien == 'CAO' %}
+                                <span class="text-red-600 font-bold text-xs"><i class="fas fa-fire mr-1"></i>{{ task.get_uu_tien_display }}</span>
+                            {% else %}
+                                <span class="text-slate-500 text-xs">{{ task.get_uu_tien_display }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="p-8 text-center text-slate-400">
+                            <i class="fas fa-clipboard-check text-4xl mb-3 opacity-30"></i>
+                            <p>Chưa có công việc nào.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

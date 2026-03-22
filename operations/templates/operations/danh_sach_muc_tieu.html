@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}Danh sách Mục tiêu{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fas fa-building text-indigo-600"></i> DANH SÁCH MỤC TIÊU
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">Quản lý các điểm bảo vệ và cấu hình vị trí.</p>
+        </div>
+        <a href="/admin/clients/muctieu/add/" class="btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2 transition-colors">
+            <i class="fas fa-plus"></i> Thêm Mục tiêu
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for mt in muc_tieus %}
+        <a href="{% url 'operations:chi_tiet_muc_tieu' mt.id %}" class="group bg-white rounded-xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-indigo-300 transition-all duration-300 flex flex-col h-full overflow-hidden">
+            <div class="p-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
+                <div class="flex justify-between items-start mb-2">
+                    <div class="w-10 h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <span class="bg-white border border-slate-200 text-slate-600 text-xs font-bold px-2 py-1 rounded-full shadow-sm">
+                        {{ mt.so_vi_tri }} Vị trí
+                    </span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 group-hover:text-indigo-600 line-clamp-1 transition-colors">
+                    {{ mt.ten_muc_tieu }}
+                </h3>
+                <p class="text-xs text-slate-500 mt-1 flex items-center gap-1">
+                    <i class="fas fa-briefcase"></i> 
+                    {{ mt.hop_dong.co_hoi.khach_hang_tiem_nang.ten_cong_ty|default:"Khách lẻ" }}
+                </p>
+            </div>
+            
+            <div class="p-5 flex-1">
+                <div class="space-y-3 text-sm text-slate-600">
+                    <div class="flex items-start gap-2">
+                        <i class="fas fa-map-marker-alt mt-1 text-slate-400 w-4"></i>
+                        <span class="line-clamp-2">{{ mt.dia_chi }}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-user-tie text-slate-400 w-4"></i>
+                        <span>Chỉ huy: <strong class="text-slate-800">{{ mt.quan_ly_muc_tieu.ho_ten|default:"Chưa gán" }}</strong></span>
+                    </div>
+                    {% if mt.sdt_lien_he %}
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-phone text-slate-400 w-4"></i>
+                        <span>{{ mt.sdt_lien_he }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex justify-between items-center text-xs font-medium text-slate-500">
+                <span>ID: #{{ mt.id }}</span>
+                <span class="text-indigo-600 group-hover:translate-x-1 transition-transform flex items-center gap-1">
+                    Chi tiết <i class="fas fa-arrow-right"></i>
+                </span>
+            </div>
+        </a>
+        {% empty %}
+        <div class="col-span-full p-12 text-center text-slate-400 bg-white rounded-xl border border-dashed border-slate-300">
+            <i class="fas fa-building text-4xl mb-3 opacity-50"></i>
+            <p>Chưa có mục tiêu nào. Hãy thêm mới!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
