@@ -98,11 +98,14 @@ class CauHinhLuong(models.Model):
 
 class BangLuongThang(models.Model):
     """Quản lý các kỳ lương tổng hợp hàng tháng của toàn hệ thống SCMD"""
-    TRANG_THAI = [
-        ('NHAP', 'Dự thảo (Đang tính toán)'),
-        ('CHO_DUYET', 'Chờ Kế toán trưởng duyệt'),
-        ('DA_PHAT_HANH', 'Đã duyệt & Phát hành (Nhân viên đã xem)'),
-    ]
+    class TrangThai(models.TextChoices):
+        DRAFT = "DRAFT", "Dự thảo"
+        CALCULATED = "CALCULATED", "Đã tính"
+        REVIEWED = "REVIEWED", "Đã đối soát"
+        LOCKED = "LOCKED", "Đã khóa kỳ"
+        PAID = "PAID", "Đã thanh toán"
+
+    LOCKED_STATES = {TrangThai.LOCKED, TrangThai.PAID}
     
     tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
 
@@ -129,8 +132,8 @@ class BangLuongThang(models.Model):
     trang_thai = models.CharField(
         "Trạng thái phê duyệt", 
         max_length=20, 
-        choices=TRANG_THAI, 
-        default='NHAP'
+        choices=TrangThai.choices,
+        default=TrangThai.DRAFT
     )
     
     # --- Số liệu thống kê tổng hợp ---
@@ -189,6 +192,13 @@ class BangLuongThang(models.Model):
             tong_chi_tra=stats['total_pay'],
             tong_gio_cong=stats['total_hours']
         )
+
+    @property
+    def is_locked(self):
+        return self.trang_thai in self.LOCKED_STATES
+
+    def can_recalculate(self):
+        return not self.is_locked
 
     def __str__(self): 
         return f"Kỳ lương SCMD - Tháng {self.thang}/{self.nam}"
