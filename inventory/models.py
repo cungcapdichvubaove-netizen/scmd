@@ -226,11 +226,13 @@ class ChiTietPhieuXuat(models.Model):
         
         # 2. Đồng bộ hóa tổng tiền phải thu cho PhieuXuat (Chỉ dành cho loại BÁN)
         try:
-            if self.phieu_xuat.loai_xuat == 'BAN_TRU_LUONG':
-                # Tính toán tổng tiền từ tất cả các dòng chi tiết của phiếu này
-                total = sum(item.so_luong * item.don_gia_ban for item in self.phieu_xuat.chi_tiet.all())
-                # Sử dụng update để tránh đệ quy gọi save() vô tận
-                PhieuXuat.objects.filter(pk=self.phieu_xuat.pk).update(tong_tien_phai_thu=total)
+            from django.db import transaction
+            with transaction.atomic():
+                if self.phieu_xuat.loai_xuat == 'BAN_TRU_LUONG':
+                    # Khóa bản ghi PhieuXuat để tránh race condition
+                    p_xuat = PhieuXuat.objects.select_for_update().get(pk=self.phieu_xuat.pk)
+                    total = sum(item.so_luong * item.don_gia_ban for item in p_xuat.chi_tiet.all())
+                    PhieuXuat.objects.filter(pk=p_xuat.pk).update(tong_tien_phai_thu=total)
         except Exception:
             pass
 

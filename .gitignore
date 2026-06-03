@@ -1,129 +1,24 @@
-# =============================================================================
-# Security Command (SCMD) System - Git Ignore Configuration
-# Author: Mr. Anh (CTO)
-# Updated: 2026-03-21
-# =============================================================================
-
-# --- PYTHON & DJANGO CORE ---
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-local_settings.py
-db.sqlite3
-db.sqlite3-journal
-*.log
-staticfiles/
-celerybeat-schedule
-celerybeat-schedule-wal
-
-# --- VIRTUAL ENVIRONMENTS ---
+# Virtual Environments
 venv/
 .venv/
 env/
 ENV/
-env.bak/
-venv.bak/
 
-# --- SECURITY & ENVIRONMENT VARIABLES (.env) ---
-# Tuyệt đối không đẩy các file chứa Secret Key và API Key lên Git
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Local Environment & Secrets
 .env
 .env.local
-.env.dev
-.env.prod
-*.env
-
-# --- FRONTEND (Node.js & Assets) ---
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-.pnp
-.pnp.js
-
-# --- MEDIA & USER UPLOADS ---
-# Bỏ qua toàn bộ file upload của người dùng nhưng giữ lại cấu trúc thư mục
-media/*
-!media/.gitkeep
-anh_the/*
-!anh_the/.gitkeep
-
-# --- STATIC ASSETS ---
-# Bỏ qua các file ảnh chung nhưng giữ lại tài nguyên hệ thống (Logo, Banner)
-*.jpg
-*.png
-*.jpeg
-*.gif
-*.svg
-*.ico
-!static/
-!static/**/
-!static/img/
-!static/assets/
-
-# --- DOCKER ---
-.docker/
-docker-compose.override.yml
-
-# --- IDEs & EDITORS ---
-.idea/
-.vscode/
-*.swp
-*.swo
-*.sublime-project
-*.sublime-workspace
-.project
-.pydevproject
-.settings/
-
-# --- SYSTEM FILES ---
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-*.tmp
-.tmp.driveupload/
-
-# --- TESTING & COVERAGE ---
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-.pytest/
-
-# --- DATABASE BACKUPS & EXPORTS ---
+db.sqlite3
 *.sqlite3
-*.rdb
 dump.rdb
-*.sql
-*.gz
-*.sql.gz
+celerybeat-schedule*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+*.log

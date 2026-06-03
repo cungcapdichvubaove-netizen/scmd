@@ -1,0 +1,264 @@
+{% extends "admin/base_site.html" %}
+{% load admin_console %}
+
+{% block content %}
+{% admin_console_metrics as admin_metrics %}
+{% group_admin_apps app_list as grouped_app_list %}
+
+<div class="col-12">
+<div class="scmd-admin-console scmd-admin-console--redesign">
+    <section class="scmd-admin-consolebar">
+        <div class="scmd-admin-consolebar-title">
+            <span class="scmd-admin-consolebar-brand">SCMD</span>
+            <span class="scmd-admin-consolebar-divider"></span>
+            <span class="scmd-admin-consolebar-label">Bảng điều khiển hệ thống</span>
+        </div>
+        <div class="scmd-admin-consolebar-status">
+            <span class="scmd-admin-pill {% if admin_metrics.status_tone == 'good' %}is-good{% else %}is-warn{% endif %}">
+                <span class="scmd-admin-pill-dot"></span>
+                {{ admin_metrics.status_label }}
+            </span>
+        </div>
+    </section>
+
+    <section class="scmd-admin-hero scmd-admin-hero--compact">
+        <div class="scmd-admin-hero-icon">
+            <i class="fas fa-terminal"></i>
+        </div>
+        <div class="scmd-admin-hero-copy">
+            <p class="scmd-admin-kicker">Quản trị kỹ thuật</p>
+            <h1>Bảng điều khiển hệ thống</h1>
+            <p>Super admin · Lập trình viên · IT admin · Vận hành hệ thống</p>
+        </div>
+        <div class="scmd-admin-hero-meta">
+            <span class="scmd-admin-pill {% if admin_metrics.status_tone == 'good' %}is-good{% else %}is-warn{% endif %}">
+                <span class="scmd-admin-pill-dot"></span>
+                {{ admin_metrics.status_label }}
+            </span>
+            <span class="scmd-admin-meta-note">{{ admin_metrics.last_updated_label }}</span>
+        </div>
+    </section>
+
+    <section class="scmd-admin-kpi-grid">
+        <article class="scmd-admin-kpi scmd-admin-kpi--success">
+            <div class="scmd-admin-kpi-top">
+                <span class="scmd-admin-kpi-icon is-green"><i class="fas fa-database"></i></span>
+                <span class="scmd-admin-kpi-badge {% if admin_metrics.db_status == 'online' %}is-good{% else %}is-bad{% endif %}">
+                    {% if admin_metrics.db_status == 'online' %}Trực tuyến{% else %}Ngoại tuyến{% endif %}
+                </span>
+            </div>
+            <p class="scmd-admin-kpi-label">Cơ sở dữ liệu</p>
+            <h2 class="scmd-admin-kpi-value {% if admin_metrics.db_status == 'online' %}is-good{% else %}is-bad{% endif %}">
+                {% if admin_metrics.db_status == 'online' %}Kết nối tốt{% else %}Mất kết nối{% endif %}
+            </h2>
+            <p class="scmd-admin-kpi-note">CSDL mặc định của Django · Phản hồi hệ thống</p>
+        </article>
+
+        <article class="scmd-admin-kpi scmd-admin-kpi--info">
+            <div class="scmd-admin-kpi-top">
+                <span class="scmd-admin-kpi-icon is-blue"><i class="fas fa-microchip"></i></span>
+                <span class="scmd-admin-kpi-badge is-neutral">{{ admin_metrics.worker_active }}/{{ admin_metrics.worker_total }}</span>
+            </div>
+            <p class="scmd-admin-kpi-label">Worker</p>
+            <h2 class="scmd-admin-kpi-value">{{ admin_metrics.worker_active }} đang hoạt động</h2>
+            <p class="scmd-admin-kpi-note">{{ admin_metrics.worker_stale }} worker stale trong 3 phút qua</p>
+        </article>
+
+        <article class="scmd-admin-kpi scmd-admin-kpi--accent">
+            <div class="scmd-admin-kpi-top">
+                <span class="scmd-admin-kpi-icon is-violet"><i class="fas fa-clock"></i></span>
+                <span class="scmd-admin-kpi-badge is-violet">{{ admin_metrics.periodic_enabled }}/{{ admin_metrics.periodic_total }} đang bật</span>
+            </div>
+            <p class="scmd-admin-kpi-label">Lịch Celery</p>
+            <h2 class="scmd-admin-kpi-value">{{ admin_metrics.periodic_enabled }} tác vụ</h2>
+            <p class="scmd-admin-kpi-note">Tác vụ định kỳ đang bật</p>
+        </article>
+
+        <article class="scmd-admin-kpi scmd-admin-kpi--warning">
+            <div class="scmd-admin-kpi-top">
+                <span class="scmd-admin-kpi-icon is-amber"><i class="fas fa-user-shield"></i></span>
+                <span class="scmd-admin-kpi-badge is-neutral">{{ admin_metrics.staff_count }} tài khoản</span>
+            </div>
+            <p class="scmd-admin-kpi-label">Bề mặt truy cập</p>
+            <h2 class="scmd-admin-kpi-value">{{ admin_metrics.superuser_count }}/{{ admin_metrics.staff_count }}</h2>
+            <p class="scmd-admin-kpi-note">Superuser / staff đang hoạt động</p>
+        </article>
+    </section>
+
+    <section class="scmd-admin-runtime-row">
+        <article class="scmd-admin-runtime-panel">
+            <div class="scmd-admin-runtime-header">
+                <div>
+                    <p class="scmd-admin-panel-kicker">Runtime</p>
+                    <h2>Kết quả tác vụ & Nhật ký</h2>
+                </div>
+                <span class="scmd-admin-runtime-count">{{ admin_metrics.task_alerts }} lỗi</span>
+            </div>
+            <div class="scmd-admin-runtime-list">
+                <div class="scmd-admin-runtime-item">
+                    <span class="scmd-admin-runtime-dot is-good"></span>
+                    <span class="scmd-admin-runtime-name">Celery job nền</span>
+                    <span class="scmd-admin-runtime-badge is-good">{{ admin_metrics.task_result_total }} results</span>
+                </div>
+                <div class="scmd-admin-runtime-item">
+                    <span class="scmd-admin-runtime-dot {% if admin_metrics.recent_errors %}is-bad{% else %}is-good{% endif %}"></span>
+                    <span class="scmd-admin-runtime-name">Nhật ký hệ thống (khác SUCCESS)</span>
+                    <span class="scmd-admin-runtime-badge {% if admin_metrics.recent_errors %}is-warn{% else %}is-good{% endif %}">{{ admin_metrics.recent_errors }} records</span>
+                </div>
+                <div class="scmd-admin-runtime-item">
+                    <span class="scmd-admin-runtime-dot {% if admin_metrics.worker_stale %}is-warn{% else %}is-good{% endif %}"></span>
+                    <span class="scmd-admin-runtime-name">Trạng thái worker stale</span>
+                    <span class="scmd-admin-runtime-badge {% if admin_metrics.worker_stale %}is-warn{% else %}is-good{% endif %}">{{ admin_metrics.worker_stale }} stale</span>
+                </div>
+            </div>
+        </article>
+
+        <article class="scmd-admin-runtime-panel">
+            <div class="scmd-admin-runtime-header">
+                <div>
+                    <p class="scmd-admin-panel-kicker">Điều hướng</p>
+                    <h2>Truy cập nhanh</h2>
+                </div>
+            </div>
+            <div class="scmd-admin-quicknav">
+                {% for item in admin_metrics.quick_links %}
+                <a href="{{ item.url }}" class="scmd-admin-quicknav-item">
+                    <span class="scmd-admin-quicknav-icon"><i class="{{ item.icon }}"></i></span>
+                    <span class="scmd-admin-quicknav-label">{{ item.label }}</span>
+                    {% if item.badge %}
+                    <span class="scmd-admin-quicknav-badge">{{ item.badge }}</span>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="scmd-admin-panels">
+        <article class="scmd-admin-panel">
+            <div class="scmd-admin-panel-header">
+                <div>
+                    <p class="scmd-admin-panel-kicker">Truy cập & Toàn vẹn</p>
+                    <h2>Hoạt động nhật ký gần đây</h2>
+                </div>
+            </div>
+            <div class="scmd-admin-table-wrap">
+                <table class="scmd-admin-table">
+                    <thead>
+                        <tr><th>Thời điểm</th><th>User</th><th>Action</th><th>Module</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for log in admin_metrics.recent_audit_logs %}
+                        <tr>
+                            <td>{{ log.timestamp|date:"d/m/Y H:i" }}</td>
+                            <td>{{ log.user|default:"SYSTEM" }}</td>
+                            <td>{{ log.action }}</td>
+                            <td>{{ log.module }}</td>
+                            <td>{{ log.status }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5">Chưa có audit log gần đây.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+
+        <article class="scmd-admin-panel">
+            <div class="scmd-admin-panel-header">
+                <div>
+                    <p class="scmd-admin-panel-kicker">Tự động hóa</p>
+                    <h2>Runtime của worker & job</h2>
+                </div>
+            </div>
+            <div class="scmd-admin-table-wrap">
+                <table class="scmd-admin-table">
+                    <thead>
+                        <tr><th>Worker</th><th>Lần ping cuối</th><th>Trạng thái</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for worker in admin_metrics.recent_workers %}
+                        <tr>
+                            <td>{{ worker.hostname }}</td>
+                            <td>{{ worker.last_ping|date:"d/m/Y H:i:s" }}</td>
+                            <td>{% if worker.is_active %}Đang bật{% else %}Tắt{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3">Chưa có heartbeat worker.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="scmd-admin-table-wrap">
+                <table class="scmd-admin-table">
+                    <thead>
+                        <tr><th>Tác vụ</th><th>Trạng thái</th><th>Hoàn tất lúc</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for result in admin_metrics.recent_task_results %}
+                        <tr>
+                            <td>{{ result.task_name|default:result.task_id }}</td>
+                            <td>{{ result.status }}</td>
+                            <td>{{ result.date_done|date:"d/m/Y H:i:s" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3">Chưa có task result gần đây.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </article>
+    </section>
+
+    <section class="scmd-admin-apps">
+        {% for group in grouped_app_list %}
+        <article class="scmd-admin-app-group">
+            <div class="scmd-admin-panel-header">
+                <div>
+                    <p class="scmd-admin-panel-kicker">Admin Taxonomy</p>
+                    <h2>{{ group.title }}</h2>
+                </div>
+            </div>
+            <div class="scmd-admin-app-grid">
+                {% for app in group.apps %}
+                <section class="scmd-admin-app-card">
+                    <header>
+                        <h3>{{ app.name }}</h3>
+                        {% if app.app_url %}<a href="{{ app.app_url }}">Mở</a>{% endif %}
+                    </header>
+                    <ul class="scmd-admin-model-list">
+                        {% for model in app.models %}
+                        <li>
+                            <div class="scmd-admin-model-main">
+                                {% if model.admin_url %}
+                                <a href="{{ model.admin_url }}">{{ model.name }}</a>
+                                {% else %}
+                                <span>{{ model.name }}</span>
+                                {% endif %}
+                                <div class="scmd-admin-badges">
+                                    {% model_badges model as badges %}
+                                    {% for label, tone in badges %}
+                                    <span class="scmd-admin-badge scmd-admin-badge--{{ tone }}">{{ label }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="scmd-admin-model-actions">
+                                {% if model.admin_url %}<a href="{{ model.admin_url }}">Quản lý</a>{% endif %}
+                                {% if model.add_url %}<a href="{{ model.add_url }}">Thêm</a>{% endif %}
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+                {% endfor %}
+            </div>
+        </article>
+        {% endfor %}
+    </section>
+
+    <section class="scmd-admin-footnote">
+        <p>Không đưa KPI nghiệp vụ vào /admin/. Dashboard vận hành, tài chính, nhân sự và CRM tiếp tục thuộc các workspace nghiệp vụ riêng.</p>
+    </section>
+</div>
+</div>
+{% endblock %}

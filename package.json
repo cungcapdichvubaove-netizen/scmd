@@ -1,4 +1,7 @@
 {
+  "name": "scmd-erp-ui-build",
+  "private": true,
+  "description": "SCMD ERP frontend asset pipeline for Tailwind and PostCSS",
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.13",
     "cross-env": "^10.0.0",

@@ -13,7 +13,7 @@ class NotificationConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
-        self.group_name = "notifications"
+        self.group_name = "war_room_staff"
         
         # Join group
         await self.channel_layer.group_add(

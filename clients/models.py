@@ -14,12 +14,18 @@ NOTICE: This file is part of a proprietary system.
 Unauthorized copying of this file, via any medium is strictly prohibited.
 """
 
+import uuid
 import calendar  # Thư viện để tính ngày trong tháng
+import logging
 from datetime import timedelta
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator
+from django.conf import settings
+from django.core.exceptions import ValidationError, ImproperlyConfigured
+from core.managers import TenantAwareManager
 
+logger = logging.getLogger(__name__)
 
 class KhachHangTiemNang(models.Model):
     """Quản lý thông tin khách hàng tiềm năng và các đầu mối (Leads) của SCMD"""
@@ -36,6 +42,8 @@ class KhachHangTiemNang(models.Model):
         ('CHOT_HOP_DONG', 'Đã ký hợp đồng'),
         ('HUY', 'Khách hủy/Thất bại'),
     ]
+
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
     
     ten_cong_ty = models.CharField(
         "Tên công ty/Khách hàng", 
@@ -88,6 +96,19 @@ class KhachHangTiemNang(models.Model):
         default=timezone.now
     )
 
+    objects = TenantAwareManager()
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"{self.ten_cong_ty} ({self.get_trang_thai_display()})"
 
@@ -107,10 +128,13 @@ class CoHoiKinhDoanh(models.Model):
         THANH_CONG = "THANHCONG", "Chốt hợp đồng (Thắng)"
         THAT_BAI = "THATBAI", "Thất bại (Thua)"
 
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+
     khach_hang_tiem_nang = models.ForeignKey(
         KhachHangTiemNang, 
         on_delete=models.CASCADE, 
-        verbose_name="Khách hàng liên quan"
+        verbose_name="Khách hàng liên quan",
+        related_name="cac_co_hoi_kinh_doanh"
     )
     ten_co_hoi = models.CharField(
         "Tên cơ hội/Dự án", 
@@ -133,13 +157,27 @@ class CoHoiKinhDoanh(models.Model):
         "users.NhanVien", 
         on_delete=models.SET_NULL, 
         null=True, 
-        blank=True, 
+        blank=True,
+        related_name="cac_co_hoi_kinh_doanh",
         verbose_name="Nhân viên Sales phụ trách"
     )
     ngay_tao = models.DateTimeField(
         "Ngày tạo cơ hội",
         auto_now_add=True
     )
+
+    objects = TenantAwareManager()
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = "Cơ hội Kinh doanh"
@@ -156,6 +194,8 @@ class HopDong(models.Model):
         ('SAP_HET_HAN', 'Sắp hết hạn (Dưới 30 ngày)'),
         ('DA_THANH_LY', 'Đã thanh lý/Hết hạn'),
     ]
+
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
     
     co_hoi = models.OneToOneField(
         CoHoiKinhDoanh, 
@@ -216,24 +256,26 @@ class HopDong(models.Model):
         db_index=True
     )
 
+    objects = TenantAwareManager()
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        """
+        Infrastructure Layer only: Persist model data.
+        Business logic for status calculation moved to Application Layer (Background Jobs).
+        """
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
     class Meta:
         verbose_name = "Hợp đồng Dịch vụ"
         verbose_name_plural = "3. Quản lý Hợp đồng"
-
-    def save(self, *args, **kwargs):
-        """Tự động cập nhật trạng thái hợp đồng dựa trên ngày hết hạn thực tế"""
-        try:
-            today = timezone.now().date()
-            if self.trang_thai != 'DA_THANH_LY':
-                if self.ngay_het_han < today:
-                    self.trang_thai = 'DA_THANH_LY'
-                elif self.ngay_het_han <= today + timedelta(days=30):
-                    self.trang_thai = 'SAP_HET_HAN'
-                else:
-                    self.trang_thai = 'HIEU_LUC'
-        except Exception:
-            pass  # Đảm bảo phương thức save gốc vẫn chạy nếu có lỗi tính toán ngày
-        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"HĐ: {self.so_hop_dong}"
@@ -244,7 +286,7 @@ class MucTieu(models.Model):
     hop_dong = models.ForeignKey(
         HopDong,
         on_delete=models.CASCADE,
-        related_name="muc_tieu",
+        related_name="cac_muc_tieu",
         verbose_name="Thuộc Hợp đồng kinh tế",
     )
     ten_muc_tieu = models.CharField(
@@ -344,6 +386,15 @@ class MucTieu(models.Model):
         blank=True, 
         verbose_name="Chỉ huy trưởng mục tiêu",
         related_name="cac_muc_tieu_quan_ly"
+    )
+
+    quan_ly_vung = models.ForeignKey(
+        "users.NhanVien",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="cac_muc_tieu_phu_trach_vung",
+        verbose_name="Quản lý vùng phụ trách (Regional Manager)"
     )
 
     class Meta:

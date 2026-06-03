@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Biến động Nhân sự SCMD</title>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #334155; margin: 0; padding: 0; background-color: #f1f5f9; }
+        .wrapper { width: 100%; table-layout: fixed; background-color: #f1f5f9; padding-bottom: 40px; }
+        .container { max-width: 700px; margin: 0 auto; background-color: #ffffff; }
+        .header { background-color: #1e293b; color: #ffffff; padding: 35px 40px; text-align: center; }
+        .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+        .header p { margin: 10px 0 0; opacity: 0.8; font-size: 14px; }
+        .content { padding: 40px; }
+        .intro { margin-bottom: 30px; font-size: 15px; color: #475569; }
+        
+        /* Table Styling */
+        .report-table { width: 100%; border-collapse: collapse; margin: 25px 0; border: 1px solid #e2e8f0; }
+        .report-table th { background-color: #f8fafc; border-bottom: 2px solid #e2e8f0; padding: 12px 15px; text-align: left; font-size: 12px; text-transform: uppercase; color: #64748b; letter-spacing: 0.5px; }
+        .report-table td { padding: 14px 15px; border-bottom: 1px solid #f1f5f9; font-size: 14px; }
+        .report-table tr:nth-child(even) { background-color: #fcfcfc; }
+        
+        /* Status & Colors */
+        .text-navy { color: #1e293b; font-weight: bold; }
+        .text-danger { color: #ef4444; font-weight: bold; }
+        .text-success { color: #10b981; font-weight: bold; }
+        .rate-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .rate-high { background-color: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+        .rate-normal { background-color: #f0fdf4; color: #10b981; border: 1px solid #dcfce7; }
+        
+        .action-area { text-align: center; margin-top: 40px; }
+        .btn { background-color: #3b82f6; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; display: inline-block; }
+        
+        .footer { background-color: #f8fafc; padding: 30px 40px; text-align: center; color: #94a3b8; font-size: 12px; border-top: 1px solid #e2e8f0; }
+        .footer p { margin: 5px 0; }
+        .disclaimer { font-style: italic; margin-top: 20px; line-height: 1.4; color: #cbd5e1; }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+            <!-- Header -->
+            <div class="header">
+                <h1>Báo cáo Biến động Nhân sự</h1>
+                <p>Tháng {{ report.month }} năm {{ report.year }}</p>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <div class="intro">
+                    Chào Ban Giám đốc, <br><br>
+                    Hệ thống <strong>SCMD ERP</strong> xin gửi báo cáo phân tích tỷ lệ biến động nhân sự (Turnover Rate) của tháng vừa qua theo từng khu vực quản lý:
+                </div>
+
+                <table class="report-table">
+                    <thead>
+                        <tr>
+                            <th>Khu vực (Phòng ban)</th>
+                            <th style="text-align: center;">Đầu kỳ</th>
+                            <th style="text-align: center;">Nghỉ việc</th>
+                            <th style="text-align: center;">Cuối kỳ</th>
+                            <th style="text-align: right;">Tỷ lệ (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in report.details %}
+                        <tr>
+                            <td class="text-navy">{{ item.region_name }}</td>
+                            <td style="text-align: center;">{{ item.start_count }}</td>
+                            <td style="text-align: center;" class="{% if item.leaver_count > 0 %}text-danger{% endif %}">
+                                {{ item.leaver_count }}
+                            </td>
+                            <td style="text-align: center;">{{ item.end_count }}</td>
+                            <td style="text-align: right;">
+                                <span class="rate-badge {% if item.turnover_rate > 10 %}rate-high{% else %}rate-normal{% endif %}">
+                                    {{ item.turnover_rate }}%
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <div class="intro" style="margin-top: 20px;">
+                    <strong>Lưu ý:</strong> Khu vực có tỷ lệ biến động 
+                    <span class="text-danger">trên 10%</span> được đánh dấu cảnh báo để Ban Giám đốc kịp thời rà soát nguyên nhân (chính sách đãi ngộ, môi trường làm việc hoặc áp lực tại mục tiêu).
+                </div>
+
+                <div class="action-area">
+                    <a href="{{ settings.SITE_URL }}/users/dashboard/" class="btn">Xem chi tiết trên Dashboard</a>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer">
+                <p><strong>Hệ thống SCMD ERP — Operational Intelligence</strong></p>
+                <p>CÔNG TY TNHH DỊCH VỤ AN NINH SCMD</p>
+                <p>Email này được gửi tự động từ hệ thống quản trị. Vui lòng không trả lời email này.</p>
+                
+                <div class="disclaimer">
+                    Thông tin trong email này mang tính bảo mật cao và chỉ dành riêng cho Ban Giám đốc. 
+                    Việc tiết lộ hoặc sử dụng trái phép dữ liệu nhân sự là vi phạm Nghị định 13/2023/NĐ-CP và chính sách bảo mật của SCMD.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

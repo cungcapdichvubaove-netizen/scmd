@@ -1,25 +1,26 @@
+{% load tailwind_tags %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>In Lý Lịch Trích Ngang - SCMD System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>In lý lịch trích ngang - SCMD Pro</title>
+    {% tailwind_css %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        
+
         :root {
-            --scmd-blue: #1e3a8a;
-            --scmd-light-blue: #eff6ff;
-            --border-color: #000000;
+            --scmd-brand: #1e3a8a;
+            --scmd-border: #0f172a;
+            --scmd-text-soft: #475569;
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f3f4f6;
             margin: 0;
             padding: 0;
+            background: #f1f5f9;
+            font-family: 'Roboto', sans-serif;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
@@ -30,33 +31,36 @@
         }
 
         .print-page {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 12mm 15mm;
-            margin: 10px auto;
-            background: white;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
             position: relative;
             box-sizing: border-box;
-            overflow: hidden;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 10px auto;
+            padding: 12mm 15mm;
+            background: #ffffff;
+            box-shadow: 0 0 12px rgba(15, 23, 42, 0.08);
             page-break-after: always;
         }
 
         @media print {
-            body { background: none; }
-            .no-print { display: none !important; }
+            body {
+                background: transparent;
+            }
+
             .print-page {
                 margin: 0;
                 box-shadow: none;
-                padding: 12mm 15mm;
+            }
+
+            .no-print {
+                display: none !important;
             }
         }
 
-        /* Khung ảnh thẻ tiêu chuẩn 3x4 */
         .profile-photo {
             width: 3cm;
             height: 4cm;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--scmd-border);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -70,221 +74,213 @@
             object-fit: cover;
         }
 
-        /* Table định dạng quân đội */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 8px;
-            border: 1.5px solid var(--border-color);
-        }
-
-        th, td {
-            border: 1px solid var(--border-color);
-            padding: 6px 8px;
-            font-size: 12.5px;
-            line-height: 1.4;
-        }
-
-        th {
-            background-color: #f1f5f9;
-            font-weight: bold;
-            text-transform: uppercase;
-            text-align: center;
-        }
-
-        /* Tiêu đề đề mục có icon và line */
         .section-header {
             display: flex;
             align-items: center;
+            gap: 12px;
             margin-top: 18px;
-            margin-bottom: 8px;
-            border-bottom: 2px solid var(--scmd-blue);
-            padding-bottom: 4px;
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            border-bottom: 2px solid var(--scmd-brand);
+        }
+
+        .section-badge {
+            width: 32px;
+            height: 32px;
+            border-radius: 999px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--scmd-brand);
+            color: #fff;
+            font-size: 12px;
         }
 
         .section-title {
-            font-weight: bold;
-            text-transform: uppercase;
+            color: var(--scmd-brand);
             font-size: 14px;
-            color: var(--scmd-blue);
+            font-weight: 700;
+            text-transform: uppercase;
         }
 
         .field-label {
-            font-weight: 500;
-            color: #374151;
             min-width: 140px;
+            font-weight: 500;
+            color: var(--scmd-text-soft);
             display: inline-block;
         }
 
         .field-value {
+            color: #0f172a;
             font-weight: 400;
-            color: #000;
         }
 
-        .hidden-field { display: none !important; }
+        .hidden-field {
+            display: none !important;
+        }
 
-        /* Watermark bảo mật (chỉ hiện khi in) */
         .watermark {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 80px;
-            color: rgba(0, 0, 0, 0.03);
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-35deg);
+            font-size: 76px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            color: rgba(15, 23, 42, 0.035);
             pointer-events: none;
-            white-space: nowrap;
-            z-index: 0;
             text-transform: uppercase;
-            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 8px;
+            border-collapse: collapse;
+            border: 1px solid var(--scmd-border);
+        }
+
+        th,
+        td {
+            border: 1px solid var(--scmd-border);
+            padding: 6px 8px;
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        th {
+            text-transform: uppercase;
+            text-align: center;
+            font-weight: 700;
+            background: #f8fafc;
         }
     </style>
 </head>
 <body>
-
-    <!-- CONTROL PANEL (ẨN KHI IN) -->
-    <div class="no-print sticky top-0 z-50 bg-white border-b p-4 shadow-md">
-        <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4">
+    <div class="no-print sticky top-0 z-50 border-b bg-white p-4 shadow-md">
+        <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4">
             <div class="flex items-center gap-3">
-                <div class="bg-blue-900 p-2 rounded-lg">
-                    <i class="fas fa-file-contract text-white text-xl"></i>
+                <div class="rounded-lg bg-blue-900 p-2 text-white">
+                    <i class="fas fa-file-contract text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold text-gray-800">Cấu hình bản in Lý lịch</h1>
-                    <p class="text-xs text-gray-500 font-medium">Hệ thống SCMD Enterprise Security Management</p>
+                    <h1 class="text-lg font-bold text-slate-800">Cấu hình bản in lý lịch</h1>
+                    <p class="text-xs font-medium text-slate-500">Không gian quản trị nhân sự và vận hành SCMD Pro</p>
                 </div>
             </div>
             <div class="flex gap-2">
-                <button onclick="window.print()" class="bg-blue-800 text-white px-5 py-2 rounded-md hover:bg-blue-900 font-bold transition-all shadow-lg flex items-center gap-2">
-                    <i class="fas fa-print"></i> XUẤT HỒ SƠ
+                <button onclick="window.print()" class="flex items-center gap-2 rounded-md bg-blue-900 px-5 py-2 font-bold text-white transition hover:bg-blue-950">
+                    <i class="fas fa-print"></i>
+                    <span>Xuất hồ sơ</span>
                 </button>
-                <button onclick="window.close()" class="bg-gray-100 text-gray-600 px-4 py-2 rounded-md border font-medium">
+                <button onclick="window.close()" class="rounded-md border bg-slate-100 px-4 py-2 font-medium text-slate-700">
                     Đóng
                 </button>
             </div>
         </div>
-        
-        <div class="max-w-5xl mx-auto grid grid-cols-3 lg:grid-cols-6 gap-2 mt-4 bg-blue-50 p-3 rounded-lg border border-blue-100">
-            <label class="flex items-center space-x-2 cursor-pointer p-1">
-                <input type="checkbox" checked onchange="toggleField('info-cccd', this)" class="w-4 h-4 text-blue-700">
+
+        <div class="mx-auto mt-4 grid max-w-5xl grid-cols-3 gap-2 rounded-lg border border-blue-100 bg-blue-50 p-3 lg:grid-cols-6">
+            <label class="flex cursor-pointer items-center space-x-2 p-1">
+                <input type="checkbox" checked onchange="toggleField('info-cccd', this)" class="h-4 w-4 text-blue-700">
                 <span class="text-xs font-semibold">Số định danh</span>
             </label>
-            <label class="flex items-center space-x-2 cursor-pointer p-1">
-                <input type="checkbox" checked onchange="toggleField('info-sdt', this)" class="w-4 h-4 text-blue-700">
+            <label class="flex cursor-pointer items-center space-x-2 p-1">
+                <input type="checkbox" checked onchange="toggleField('info-sdt', this)" class="h-4 w-4 text-blue-700">
                 <span class="text-xs font-semibold">Liên lạc</span>
             </label>
-            <label class="flex items-center space-x-2 cursor-pointer p-1">
-                <input type="checkbox" checked onchange="toggleField('info-address', this)" class="w-4 h-4 text-blue-700">
+            <label class="flex cursor-pointer items-center space-x-2 p-1">
+                <input type="checkbox" checked onchange="toggleField('info-address', this)" class="h-4 w-4 text-blue-700">
                 <span class="text-xs font-semibold">Địa chỉ</span>
             </label>
-            <label class="flex items-center space-x-2 cursor-pointer p-1">
-                <input type="checkbox" checked onchange="toggleField('info-history', this)" class="w-4 h-4 text-blue-700">
+            <label class="flex cursor-pointer items-center space-x-2 p-1">
+                <input type="checkbox" checked onchange="toggleField('info-history', this)" class="h-4 w-4 text-blue-700">
                 <span class="text-xs font-semibold">Kinh nghiệm</span>
             </label>
-            <label class="flex items-center space-x-2 cursor-pointer p-1">
-                <input type="checkbox" checked onchange="toggleField('info-edu', this)" class="w-4 h-4 text-blue-700">
+            <label class="flex cursor-pointer items-center space-x-2 p-1">
+                <input type="checkbox" checked onchange="toggleField('info-edu', this)" class="h-4 w-4 text-blue-700">
                 <span class="text-xs font-semibold">Bằng cấp</span>
             </label>
-            <label class="flex items-center space-x-2 cursor-pointer p-1">
-                <input type="checkbox" checked onchange="toggleField('info-sign', this)" class="w-4 h-4 text-blue-700">
+            <label class="flex cursor-pointer items-center space-x-2 p-1">
+                <input type="checkbox" checked onchange="toggleField('info-sign', this)" class="h-4 w-4 text-blue-700">
                 <span class="text-xs font-semibold">Chữ ký</span>
             </label>
         </div>
     </div>
 
-    <!-- AREA PRINT -->
     <div id="print-area">
         {% if nhan_vien or queryset or nhan_vien_list %}
             {% for nv in queryset|default:nhan_vien_list|default:nhan_vien_as_list %}
                 <div class="print-page">
-                    <div class="watermark">SCMD SECURITY</div>
-                    
-                    <!-- HEADER CÔNG TY VỚI LOGO -->
-                    <div class="flex justify-between items-start border-b-2 border-blue-900 pb-4 mb-6">
+                    <div class="watermark">SCMD Pro</div>
+
+                    <div class="mb-6 flex items-start justify-between border-b-2 border-blue-900 pb-4">
                         <div class="flex items-center gap-4">
-                            <!-- Logo SCMD Placeholder - Thay thế bằng URL thật khi deploy -->
-                            <div class="w-20 h-20 bg-blue-900 flex items-center justify-center rounded-lg shadow-sm">
-                                <i class="fas fa-shield-halved text-white text-5xl"></i>
+                            <div class="flex h-20 w-20 items-center justify-center rounded-lg bg-blue-900 text-white shadow-sm">
+                                <i class="fas fa-shield-halved text-5xl"></i>
                             </div>
                             <div>
-                                <h2 class="text-xl font-extrabold text-blue-900 leading-tight">CÔNG TY TNHH DỊCH VỤ<br>BẢO VỆ SCMD</h2>
-                                <p class="text-[10px] font-bold text-gray-700 mt-1 uppercase">Hệ thống quản trị an ninh chuyên nghiệp</p>
-                                <p class="text-[9px] text-gray-500">Trụ sở: Tòa nhà SCMD, Quận 1, TP. Hồ Chí Minh</p>
+                                <h2 class="leading-tight text-xl font-extrabold text-blue-900">CÔNG TY TNHH DỊCH VỤ<br>BẢO VỆ SCMD</h2>
+                                <p class="mt-1 text-[10px] font-bold uppercase text-slate-700">SCMD Pro | Hệ thống vận hành nội bộ</p>
+                                <p class="text-[9px] text-slate-500">Trụ sở: Tòa nhà SCMD, Quận 1, TP. Hồ Chí Minh</p>
                             </div>
                         </div>
                         <div class="text-right">
-                            <div class="bg-gray-100 p-2 rounded border border-gray-300">
-                                <p class="text-[10px] font-bold text-gray-600">MÃ NHÂN VIÊN</p>
-                                <p class="text-lg font-black text-blue-800 tracking-tighter">{{ nv.ma_nhan_vien|default:"SCMD-XXXX" }}</p>
+                            <div class="rounded border border-slate-300 bg-slate-100 p-2">
+                                <p class="text-[10px] font-bold text-slate-600">MÃ NHÂN VIÊN</p>
+                                <p class="tracking-tighter text-lg font-black text-blue-800">{{ nv.ma_nhan_vien|default:"SCMD-XXXX" }}</p>
                             </div>
-                            <p class="text-[9px] text-gray-400 mt-2 font-medium italic">Ngày in: {% now "d/m/Y H:i" %}</p>
+                            <p class="mt-2 text-[9px] font-medium italic text-slate-400">Ngày in: {% now "d/m/Y H:i" %}</p>
                         </div>
                     </div>
 
-                    <!-- TITLE & PHOTO SECTION -->
-                    <div class="flex justify-between items-center mb-8">
+                    <div class="mb-8 flex items-center justify-between">
                         <div class="w-2/3">
-                            <h1 class="text-3xl font-black text-gray-900 tracking-widest uppercase mb-1">Lý Lịch Trích Ngang</h1>
-                            <div class="h-1 w-24 bg-blue-800 mb-4"></div>
+                            <h1 class="mb-1 text-3xl font-black uppercase tracking-[0.12em] text-slate-900">Lý lịch trích ngang</h1>
+                            <div class="mb-4 h-1 w-24 bg-blue-800"></div>
                             <div class="space-y-1">
-                                <p class="text-sm">Họ và tên: <span class="text-xl font-bold uppercase text-blue-900 ml-2">{{ nv.ho_ten|default:"..." }}</span></p>
-                                <p class="text-sm">Chức vụ: <span class="font-bold text-gray-700 ml-2">{{ nv.chuc_danh.ten_chuc_danh|default:"Nhân viên bảo vệ" }}</span></p>
-                                <p class="text-sm">Đơn vị: <span class="font-bold text-gray-700 ml-2">{{ nv.phong_ban.ten_phong_ban|default:"Phòng Nghiệp vụ" }}</span></p>
+                                <p class="text-sm">Họ và tên: <span class="ml-2 text-xl font-bold uppercase text-blue-900">{{ nv.ho_ten|default:"..." }}</span></p>
+                                <p class="text-sm">Chức vụ: <span class="ml-2 font-bold text-slate-700">{{ nv.chuc_danh.ten_chuc_danh|default:"Nhân viên" }}</span></p>
+                                <p class="text-sm">Đơn vị: <span class="ml-2 font-bold text-slate-700">{{ nv.phong_ban.ten_phong_ban|default:"Phòng nghiệp vụ" }}</span></p>
                             </div>
                         </div>
                         <div class="profile-photo shadow-md">
                             {% if nv.anh_the %}
                                 <img src="{{ nv.anh_the.url }}" alt="Photo">
                             {% else %}
-                                <div class="text-center p-2 text-gray-300">
-                                    <i class="fas fa-user text-5xl mb-1"></i>
-                                    <p class="text-[8px]">Dán ảnh 3x4</p>
+                                <div class="p-2 text-center text-slate-300">
+                                    <i class="fas fa-user text-5xl"></i>
+                                    <p class="mt-1 text-[8px]">Dán ảnh 3x4</p>
                                 </div>
                             {% endif %}
                         </div>
                     </div>
 
-                    <!-- I. THÔNG TIN CÁ NHÂN -->
                     <div class="section-header">
-                        <div class="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center mr-3 text-xs">
-                            <i class="fas fa-user-shield"></i>
-                        </div>
-                        <span class="section-title">I. Thông tin nhân thân & Lý lịch</span>
+                        <span class="section-badge"><i class="fas fa-user-shield"></i></span>
+                        <span class="section-title">I. Thông tin nhân thân và lý lịch</span>
                     </div>
-                    
                     <div class="grid grid-cols-2 gap-y-2 px-2">
                         <div class="flex"><span class="field-label">Ngày sinh:</span> <span class="field-value">{{ nv.ngay_sinh|date:"d/m/Y"|default:"..." }}</span></div>
                         <div class="flex"><span class="field-label">Giới tính:</span> <span class="field-value">{{ nv.get_gioi_tinh_display|default:"..." }}</span></div>
-                        
-                        <div class="info-cccd col-span-2 flex border-t border-gray-50 pt-1">
-                            <span class="field-label">Số CCCD/CMND:</span> <span class="field-value">{{ nv.so_cccd|default:"..." }}</span>
-                        </div>
-                        
-                        <div class="info-sdt col-span-2 flex border-t border-gray-50 pt-1">
-                            <span class="field-label">Số điện thoại:</span> <span class="field-value font-bold text-blue-800">{{ nv.sdt_chinh|default:"..." }}</span>
-                        </div>
-                        
-                        <div class="info-address col-span-2 flex border-t border-gray-50 pt-1">
-                            <span class="field-label">Địa chỉ trú quán:</span> <span class="field-value text-xs">{{ nv.dia_chi_thuong_tru|default:"..." }}</span>
-                        </div>
-                        
-                        <div class="flex border-t border-gray-50 pt-1"><span class="field-label">Ngày vào làm:</span> <span class="field-value">{{ nv.ngay_vao_lam|date:"d/m/Y"|default:"..." }}</span></div>
-                        <div class="flex border-t border-gray-50 pt-1"><span class="field-label">Trình độ VH:</span> <span class="field-value">12/12</span></div>
+                        <div class="info-cccd col-span-2 flex border-t border-slate-100 pt-1"><span class="field-label">Số CCCD/CMND:</span> <span class="field-value">{{ nv.so_cccd|default:"..." }}</span></div>
+                        <div class="info-sdt col-span-2 flex border-t border-slate-100 pt-1"><span class="field-label">Số điện thoại:</span> <span class="field-value font-bold text-blue-800">{{ nv.sdt_chinh|default:"..." }}</span></div>
+                        <div class="info-address col-span-2 flex border-t border-slate-100 pt-1"><span class="field-label">Địa chỉ thường trú:</span> <span class="field-value text-xs">{{ nv.dia_chi_thuong_tru|default:"..." }}</span></div>
+                        <div class="flex border-t border-slate-100 pt-1"><span class="field-label">Ngày vào làm:</span> <span class="field-value">{{ nv.ngay_vao_lam|date:"d/m/Y"|default:"..." }}</span></div>
+                        <div class="flex border-t border-slate-100 pt-1"><span class="field-label">Trình độ VH:</span> <span class="field-value">12/12</span></div>
                     </div>
 
-                    <!-- II. TRÌNH ĐỘ CHUYÊN MÔN -->
                     <div class="info-edu">
                         <div class="section-header">
-                            <div class="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center mr-3 text-xs">
-                                <i class="fas fa-graduation-cap"></i>
-                            </div>
-                            <span class="section-title">II. Học vấn & Chứng chỉ nghiệp vụ</span>
+                            <span class="section-badge"><i class="fas fa-graduation-cap"></i></span>
+                            <span class="section-title">II. Học vấn và chứng chỉ nghiệp vụ</span>
                         </div>
                         <table>
                             <thead>
                                 <tr>
                                     <th width="35%">Cấp bậc/Bằng cấp</th>
                                     <th width="45%">Chuyên ngành/Cơ sở</th>
-                                    <th width="20%">Xếp loại/Năm</th>
+                                    <th width="20%">Năm</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -295,19 +291,16 @@
                                     <td class="text-center">{{ hoc.nam_tot_nghiep }}</td>
                                 </tr>
                                 {% empty %}
-                                <tr><td colspan="3" class="text-center italic text-gray-400 py-3">Hệ thống đang đồng bộ dữ liệu bằng cấp chứng chỉ...</td></tr>
+                                <tr><td colspan="3" class="py-3 text-center italic text-slate-400">Chưa có dữ liệu bằng cấp chứng chỉ.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- III. QUÁ TRÌNH CÔNG TÁC -->
                     <div class="info-history">
                         <div class="section-header">
-                            <div class="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center mr-3 text-xs">
-                                <i class="fas fa-history"></i>
-                            </div>
-                            <span class="section-title">III. Lịch sử công tác & Nhiệm vụ tiêu biểu</span>
+                            <span class="section-badge"><i class="fas fa-history"></i></span>
+                            <span class="section-title">III. Lịch sử công tác và nhiệm vụ tiêu biểu</span>
                         </div>
                         <table>
                             <thead>
@@ -325,40 +318,37 @@
                                     <td>{{ ct.ghi_chu|default:"Hoàn thành tốt nhiệm vụ" }}</td>
                                 </tr>
                                 {% empty %}
-                                <tr><td colspan="3" class="text-center italic text-gray-400 py-3">Chưa có ghi nhận điều động công tác.</td></tr>
+                                <tr><td colspan="3" class="py-3 text-center italic text-slate-400">Chưa có ghi nhận điều động công tác.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- IV. XÁC NHẬN -->
                     <div class="info-sign mt-10">
                         <div class="grid grid-cols-2 text-center">
                             <div class="space-y-24">
                                 <div>
-                                    <p class="font-bold uppercase text-xs">Nhân viên cam đoan</p>
-                                    <p class="text-[10px] italic text-gray-500">(Ký và ghi rõ họ tên)</p>
+                                    <p class="text-xs font-bold uppercase">Nhân viên cam đoan</p>
+                                    <p class="text-[10px] italic text-slate-500">(Ký và ghi rõ họ tên)</p>
                                 </div>
                                 <p class="text-sm font-bold uppercase text-blue-900">{{ nv.ho_ten }}</p>
                             </div>
                             <div class="space-y-24">
                                 <div>
-                                    <p class="font-bold uppercase text-xs">Đại diện Công ty SCMD</p>
-                                    <p class="text-[10px] italic text-gray-500">(Ký tên và đóng dấu pháp nhân)</p>
+                                    <p class="text-xs font-bold uppercase">Đại diện SCMD</p>
+                                    <p class="text-[10px] italic text-slate-500">(Ký tên và đóng dấu pháp nhân)</p>
                                 </div>
-                                <div class="relative">
+                                <div>
                                     <p class="text-sm font-bold uppercase">Phòng nhân sự</p>
-                                    <!-- Dấu mộc placeholder - có thể dùng ảnh nếu có -->
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- FOOTER BẢO MẬT -->
-                    <div class="absolute bottom-8 left-0 right-0 px-15">
-                        <div class="border-t-2 border-gray-100 pt-3 flex justify-between items-center">
-                            <p class="text-[8px] text-gray-400 italic max-w-sm">
-                                Hồ sơ này là tài sản bảo mật của SCMD. Mọi hành vi sao chép, chỉnh sửa dữ liệu khi chưa được cấp phép là vi phạm quy định công ty và pháp luật.
+                    <div class="absolute bottom-8 left-0 right-0 px-[60px]">
+                        <div class="flex items-center justify-between border-t-2 border-slate-100 pt-3">
+                            <p class="max-w-sm text-[8px] italic text-slate-400">
+                                Hồ sơ này là tài sản quản trị nội bộ của SCMD Pro. Mọi hành vi sao chép hoặc điều chỉnh dữ liệu khi chưa được cấp phép đều vi phạm quy định công ty và pháp luật.
                             </p>
                             <div class="flex gap-4 text-blue-900 opacity-30">
                                 <i class="fas fa-shield-alt"></i>
@@ -370,37 +360,27 @@
                 </div>
             {% endfor %}
         {% else %}
-            <div class="flex items-center justify-center h-screen no-print">
-                <div class="text-center p-8 bg-white rounded-xl shadow-xl border border-red-100">
-                    <i class="fas fa-exclamation-triangle text-red-500 text-5xl mb-4"></i>
+            <div class="no-print flex h-screen items-center justify-center">
+                <div class="rounded-xl border border-red-100 bg-white p-8 text-center shadow-xl">
+                    <i class="fas fa-exclamation-triangle mb-4 text-5xl text-red-500"></i>
                     <h3 class="text-xl font-bold">Không tìm thấy dữ liệu</h3>
-                    <p class="text-gray-500">Vui lòng chọn nhân viên từ danh sách để thực hiện in.</p>
+                    <p class="text-slate-500">Vui lòng chọn nhân viên từ danh sách để thực hiện in.</p>
                 </div>
             </div>
         {% endif %}
     </div>
 
     <script>
-        // Xử lý bật tắt các trường thông tin theo nhu cầu người dùng
         function toggleField(className, checkbox) {
             const elements = document.querySelectorAll('.' + className);
-            elements.forEach(el => {
+            elements.forEach((element) => {
                 if (checkbox.checked) {
-                    el.classList.remove('hidden-field');
+                    element.classList.remove('hidden-field');
                 } else {
-                    el.classList.add('hidden-field');
+                    element.classList.add('hidden-field');
                 }
             });
         }
-
-        // Tự động xử lý danh sách đầu vào cho phù hợp với template
-        document.addEventListener('DOMContentLoaded', () => {
-            // Fix trường hợp nhan_vien là object đơn lẻ
-            const printArea = document.getElementById('print-area');
-            if (printArea.children.length === 0) {
-                console.warn("No data detected in template context.");
-            }
-        });
     </script>
 </body>
 </html>

@@ -8,6 +8,8 @@ Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 File: accounting/models_soquy.py
 Author: Mr. Anh
 Created Date: 2025-11-30
+Updated Date: 2026-04-28
+Version: v1.1.0
 Description: Model quản lý Sổ Quỹ (Thu/Chi) với quy trình Duyệt.
 """
 

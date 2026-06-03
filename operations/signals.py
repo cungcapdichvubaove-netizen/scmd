@@ -1,34 +1,29 @@
 # operations/signals.py
 # -*- coding: utf-8 -*-
+import logging
 
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.contrib.auth.models import User
+from django.utils import timezone
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
-from users.models import NhanVien
 from .models import BaoCaoSuCo, ChamCong
+from .models_alive_check import KiemTraQuanSo
 from .tasks import process_timesheet_async, resize_image_async, process_new_incident_alert
 
-
-# ==========================================================
-# 1. AUTO CREATE PROFILE
-# ==========================================================
-
-@receiver(post_save, sender=User)
-def create_profile(sender, instance, created, **kwargs):
-    if created and not hasattr(instance, 'nhanvien'):
-        NhanVien.objects.create(
-            user=instance,
-            ho_ten=instance.username
-        )
+logger = logging.getLogger(__name__)
 
 
-@receiver(post_save, sender=User)
-def save_profile(sender, instance, **kwargs):
-    if hasattr(instance, 'nhanvien'):
-        instance.nhanvien.save()
+def _safe_avatar_url(nhan_vien):
+    if not nhan_vien or not nhan_vien.anh_the:
+        return None
+    try:
+        return nhan_vien.anh_the.url
+    except Exception:
+        logger.exception("Unable to resolve avatar URL for employee %s", getattr(nhan_vien, "id", "unknown"))
+        return None
 
 
 # ==========================================================
@@ -54,27 +49,15 @@ def handle_su_co_changes(sender, instance, created, **kwargs):
             'hinh_anh_2'
         )
 
-    if created:
-
-        process_new_incident_alert.delay(instance.id)
-
+    def broadcast_incident():
         try:
             channel_layer = get_channel_layer()
+            if not channel_layer:
+                return
 
-            target_name = (
-                instance.muc_tieu.ten_muc_tieu
-                if instance.muc_tieu
-                else "Không xác định"
-            )
-
-            lat = None
-            lng = None
-
-            if instance.lat:
-                lat = float(instance.lat)
-
-            if instance.long:
-                lng = float(instance.long)
+            target_name = instance.muc_tieu.ten_muc_tieu if instance.muc_tieu else "Không xác định"
+            lat = float(instance.muc_tieu.vi_do) if instance.muc_tieu and instance.muc_tieu.vi_do else None
+            lng = float(instance.muc_tieu.kinh_do) if instance.muc_tieu and instance.muc_tieu.kinh_do else None
 
             payload = {
                 "type": "INCIDENT",
@@ -88,15 +71,15 @@ def handle_su_co_changes(sender, instance, created, **kwargs):
             }
 
             async_to_sync(channel_layer.group_send)(
-                "notifications",
-                {
-                    "type": "send_notification",
-                    "payload": payload
-                }
+                "war_room_staff", # Fix F13: Gửi tới nhóm War Room Staff
+                {"type": "send_notification", "payload": payload}
             )
+        except Exception:
+            logger.exception("Incident WebSocket broadcast failed for incident %s", instance.id)
 
-        except Exception as e:
-            print("Incident WebSocket Error:", e)
+    if created:
+        process_new_incident_alert.delay(instance.id)
+        transaction.on_commit(broadcast_incident)
 
 
 # ==========================================================
@@ -108,59 +91,87 @@ def broadcast_attendance(sender, instance, created, **kwargs):
     """
     Broadcast Check-in / Check-out realtime lên bản đồ
     """
+    is_checkout = bool(instance.thoi_gian_check_out)
+    if not created and not is_checkout:
+        return
+    
+    def broadcast_attendance_socket():
+        try:
+            ca_truc = instance.ca_truc
+            nhan_vien = getattr(ca_truc, 'nhan_vien', None) if ca_truc else None
+            if not nhan_vien: 
+                return
 
-    try:
+            # Safe extraction of coordinates
+            point = instance.location_check_out if is_checkout else instance.location_check_in
+            lat = point.y if point else getattr(instance, 'lat_check_in', 0.0)
+            lng = point.x if point else getattr(instance, 'long_check_in', 0.0)
 
-        nhan_vien = instance.ca_truc.nhan_vien
+            if not lat or not lng: 
+                return
 
-        lat = instance.lat_check_in
-        lng = instance.long_check_in
+            action = "CHECKOUT" if is_checkout else "CHECKIN"
+            avatar_url = _safe_avatar_url(nhan_vien)
 
-        if not lat or not lng:
-            if instance.location_check_in:
-                lat = instance.location_check_in.y
-                lng = instance.location_check_in.x
+            channel_layer = get_channel_layer()
+            if not channel_layer: 
+                return
 
-        if not lat or not lng:
-            return
-
-        action = "CHECKIN"
-
-        if instance.thoi_gian_check_out:
-            action = "CHECKOUT"
-
-        avatar_url = None
-
-        if nhan_vien.anh_the:
-            try:
-                avatar_url = nhan_vien.anh_the.url
-            except:
-                pass
-
-        channel_layer = get_channel_layer()
-
-        payload = {
-            "type": action,
-            "id": instance.id,
-            "user_name": nhan_vien.ho_ten,
-            "avatar": avatar_url,
-            "lat": float(lat),
-            "lng": float(lng),
-            "message": f"{nhan_vien.ho_ten} vừa {action.lower()}",
-            "timestamp": (
-                instance.thoi_gian_check_out.strftime("%H:%M:%S")
-                if action == "CHECKOUT"
-                else instance.thoi_gian_check_in.strftime("%H:%M:%S")
-            )
-        }
-
-        async_to_sync(channel_layer.group_send)(
-            "notifications",
-            {
-                "type": "send_notification",
-                "payload": payload
+            payload = {
+                "type": action,
+                "id": instance.id,
+                "user_name": nhan_vien.ho_ten,
+                "avatar": avatar_url,
+                "lat": float(lat) if lat else 0.0,
+                "lng": float(lng) if lng else 0.0,
+                "message": f"{nhan_vien.ho_ten} vừa {action.lower()}",
+                "timestamp": (
+                    instance.thoi_gian_check_out.strftime("%H:%M:%S")
+                    if is_checkout
+                    else instance.thoi_gian_check_in.strftime("%H:%M:%S")
+                )
             }
-        )
 
-    except Exception as e:
-        print("Attendance WebSocket Error:", e)
+            async_to_sync(channel_layer.group_send)(
+                "war_room_staff", # Fix F13: Gửi tới nhóm War Room Staff
+                {"type": "send_notification", "payload": payload}
+            )
+        except Exception:
+            logger.exception("Attendance WebSocket broadcast failed for attendance %s", instance.id)
+
+    transaction.on_commit(broadcast_attendance_socket)
+
+
+# ==========================================================
+# 4. ALIVE CHECK MONITORING
+# ==========================================================
+
+@receiver(post_save, sender=KiemTraQuanSo)
+def handle_alive_check_broadcast(sender, instance, created, **kwargs):
+    """
+    Broadcast cảnh báo khi Alive Check vi phạm (Sai vị trí hoặc Quá hạn).
+    """
+    if instance.trang_thai in ['MISSED', 'LATE']:
+        def broadcast_alert():
+            try:
+                channel_layer = get_channel_layer()
+                if not channel_layer:
+                    return
+
+                payload = {
+                    "type": "ALIVE_CHECK_ALERT",
+                    "id": str(instance.id),
+                    "status": instance.trang_thai,
+                    "nhan_vien": instance.ca_truc.nhan_vien.ho_ten,
+                    "muc_tieu": instance.ca_truc.vi_tri_chot.muc_tieu.ten_muc_tieu,
+                    "message": f"Vi phạm Alive Check: {instance.ca_truc.nhan_vien.ho_ten} ({instance.get_trang_thai_display()})",
+                    "timestamp": timezone.now().strftime("%H:%M:%S")
+                }
+                async_to_sync(channel_layer.group_send)(
+                    "war_room_staff",
+                    {"type": "send_notification", "payload": payload}
+                )
+            except Exception:
+                logger.exception("AliveCheck WebSocket broadcast failed for check %s", instance.id)
+
+        transaction.on_commit(broadcast_alert)

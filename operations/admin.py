@@ -102,9 +102,10 @@ class ChamCongInline(admin.StackedInline):
     verbose_name_plural = 'DỮ LIỆU CHẤM CÔNG (REAL-TIME)'
     fk_name = 'ca_truc'
     readonly_fields = (
-        'thoi_gian_check_in', 'thoi_gian_check_out', 
-        'preview_check_in', 'preview_check_out', 
-        'map_view'
+        'thoi_gian_check_in', 'thoi_gian_check_out',
+        'preview_check_in', 'preview_check_out',
+        'map_view', 'vi_tri_hop_le', 'khoang_cach_check_in',
+        'thiet_bi_check_in', 'ip_check_in', 'ghi_chu'
     )
     
     fieldsets = (

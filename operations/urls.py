@@ -12,7 +12,7 @@ Description: Định tuyến URL module Vận hành.
 """
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from . import views, api_views
+from operations import api, api_views, views
 
 app_name = 'operations'
 
@@ -26,6 +26,18 @@ urlpatterns = [
     # [FIX] Đưa endpoint cụ thể lên TRƯỚC router tổng
     # Nếu để bên dưới, Django sẽ match 'api/' của router trước và gây lỗi 404
     path('api/dashboard/data/', api_views.DashboardDataAPIView.as_view(), name='api_dashboard_data'),
+    path('api/dashboard/alive-check-violations/', api_views.AliveCheckViolationAPIView.as_view(), name='api_alive_check_violations'),
+
+    # API Chấm công Mobile (Clean Architecture v2)
+    path('api/v1/mobile/checkin/', api_views.CheckInAPI.as_view(), name='mobile_checkin_api'),
+    path('api/v1/mobile/checkout/', api_views.CheckOutAPI.as_view(), name='mobile_checkout_api'),
+    path('api/v1/mobile/lich-truc/', api.FrozenLegacyAPIView.as_view(), name='mobile_lich_truc_api'),
+    path('api/v1/mobile/doi-ca/', api.FrozenLegacyAPIView.as_view(), name='mobile_doi_ca_api'),
+    path('api/v1/mobile/doi-ca/phe-duyet/', api.FrozenLegacyAPIView.as_view(), name='mobile_doi_ca_approve_api'),
+    path('api/v1/mobile/alive-check/respond/', api_views.MobileAliveCheckResponseAPIView.as_view(), name='mobile_alive_check_respond_api'),
+
+    # Reports & Analytics
+    path('api/v1/operations/reports/swap-rate/', api.FrozenLegacyAPIView.as_view(), name='report_swap_rate_api'),
 
     # Sau đó mới đến router chung
     path('api/', include(router.urls)),

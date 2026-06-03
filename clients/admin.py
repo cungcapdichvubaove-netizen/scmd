@@ -30,7 +30,7 @@ UI_COLORS = {
 }
 
 def format_html_status(text, status_code):
-    """Định dạng Badge trạng thái theo chuẩn giao diện SCMD Pro"""
+    """Định dạng Badge trạng thái theo chuẩn giao diện SCMD Erp"""
     color = UI_COLORS.get(status_code, '#475569')
     return format_html(
         '<span style="background-color: {}; color: white; padding: 4px 10px; border-radius: 12px; '

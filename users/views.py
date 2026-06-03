@@ -2,11 +2,13 @@
 """
 Security Command (SCMD) System
 ------------------------------
-Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
+Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
 File: users/views.py
 Author: Mr. Anh
 Created Date: 2025-12-05
+Updated Date: 2026-04-28
+Version: v1.1.0
 Description: Views xử lý logic người dùng (Nhân sự).
              UPDATED: Mobile Feature Set (Update Profile, Change Password, Salary Detail).
 """
@@ -22,11 +24,13 @@ from pathlib import Path
 from weasyprint import HTML
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.db.models import Count
 
-from .models import NhanVien, BangCapChungChi
+from .models import NhanVien, BangCapChungChi, PhongBan, LichSuCongTac
 from .forms import UserProfileForm
 from operations.models import PhanCongCaTruc
 from accounting.models import ChiTietLuong
+from clients.models import MucTieu
 
 # ==============================================================================
 # 1. DASHBOARD NHÂN SỰ (HR)
@@ -37,18 +41,42 @@ def dashboard_view(request):
     current_month = today.month
     current_year = today.year
 
-    total_staff = NhanVien.objects.count()
-    new_staff = NhanVien.objects.filter(ngay_vao_lam__month=current_month, ngay_vao_lam__year=current_year).count()
-    probation_staff = NhanVien.objects.filter(trang_thai_lam_viec='THUVIEC').count()
+    # 1. KPIs Tổng quát
+    total_staff = NhanVien.objects.filter(trang_thai_lam_viec__in=['THUVIEC', 'CHINHTHUC']).count()
+    new_staff_count = NhanVien.objects.filter(ngay_vao_lam__month=current_month, ngay_vao_lam__year=current_year).count()
+    probation_staff_count = NhanVien.objects.filter(trang_thai_lam_viec='THUVIEC').count()
     
+    # 2. Cảnh báo Bằng cấp (Sắp hết hạn trong 30 ngày)
     next_30_days = today + timedelta(days=30)
-    expiring_certs = BangCapChungChi.objects.filter(ngay_het_han__range=[today, next_30_days]).select_related('nhan_vien')
+    expiring_certs = BangCapChungChi.objects.filter(
+        ngay_het_han__range=[today, next_30_days]
+    ).select_related('nhan_vien', 'nhan_vien__phong_ban')
+
+    # 3. Nhân sự mới gia nhập gần đây (Để chào mừng/theo dõi)
+    recent_staff = NhanVien.objects.filter(trang_thai_lam_viec__in=['THUVIEC', 'CHINHTHUC']).order_by('-ngay_vao_lam')[:5]
+
+    # 4. Dữ liệu biểu đồ cơ cấu phòng ban
+    dept_stats = PhongBan.objects.annotate(count=Count('cac_nhan_vien')).filter(count__gt=0)
+    chart_labels = [dept.ten_phong_ban for dept in dept_stats]
+    chart_data = [dept.count for dept in dept_stats]
+
+    # 5. Sinh nhật trong tháng
+    birthdays = NhanVien.objects.filter(
+        ngay_sinh__month=current_month,
+        trang_thai_lam_viec__in=['THUVIEC', 'CHINHTHUC']
+    ).order_by('ngay_sinh__day')
 
     context = {
         "total_staff": total_staff,
-        "new_staff": new_staff,
-        "probation_staff": probation_staff,
+        "new_staff_count": new_staff_count,
+        "probation_staff_count": probation_staff_count,
         "expiring_certs": expiring_certs,
+        "recent_staff": recent_staff,
+        "today": today,
+        "chart_labels": chart_labels,
+        "chart_data": chart_data,
+        "birthdays": birthdays,
+        "now": today,
     }
     return render(request, "users/dashboard_hr.html", context)
 
@@ -204,4 +232,47 @@ def export_ly_lich_pdf(request, nhan_vien_id):
     
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'filename="ly_lich_{nhan_vien.ma_nhan_vien}.pdf"'
+    return response
+
+@login_required
+@permission_required('users.view_nhanvien', raise_exception=True)
+def export_the_ten_pdf(request, nhan_vien_id):
+    """Xuất file PDF thẻ tên nhân viên chuyên nghiệp (Standard ID Card)"""
+    nhan_vien = get_object_or_404(NhanVien, pk=nhan_vien_id)
+    
+    html_string = render_to_string("users/pdf/the_ten.html", {
+        "nv": nhan_vien,
+        "now": timezone.now(),
+    })
+    
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    pdf_file = html.write_pdf()
+    
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'filename="the_ten_{nhan_vien.ma_nhan_vien}.pdf"'
+    return response
+
+@login_required
+@permission_required('users.view_nhanvien', raise_exception=True)
+def export_danh_sach_nhan_su_muc_tieu_pdf(request, muc_tieu_id):
+    """Xuất danh sách nhân sự đang công tác tại một mục tiêu cụ thể (Site Personnel)"""
+    muc_tieu = get_object_or_404(MucTieu, pk=muc_tieu_id)
+    
+    # SSOT: Lấy từ lịch sử công tác đang hoạt động
+    nhan_su = LichSuCongTac.objects.filter(
+        muc_tieu=muc_tieu,
+        ngay_ket_thuc__isnull=True
+    ).select_related('nhan_vien', 'nhan_vien__chuc_danh')
+
+    html_string = render_to_string("users/pdf/danh_sach_muc_tieu.html", {
+        "muc_tieu": muc_tieu,
+        "nhan_su": nhan_su,
+        "now": timezone.now()
+    })
+
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    pdf_file = html.write_pdf()
+
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'filename="danh_sach_nhan_su_{muc_tieu.id}.pdf"'
     return response

@@ -1,0 +1,27 @@
+# SCMD ERP - Development Dependencies
+
+# Inherit base production requirements
+-r requirements.txt
+
+# --- Code Quality & Linting ---
+flake8==7.3.0
+black==25.1.0
+isort==6.0.0
+mypy==1.15.0
+mccabe==0.7.0
+pycodestyle==2.14.0
+pyflakes==3.4.0
+
+# --- Testing Framework ---
+pytest==8.3.4
+pytest-django==4.9.0
+coverage==7.6.10
+pytest-cov==6.0.0
+
+# --- Mocking & Factory ---
+factory-boy==3.3.1
+Faker==37.6.0
+
+# --- Development Utilities ---
+cookiecutter==2.6.0
+django-extensions==3.2.3

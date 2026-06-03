@@ -1,0 +1,89 @@
+<div class="card bg-white shadow-xl border border-slate-200 mt-8">
+    <div class="card-body p-0">
+        <div class="flex items-center justify-between p-6 border-b border-slate-100">
+            <h2 class="card-title text-slate-800 text-lg uppercase tracking-tight">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Lịch sử thông báo hệ thống
+            </h2>
+            <button id="refresh-alerts" class="btn btn-ghost btn-sm text-slate-400 hover:text-indigo-600">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Làm mới
+            </button>
+        </div>
+
+        <!-- Thanh công cụ: Tìm kiếm và Lọc -->
+        <div class="flex flex-wrap items-center gap-3 p-4 bg-slate-50 border-b border-slate-100">
+            <div class="form-control flex-1 min-w-[250px]">
+                <input type="text" id="hr-alert-search" placeholder="Tìm kiếm tiêu đề hoặc nội dung..." class="input input-bordered input-sm w-full focus:border-indigo-500" />
+            </div>
+            <select id="hr-alert-status-filter" class="select select-bordered select-sm text-xs font-semibold">
+                <option value="">Tất cả trạng thái</option>
+                <option value="SUCCESS">Thành công</option>
+                <option value="WARNING">Cảnh báo</option>
+                <option value="ERROR">Lỗi hệ thống</option>
+            </select>
+            <div class="flex items-center gap-2 bg-white px-3 py-1 rounded-md border border-slate-200">
+                <span class="text-[10px] text-slate-400 uppercase font-bold">Từ:</span>
+                <input type="date" id="hr-alert-start-date" class="input input-ghost input-xs focus:bg-transparent p-0 w-28 h-6 min-h-0" />
+                <span class="text-[10px] text-slate-400 uppercase font-bold border-l pl-2 border-slate-200">Đến:</span>
+                <input type="date" id="hr-alert-end-date" class="input input-ghost input-xs focus:bg-transparent p-0 w-28 h-6 min-h-0" />
+            </div>
+            <div class="flex items-center gap-2 ml-auto">
+                <span class="text-[10px] text-slate-400 uppercase font-bold">Hiển thị:</span>
+                <select id="hr-alert-page-size" class="select select-bordered select-sm text-xs font-semibold">
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="table table-zebra w-full" id="hr-alerts-table">
+                <thead class="bg-slate-50 text-slate-500 uppercase text-[11px] font-bold">
+                    <tr>
+                        <th class="w-20">Thời gian</th>
+                        <th>Tiêu đề</th>
+                        <th>Nội dung chi tiết</th>
+                        <th class="text-center">Ảnh hưởng</th>
+                        <th class="text-center">Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="hr-alerts-body">
+                    <!-- Dữ liệu sẽ được chèn vào đây bởi JavaScript -->
+                    <tr>
+                        <td colspan="5" class="text-center py-10">
+                            <span class="loading loading-spinner loading-md text-indigo-600"></span>
+                            <p class="text-xs text-slate-400 mt-2">Đang tải lịch sử thông báo...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Phân trang -->
+        <div id="hr-alerts-pagination" class="flex items-center justify-between p-4 bg-slate-50 border-t border-slate-100 hidden">
+            <div class="text-xs text-slate-500">
+                Hiển thị <span id="pagination-info" class="font-bold">0</span> kết quả
+            </div>
+            <div class="join">
+                <button id="prev-page" class="join-item btn btn-sm">«</button>
+                <button id="current-page-num" class="join-item btn btn-sm btn-disabled">Trang 1</button>
+                <button id="next-page" class="join-item btn btn-sm">»</button>
+            </div>
+        </div>
+
+        <div id="hr-alerts-empty" class="hidden p-10 text-center">
+            <div class="opacity-20 mb-2 flex justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                </svg>
+            </div>
+            <p class="text-slate-400 text-sm">Không có thông báo hệ thống nào trong 30 ngày qua.</p>
+        </div>
+    </div>
+</div>

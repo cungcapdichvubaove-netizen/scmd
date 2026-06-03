@@ -1,72 +1,64 @@
 services:
-  # --- 1. DJANGO WEB APP ---
-  web:
-    build: .
-    # Ép web thực hiện migrate và collectstatic trước khi chạy server
-    command: >
-      sh -c "python manage.py migrate && 
-             python manage.py collectstatic --noinput && 
-             python manage.py runserver 0.0.0.0:8000"
-    volumes:
-      - .:/app
-    ports:
-      - "8000:8000"
-    depends_on:
-      db:
-        condition: service_healthy # Chỉ chạy khi DB thực sự sẵn sàng
-      redis:
-        condition: service_started
-    environment:
-      - DEBUG=True
-      - SECRET_KEY=django-insecure-docker-dev-key
-      - DATABASE_URL=postgres://scmd_user:scmd_password@db:5432/scmd_db
-      - REDIS_URL=redis://redis:6379/0
-      - ALLOWED_HOSTS=*
-    user: root 
-
-  # --- 2. WORKER (CELERY) ---
-  celery:
-    build: .
-    # Celery CHỈ chạy worker, KHÔNG chạy migrate để tránh xung đột
-    command: celery -A config worker -l info
-    volumes:
-      - .:/app
-    depends_on:
-      web:
-        condition: service_started # Đợi web migrate xong mới chạy worker
-      db:
-        condition: service_healthy
-    environment:
-      - DEBUG=True
-      - DATABASE_URL=postgres://scmd_user:scmd_password@db:5432/scmd_db
-      - REDIS_URL=redis://redis:6379/0
-
-  # --- 3. DATABASE (POSTGIS) ---
   db:
-    image: postgis/postgis:15-3.3
-    container_name: scmd_postgres
+    image: postgis/postgis:15-3.3-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=scmd_db
       - POSTGRES_USER=scmd_user
-      - POSTGRES_PASSWORD=scmd_password
-    healthcheck: # Kiểm tra xem DB đã thực sự nhận kết nối chưa
+      - POSTGRES_PASSWORD=scmd_pass
+    healthcheck:
       test: ["CMD-SHELL", "pg_isready -U scmd_user -d scmd_db"]
       interval: 5s
       timeout: 5s
       retries: 5
-    ports:
-      - "5433:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    restart: always
 
-  # --- 4. REDIS ---
   redis:
-    image: redis:7
-    container_name: scmd_redis
+    image: redis:7-alpine
+
+  web:
+    build: .
+    volumes:
+      - .:/app
     ports:
-      - "6380:6379"
-    restart: always
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-local-dev-key
+      - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
+      - REDIS_URL=redis://redis:6379/0
+      - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  celery_worker:
+    build: .
+    command: celery -A config worker -l info
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
+      - REDIS_URL=redis://redis:6379/0
+      - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+    depends_on:
+      - db
+      - redis
+
+  celery_beat:
+    build: .
+    command: celery -A config beat -l info
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
+      - REDIS_URL=redis://redis:6379/0
+      - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+    depends_on:
+      - db
+      - redis
 
 volumes:
   postgres_data:

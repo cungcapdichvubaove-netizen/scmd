@@ -7,13 +7,13 @@ Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 File: operations/models.py
 Author: Mr. Anh (CTO) & AI Assistant
 Created Date: 2025-12-10
-Updated Date: 2026-03-21
+Updated Date: 2026-05-15
+Version: v2.0.0-pro
 Description: Model quản lý Vận hành, Chấm công và Xử lý sự cố.
-             UPGRADE PHASE 2: Chuyển đổi sang GeoDjango (PostGIS).
+             HARDENING PHASE: Chuẩn hóa Multi-tenancy và Geo-spatial helpers.
              - Tích hợp PointField cho định vị chính xác cao.
              - Gia cố Anti-fraud và GEOFENCING logic.
-             - FIXED: Lỗi Migration ma_su_co (non-nullable error).
-             - FIXED: Chuẩn hóa toàn bộ verbose_name_plural trong class Meta.
+             - SSOT: Tuân thủ tuyệt đối DOCUMENTATION.md v2.0.0.
 """
 
 import uuid
@@ -23,7 +23,8 @@ from django.contrib.gis.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from django.db import transaction
+from django.db import IntegrityError, transaction, models as db_models # Alias models to db_models to avoid conflict with gis.db.models
+from core.managers import TenantAwareManager
 
 from users.models import NhanVien
 from clients.models import MucTieu
@@ -31,16 +32,25 @@ from clients.models import MucTieu
 # Logger cho hệ thống vận hành SCMD
 logger = logging.getLogger(__name__)
 
+from django.conf import settings
 # ==============================================================================
-# 1. CẤU HÌNH VỊ TRÍ & CA TRỰC
+# 0. MULTI-TENANCY CORE (Zero Trust Architecture)
 # ==============================================================================
+
+class ViTriChotManager(TenantAwareManager):
+    """Manager cho ViTriChot giúp tối ưu hóa N+1 với MucTieu"""
+    def get_queryset(self):
+        return super().get_queryset().select_related('muc_tieu')
+
 
 class ViTriChot(models.Model):
     """Định nghĩa các vị trí trực cụ thể tại mục tiêu (Cổng chính, Tuần tra, Giám sát...)"""
+    tenant_id = models.UUIDField(_("Tenant ID"), db_index=True, default=uuid.uuid4, editable=False) # Default kept for migration compatibility, but enforced in save()
+    
     muc_tieu = models.ForeignKey(
         MucTieu, 
         on_delete=models.CASCADE, 
-        related_name="vi_tri_chot", 
+        related_name="cac_vi_tri_chot", 
         verbose_name=_("Mục tiêu bảo vệ"),
         help_text=_("Chọn khách hàng/mục tiêu quản lý vị trí trực này")
     )
@@ -49,6 +59,20 @@ class ViTriChot(models.Model):
         max_length=255,
         help_text=_("VD: Cổng chính, Kho A, Tuần tra vòng ngoài")
     )
+
+    objects = ViTriChotManager()
+
+    def save(self, *args, **kwargs):
+        from django.core.exceptions import ImproperlyConfigured
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID is not defined in settings. Cannot save tenant-aware model.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID # Enforce SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(_(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID} for this organization."))
+        super().clean()
 
     class Meta:
         verbose_name = _("Vị trí chốt trực")
@@ -63,6 +87,8 @@ class ViTriChot(models.Model):
 
 class CaLamViec(models.Model):
     """Quy định khung thời gian các ca làm việc (Ca ngày, Ca đêm, Ca hành chính)"""
+    tenant_id = models.UUIDField(_("Tenant ID"), db_index=True, default=uuid.uuid4, editable=False) # Default kept for migration compatibility, but enforced in save()
+
     ten_ca = models.CharField(
         _("Tên ca trực"), 
         max_length=100,
@@ -70,6 +96,20 @@ class CaLamViec(models.Model):
     )
     gio_bat_dau = models.TimeField(_("Giờ bắt đầu"))
     gio_ket_thuc = models.TimeField(_("Giờ kết thúc"))
+
+    objects = TenantAwareManager()
+
+    def save(self, *args, **kwargs):
+        from django.core.exceptions import ImproperlyConfigured
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID is not defined in settings. Cannot save tenant-aware model.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID # Enforce SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(_(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID} for this organization."))
+        super().clean()
 
     class Meta:
         verbose_name = _("Ca làm việc")
@@ -87,31 +127,37 @@ class CaLamViec(models.Model):
         return False
 
 
-class PhanCongManager(models.Manager):
+class PhanCongManager(TenantAwareManager):
     """Tối ưu hóa truy vấn bảng phân công nhằm giảm thiểu N+1 Query"""
     def get_queryset(self):
         return super().get_queryset().select_related(
             'nhan_vien', 
             'ca_lam_viec', 
-            'vi_tri_chot__muc_tieu'
+            'vi_tri_chot__muc_tieu',
+            'chamcong'  # Thêm quan hệ OneToOne để tránh N+1 khi gọi serializer
         )
 
 
 class PhanCongCaTruc(models.Model):
     """Lịch trình phân công nhân sự cụ thể theo ngày và vị trí"""
+    tenant_id = models.UUIDField(_("Tenant ID"), db_index=True, default=uuid.uuid4, editable=False) # Default kept for migration compatibility, but enforced in save()
+
     vi_tri_chot = models.ForeignKey(
         ViTriChot, 
         on_delete=models.CASCADE, 
+        related_name="cac_phan_cong",
         verbose_name=_("Vị trí chốt")
     )
     nhan_vien = models.ForeignKey(
         NhanVien, 
         on_delete=models.CASCADE, 
+        related_name="cac_phan_cong",
         verbose_name=_("Nhân viên thực hiện")
     )
     ca_lam_viec = models.ForeignKey(
         CaLamViec, 
         on_delete=models.CASCADE, 
+        related_name="cac_phan_cong",
         verbose_name=_("Ca trực")
     )
     ngay_truc = models.DateField(
@@ -121,6 +167,18 @@ class PhanCongCaTruc(models.Model):
     )
 
     objects = PhanCongManager()
+
+    def save(self, *args, **kwargs):
+        from django.core.exceptions import ImproperlyConfigured
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID is not defined in settings. Cannot save tenant-aware model.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID # Enforce SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(_(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID} for this organization."))
+        super().clean()
 
     class Meta:
         verbose_name = _("Phân công ca trực")
@@ -166,6 +224,8 @@ class ChamCong(models.Model):
     Model lưu trữ dữ liệu chấm công GPS.
     GEO UPDATE: Sử dụng PointField (WGS84) để lưu trữ tọa độ chính xác cao.
     """
+    tenant_id = models.UUIDField(_("Tenant ID"), db_index=True, default=uuid.uuid4, editable=False) # Default kept for migration compatibility, but enforced in save()
+
     ca_truc = models.OneToOneField(
         PhanCongCaTruc, 
         on_delete=models.CASCADE, 
@@ -222,7 +282,7 @@ class ChamCong(models.Model):
     thiet_bi_check_in = models.CharField(_("Thiết bị In"), max_length=255, blank=True, null=True)
     thiet_bi_check_out = models.CharField(_("Thiết bị Out"), max_length=255, blank=True, null=True)
 
-    # GEOFENCING VALIDATION
+    # GEOFENCING VALIDATION (SSOT from MucTieu)
     vi_tri_hop_le = models.BooleanField(
         _("Đúng vị trí quy định?"), 
         default=True,
@@ -234,16 +294,59 @@ class ChamCong(models.Model):
         help_text=_("Khoảng cách từ nhân viên đến tâm mục tiêu (mét)")
     )
 
+    # PHÂN TÍCH CA TRỰC (AUTO-CALCULATED) - Nâng cấp v2.0.0
+    thuc_lam_gio = models.FloatField(
+        _("Giờ làm thực tế"), 
+        default=0.0,
+        help_text=_("Số giờ làm việc tính toán dựa trên thời gian check-in/out")
+    )
+    di_muon_phut = models.IntegerField(
+        _("Đi muộn (phút)"), 
+        default=0,
+        help_text=_("Số phút vào ca trễ so với quy định")
+    )
+    ve_som_phut = models.IntegerField(
+        _("Về sớm (phút)"), 
+        default=0,
+        help_text=_("Số phút rời ca sớm so với quy định")
+    )
+    phat_vi_pham = models.DecimalField(
+        _("Tiền phạt ca trực"), 
+        max_digits=12, 
+        decimal_places=0, 
+        default=0,
+        help_text=_("Tổng tiền phạt vi phạm phát sinh trong ca trực này")
+    )
+
     ghi_chu = models.TextField(_("Ghi chú chấm công"), blank=True)
+
+    objects = TenantAwareManager()
+
+    def save(self, *args, **kwargs):
+        from django.core.exceptions import ImproperlyConfigured
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID is not defined in settings. Cannot save tenant-aware model.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID # Enforce SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(_(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID} for this organization."))
+        super().clean()
 
     class Meta:
         verbose_name = _("Dữ liệu Chấm công")
         verbose_name_plural = _("4. Dữ liệu Chấm công")
 
-    # API Compatibility Helpers
+    def calculate_work_hours(self):
+        # Logic này nên được dời về UseCase, tuy nhiên giữ lại wrapper 
+        # để không phá vỡ các legacy template tags nếu có.
+        from operations.application.attendance_use_cases import CalculateWorkHoursUseCase
+        return CalculateWorkHoursUseCase.execute(self)
+
+    # --- API & UI COMPATIBILITY HELPERS ---
     @property
     def lat_check_in(self):
-        """Lấy vĩ độ từ PointField check-in"""
         try:
             return self.location_check_in.y if self.location_check_in else None
         except Exception:
@@ -251,9 +354,24 @@ class ChamCong(models.Model):
 
     @property
     def long_check_in(self):
-        """Lấy kinh độ từ PointField check-in"""
         try:
             return self.location_check_in.x if self.location_check_in else None
+        except Exception:
+            return None
+
+    @property
+    def lat_check_out(self):
+        """Lấy vĩ độ từ PointField check-out (Hardening Phase)"""
+        try:
+            return self.location_check_out.y if self.location_check_out else None
+        except Exception:
+            return None
+
+    @property
+    def long_check_out(self):
+        """Lấy kinh độ từ PointField check-out (Hardening Phase)"""
+        try:
+            return self.location_check_out.x if self.location_check_out else None
         except Exception:
             return None
 
@@ -280,6 +398,8 @@ class BaoCaoSuCo(models.Model):
         ('HUY', _('❌ Đã hủy bỏ'))
     ]
 
+    tenant_id = models.UUIDField(_("Tenant ID"), db_index=True, default=uuid.uuid4, editable=False) # Default kept for migration compatibility, but enforced in save()
+
     tieu_de = models.CharField(
         _("Tiêu đề sự cố"), 
         max_length=200,
@@ -289,11 +409,9 @@ class BaoCaoSuCo(models.Model):
     # FIXED: Bổ sung default và blank để vượt qua lỗi migration nullable
     ma_su_co = models.CharField(
         _("Mã vụ việc"), 
-        max_length=50, 
+        max_length=30, 
         unique=True, 
-        editable=False,
-        default='PENDING',
-        blank=True
+        editable=False
     )
     
     nhan_vien_bao_cao = models.ForeignKey(
@@ -305,12 +423,14 @@ class BaoCaoSuCo(models.Model):
     muc_tieu = models.ForeignKey(
         MucTieu, 
         on_delete=models.CASCADE, 
-        verbose_name=_("Địa điểm (Mục tiêu)"), 
+        verbose_name=_("Địa điểm (Mục tiêu)"),
+        related_name='cac_su_co',
         null=True, blank=True
     )
     ca_truc = models.ForeignKey(
         PhanCongCaTruc, 
         on_delete=models.SET_NULL, 
+        related_name='cac_su_co',
         null=True, blank=True, 
         verbose_name=_("Phiên trực liên quan")
     )
@@ -383,21 +503,47 @@ class BaoCaoSuCo(models.Model):
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    thoi_gian_quyet_toan = models.DateTimeField(
+        _("Thời điểm chốt đền bù"), 
+        null=True, 
+        blank=True,
+        help_text=_("Mốc thời gian dùng để truy vấn vào bảng lương (SSOT)")
+    )
+
+    objects = TenantAwareManager()
+
+    @staticmethod
+    def generate_incident_code():
+        """Generate a human-readable unique incident code."""
+        return f"SC-{timezone.now():%Y%m%d}-{uuid.uuid4().hex[:6].upper()}"
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(_(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID} for this organization."))
+        super().clean()
 
     def save(self, *args, **kwargs):
-        """Tự động sinh mã sự cố định dạng chuẩn SCMD: SC-YYYYMMDD-HEX"""
-        try:
-            if not self.ma_su_co or self.ma_su_co == 'PENDING':
-                date_part = timezone.now().strftime('%Y%m%d')
-                unique_part = uuid.uuid4().hex[:6].upper()
-                self.ma_su_co = f"SC-{date_part}-{unique_part}"
-                
-            if self.phai_thu_nhan_vien > 0 and self.trang_thai == 'DA_XU_LY':
-                self.trang_thai = 'CHO_DEN_BU'
-        except Exception as e:
-            logger.error(f"Error in BaoCaoSuCo.save: {str(e)}")
-            
-        super().save(*args, **kwargs)
+        """Persist incident data while enforcing tenant and identity invariants."""
+        from django.core.exceptions import ImproperlyConfigured
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID is not defined in settings. Cannot save tenant-aware model.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID # Enforce SCMD_ORGANIZATION_ID
+
+        auto_generated_code = False
+        if not self.ma_su_co or self.ma_su_co == 'PENDING':
+            self.ma_su_co = self.generate_incident_code()
+            auto_generated_code = True
+
+        for _ in range(5):
+            try:
+                super().save(*args, **kwargs)
+                return
+            except IntegrityError as exc:
+                if not auto_generated_code or 'ma_su_co' not in str(exc):
+                    raise
+                self.ma_su_co = self.generate_incident_code()
+
+        raise IntegrityError("Unable to generate a unique ma_su_co after multiple attempts.")
 
     def __str__(self):
         return f"[{self.get_muc_do_display()}] {self.tieu_de} ({self.ma_su_co})"
@@ -428,8 +574,21 @@ class BaoCaoDeXuat(models.Model):
         TU_CHOI = "TUCHOI", _("❌ Đã từ chối")
         CHUYEN_VAN_PHONG = "VP", _("🏢 Vượt thẩm quyền - Chuyển Văn phòng")
 
-    nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, verbose_name=_("Nhân viên đề xuất"))
-    muc_tieu = models.ForeignKey(MucTieu, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Tại mục tiêu"))
+    tenant_id = models.UUIDField(_("Tenant ID"), db_index=True, default=uuid.uuid4, editable=False) # Default kept for migration compatibility, but enforced in save()
+
+    nhan_vien = models.ForeignKey(
+        NhanVien, 
+        on_delete=models.CASCADE, 
+        related_name='cac_de_xuat',
+        verbose_name=_("Nhân viên đề xuất")
+    )
+    muc_tieu = models.ForeignKey(
+        MucTieu, 
+        on_delete=models.SET_NULL, 
+        related_name='cac_de_xuat',
+        null=True, blank=True, 
+        verbose_name=_("Tại mục tiêu")
+    )
     
     loai_de_xuat = models.CharField(_("Loại đề xuất"), max_length=20, choices=LoaiDeXuat.choices, default=LoaiDeXuat.KHAC)
     tieu_de = models.CharField(_("Tiêu đề ngắn gọn"), max_length=255)
@@ -442,7 +601,7 @@ class BaoCaoDeXuat(models.Model):
     chi_huy_duyet = models.ForeignKey(
         NhanVien, on_delete=models.SET_NULL, 
         null=True, blank=True, 
-        related_name="de_xuat_chi_huy_duyet", 
+        related_name="cac_de_xuat_chi_huy_duyet", 
         verbose_name=_("Chỉ huy duyệt")
     )
     y_kien_chi_huy = models.TextField(_("Ý kiến của Chỉ huy"), blank=True, null=True)
@@ -451,11 +610,25 @@ class BaoCaoDeXuat(models.Model):
     nguoi_duyet_nghiep_vu = models.ForeignKey(
         NhanVien, on_delete=models.SET_NULL, 
         null=True, blank=True, 
-        related_name="de_xuat_nghiep_vu_duyet", 
+        related_name="cac_de_xuat_nghiep_vu_duyet", 
         verbose_name=_("Nghiệp vụ duyệt")
     )
     y_kien_nghiep_vu = models.TextField(_("Ý kiến của Phòng nghiệp vụ"), blank=True, null=True)
     thoi_gian_nghiep_vu_duyet = models.DateTimeField(_("Thời điểm NV duyệt"), null=True, blank=True)
+
+    objects = TenantAwareManager()
+
+    def save(self, *args, **kwargs):
+        from django.core.exceptions import ImproperlyConfigured
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID is not defined in settings. Cannot save tenant-aware model.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID # Enforce SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(_(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID} for this organization."))
+        super().clean()
 
     class Meta:
         verbose_name = _("Đề xuất nghiệp vụ")
@@ -474,6 +647,9 @@ class KiemTraQuanSo(models.Model):
         ('MISSED', _('❌ Bỏ lỡ (Không phản hồi)')), 
         ('LATE', _('🕒 Phản hồi muộn'))
     ]
+
+    tenant_id = models.UUIDField(_("Tenant ID"), db_index=True, default=uuid.uuid4, editable=False) # Default kept for migration compatibility, but enforced in save()
+
     ca_truc = models.ForeignKey(
         PhanCongCaTruc, 
         on_delete=models.CASCADE, 
@@ -492,6 +668,20 @@ class KiemTraQuanSo(models.Model):
     )
     trang_thai = models.CharField(_("Kết quả kiểm tra"), max_length=20, choices=TRANG_THAI_CHECK, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = TenantAwareManager()
+
+    def save(self, *args, **kwargs):
+        from django.core.exceptions import ImproperlyConfigured
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID is not defined in settings. Cannot save tenant-aware model.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID # Enforce SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(_(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID} for this organization."))
+        super().clean()
 
     class Meta:
         verbose_name = _("Kiểm tra quân số")

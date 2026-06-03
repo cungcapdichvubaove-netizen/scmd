@@ -1,71 +1,49 @@
 # -*- coding: utf-8 -*-
-"""
-Security Command (SCMD) System
-------------------------------
-Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
-
-File: operations/serializers.py
-Author: Mr. Anh
-Created Date: 2025-12-10
-Description: Chuyển đổi dữ liệu (Serializer).
-             FIXED: Thêm Alias để tương thích ngược với API Views cũ.
-"""
-
 from rest_framework import serializers
-from .models import PhanCongCaTruc, ChamCong, BaoCaoSuCo, ViTriChot, CaLamViec
-from clients.models import MucTieu
+from operations.models import PhanCongCaTruc
 
-class MucTieuSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = MucTieu
-        fields = ['id', 'ten_muc_tieu', 'dia_chi', 'vi_do', 'kinh_do', 'ban_kinh_cho_phep']
-
-class ViTriChotSerializer(serializers.ModelSerializer):
-    muc_tieu = MucTieuSerializer(read_only=True)
-    class Meta:
-        model = ViTriChot
-        fields = ['id', 'ten_vi_tri', 'muc_tieu']
-
-class CaLamViecSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CaLamViec
-        fields = ['id', 'ten_ca', 'gio_bat_dau', 'gio_ket_thuc']
-
-class ChamCongSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ChamCong
-        fields = ['thoi_gian_check_in', 'thoi_gian_check_out', 'anh_check_in', 'anh_check_out', 'location_check_in']
-
-class PhanCongCaTrucSerializer(serializers.ModelSerializer):
-    vi_tri_chot = ViTriChotSerializer(read_only=True)
-    ca_lam_viec = CaLamViecSerializer(read_only=True)
-    cham_cong = ChamCongSerializer(source='chamcong', read_only=True)
-    trang_thai = serializers.SerializerMethodField()
+class MobileWeeklyScheduleSerializer(serializers.ModelSerializer):
+    """
+    Serializer cho lịch trực tuần trên Mobile.
+    """
+    ten_ca = serializers.CharField(source='ca_lam_viec.ten_ca', read_only=True)
+    thoi_gian = serializers.SerializerMethodField()
+    ten_muc_tieu = serializers.CharField(source='vi_tri_chot.muc_tieu.ten_muc_tieu', read_only=True)
+    ten_vi_tri = serializers.CharField(source='vi_tri_chot.ten_vi_tri', read_only=True)
+    is_today = serializers.SerializerMethodField()
 
     class Meta:
         model = PhanCongCaTruc
-        fields = ['id', 'ngay_truc', 'vi_tri_chot', 'ca_lam_viec', 'cham_cong', 'trang_thai']
+        fields = [
+            'id', 'ngay_truc', 'ten_ca', 'thoi_gian', 
+            'ten_muc_tieu', 'ten_vi_tri', 'is_today'
+        ]
 
-    def get_trang_thai(self, obj):
-        if not hasattr(obj, 'chamcong'):
-            return "CHUA_CHECKIN"
-        cc = obj.chamcong
-        if cc.thoi_gian_check_in and not cc.thoi_gian_check_out:
-            return "DANG_LAM_VIEC"
-        if cc.thoi_gian_check_out:
-            return "HOAN_THANH"
-        return "CHUA_CHECKIN"
+    def get_thoi_gian(self, obj):
+        if not obj.ca_lam_viec: return ""
+        return f"{obj.ca_lam_viec.gio_bat_dau.strftime('%H:%M')} - {obj.ca_lam_viec.gio_ket_thuc.strftime('%H:%M')}"
 
-class BaoCaoSuCoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BaoCaoSuCo
-        fields = '__all__'
-        read_only_fields = ['ma_su_co', 'trang_thai', 'nguoi_xu_ly', 'created_at']
+    def get_is_today(self, obj):
+        from django.utils import timezone
+        return obj.ngay_truc == timezone.now().date()
 
-# ==============================================================================
-# [QUAN TRỌNG] CẦU NỐI TƯƠNG THÍCH (ALIASES)
-# ==============================================================================
-# Dòng này giúp api_views.py có thể import 'MobileCaTrucSerializer' 
-# mà thực chất là đang dùng 'PhanCongCaTrucSerializer' mới.
-MobileCaTrucSerializer = PhanCongCaTrucSerializer
-MobileBaoCaoSuCoSerializer = BaoCaoSuCoSerializer
+class MobileShiftSwapSerializer(serializers.Serializer):
+    """
+    Serializer cho yêu cầu đổi ca trực từ nhân viên.
+    """
+    ca_truc_id = serializers.IntegerField(required=True)
+    ly_do = serializers.CharField(required=True, min_length=10, max_length=1000)
+
+    def validate_ca_truc_id(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("ID ca trực không hợp lệ.")
+        return value
+
+class ProcessShiftSwapSerializer(serializers.Serializer):
+    """
+    Serializer cho Đội trưởng xử lý phê duyệt đơn.
+    """
+    request_id = serializers.IntegerField(required=True)
+    action = serializers.ChoiceField(choices=['APPROVE', 'REJECT'], required=True)
+    nhan_vien_moi_id = serializers.IntegerField(required=False)
+    note = serializers.CharField(required=False, allow_blank=True, max_length=500)

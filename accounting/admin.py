@@ -19,6 +19,7 @@ from django.utils.html import format_html
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 from .models import CauHinhLuong, BangLuongThang, ChiTietLuong
+from accounting.application.payroll_use_cases import AuditPayrollUseCase
 from .models_soquy import SoQuy
 from .services.payroll import PayrollService
 
@@ -160,12 +161,13 @@ class BangLuongThangAdmin(admin.ModelAdmin):
         'nam', 
         'hien_thi_tong_chi', 
         'trang_thai_badge', 
-        'nut_xem_bao_cao'
+        'nut_xem_bao_cao',
+        'nut_doi_soat'
     ]
     list_filter = ['nam', 'trang_thai', 'thang']
     search_fields = ['ten_bang_luong']
     inlines = [ChiTietLuongInline]
-    actions = ['tinh_luong_lai', 'phat_hanh_luong']
+    actions = ['tinh_luong_lai', 'phat_hanh_luong', 'audit_payroll_anomalies']
     list_per_page = 20
 
     @admin.display(description=_("Tổng ngân sách chi"))
@@ -200,6 +202,18 @@ class BangLuongThangAdmin(admin.ModelAdmin):
             )
         return "-"
 
+    @admin.display(description=_("Đối soát Quỹ"))
+    def nut_doi_soat(self, obj):
+        """Nút truy cập báo cáo đối soát khấu trừ"""
+        if obj.pk:
+            url = f"/accounting/doi-soat-khau-tru/{obj.pk}/"
+            return format_html(
+                '<a href="{}" target="_blank" class="button" '
+                'style="background:#059669; color:white; padding:4px 12px; border-radius:4px; '
+                'text-decoration:none; font-size:11px; font-weight:bold;">📊 ĐỐI SOÁT</a>', 
+                url
+            )
+        return "-"
     def tinh_luong_lai(self, request, queryset):
         """Thực thi tính toán lại số liệu lương định kỳ"""
         count = 0
@@ -232,8 +246,14 @@ class BangLuongThangAdmin(admin.ModelAdmin):
     def phat_hanh_luong(self, request, queryset):
         """Chốt sổ lương hàng tháng"""
         try:
-            updated = queryset.filter(trang_thai__in=['NHAP', 'CHO_DUYET']).update(trang_thai='DA_PHAT_HANH')
-            self.message_user(request, f"Xác nhận: Đã khóa sổ {updated} bảng lương thành công.", messages.SUCCESS)
+            count = 0
+            for bl in queryset.filter(trang_thai__in=['NHAP', 'CHO_DUYET']):
+                with transaction.atomic():
+                    bl.trang_thai = 'DA_PHAT_HANH'
+                    bl.save()
+                    PayrollService.lock_related_records(bl)
+                    count += 1
+            self.message_user(request, f"Xác nhận: Đã khóa sổ {count} bảng lương và đồng bộ dữ liệu SSOT.", messages.SUCCESS)
         except Exception as e:
             self.message_user(request, f"Lỗi khi thực hiện khóa sổ: {str(e)}", messages.ERROR)
 

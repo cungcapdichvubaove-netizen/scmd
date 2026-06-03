@@ -7,17 +7,30 @@ Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 File: accounting/models.py
 Author: Mr. Anh
 Created Date: 2025-11-30
+Updated Date: 2026-05-15
+Version: v2.0.0-pro
 Description: Model quản lý Kế toán - Tiền lương (Core Payroll Models).
-             BẢN MERGE: Giữ nguyên cấu trúc legacy, tối ưu hóa logic tính toán 
-             và chuẩn hóa ngôn ngữ giao diện an ninh.
+             HARDENING PHASE: Chuẩn hóa SSOT (CRM -> Payroll) theo DOCUMENTATION.md.
+             - Cập nhật định danh các khoản thu nhập/khấu trừ.
+             - Đảm bảo tính nhất quán với logic quyết toán tự động.
 """
 
+import uuid
+import logging
 from django.db import models, transaction
 from django.utils import timezone
 from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError, ImproperlyConfigured
+from core.managers import TenantAwareManager
+from django.conf import settings
 from users.models import NhanVien
 from decimal import Decimal, ROUND_HALF_UP
 
+logger = logging.getLogger(__name__)
+
+# ==============================================================================
+# 0. MULTI-TENANCY CORE
+# ==============================================================================
 
 class CauHinhLuong(models.Model):
     """Hồ sơ thiết lập các tham số lương và phụ cấp cố định cho từng nhân viên an ninh"""
@@ -27,6 +40,8 @@ class CauHinhLuong(models.Model):
         related_name="cau_hinh_luong", 
         verbose_name="Nhân viên thụ hưởng"
     )
+
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
     
     # --- Dữ liệu kế thừa (Legacy) ---
     luong_co_ban_ngay = models.DecimalField(
@@ -60,9 +75,22 @@ class CauHinhLuong(models.Model):
         help_text="Hỗ trợ tiền ăn trực ca theo quy định của SCMD."
     )
 
+    objects = TenantAwareManager()
+
     class Meta: 
         verbose_name = "Hồ sơ Lương cá nhân"
         verbose_name_plural = "Hồ sơ Lương cá nhân"
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
 
     def __str__(self): 
         return f"Cấu hình lương: {self.nhan_vien.ho_ten} ({self.nhan_vien.ma_nhan_vien})"
@@ -76,6 +104,8 @@ class BangLuongThang(models.Model):
         ('DA_PHAT_HANH', 'Đã duyệt & Phát hành (Nhân viên đã xem)'),
     ]
     
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+
     ten_bang_luong = models.CharField(
         "Tên bảng lương", 
         max_length=200, 
@@ -126,24 +156,51 @@ class BangLuongThang(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo bảng kê")
 
+    objects = TenantAwareManager()
+
     class Meta: 
         verbose_name = "Kỳ lương hệ thống"
         verbose_name_plural = "1. Quản lý Kỳ lương"
-        unique_together = ('thang', 'nam')
+        unique_together = ('thang', 'nam', 'tenant_id')
         ordering = ['-nam', '-thang']
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
 
     def update_totals(self):
         """Tính toán lại tổng chi và tổng công dựa trên các phiếu lương chi tiết"""
-        stats = self.chi_tiet.aggregate(
-            total_pay=models.Sum('thuc_lanh'),
-            total_hours=models.Sum('tong_gio_lam')
+        # SSOT: Sử dụng aggregate trực tiếp từ DB
+        stats = self.chi_tiet.all().aggregate(
+            total_pay=models.Sum('thuc_lanh', default=0),
+            total_hours=models.Sum('tong_gio_lam', default=0)
         )
-        self.tong_chi_tra = stats.get('total_pay') or 0
-        self.tong_gio_cong = stats.get('total_hours') or 0
-        self.save()
+        
+        # Tối ưu: Sử dụng .update() để tránh gọi lại save() của BangLuongThang
+        # Điều này ngăn chặn các signal hoặc logic save() khác bị lặp lại vô tận
+        BangLuongThang.objects.filter(pk=self.pk).update(
+            tong_chi_tra=stats['total_pay'],
+            tong_gio_cong=stats['total_hours']
+        )
 
     def __str__(self): 
-        return f"Bảng lương SCMD - Tháng {self.thang}/{self.nam}"
+        return f"Kỳ lương SCMD - Tháng {self.thang}/{self.nam}"
+
+
+class ChiTietLuongManager(TenantAwareManager):
+    """Manager tối ưu hóa truy vấn để triệt tiêu lỗi N+1 Query"""
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'nhan_vien', 
+            'bang_luong'
+        )
 
 
 class ChiTietLuong(models.Model):
@@ -160,20 +217,22 @@ class ChiTietLuong(models.Model):
         verbose_name="Nhân sự"
     )
     
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+
     # --- Nhóm dữ liệu Chấm công ---
     tong_gio_lam = models.FloatField("Tổng giờ làm việc", default=0)
     so_ngay_nghi = models.IntegerField("Số ngày nghỉ phép/không lương", default=0)
     
-    # --- Nhóm dữ liệu Thu nhập (Earnings) ---
-    luong_chinh = models.DecimalField("Lương theo công trạng", max_digits=12, decimal_places=0, default=0)
+    # --- Nhóm dữ liệu Thu nhập (Earnings) - SSOT Section 7 ---
+    luong_chinh = models.DecimalField("Lương khoán (từ CRM)", max_digits=12, decimal_places=0, default=0)
     thuong_chuyen_can = models.DecimalField("Thưởng chuyên cần", max_digits=12, decimal_places=0, default=0)
     phu_cap_khac = models.DecimalField("Tổng phụ cấp khác", max_digits=12, decimal_places=0, default=0)
     
-    # --- Nhóm dữ liệu Khấu trừ (Deductions) ---
+    # --- Nhóm dữ liệu Khấu trừ (Deductions) - SSOT Section 7 ---
     ung_luong = models.DecimalField("Khoản tạm ứng", max_digits=12, decimal_places=0, default=0)
     phat_vi_pham = models.DecimalField("Phạt kỷ luật/Vi phạm", max_digits=12, decimal_places=0, default=0)
-    tien_dong_phuc = models.DecimalField("Tiền quân trang/Đồng phục", max_digits=12, decimal_places=0, default=0)
-    tien_den_bu = models.DecimalField("Bồi thường thiệt hại (nếu có)", max_digits=12, decimal_places=0, default=0)
+    tien_dong_phuc = models.DecimalField("Khấu trừ vật tư/Đồng phục", max_digits=12, decimal_places=0, default=0)
+    tien_den_bu = models.DecimalField("Khấu trừ đền bù sự cố", max_digits=12, decimal_places=0, default=0)
     bao_hiem = models.DecimalField("Khấu trừ BHXH/BHYT", max_digits=12, decimal_places=0, default=0)
     phi_cong_doan = models.DecimalField("Kinh phí Công đoàn", max_digits=12, decimal_places=0, default=0)
     
@@ -184,12 +243,37 @@ class ChiTietLuong(models.Model):
     class Meta: 
         verbose_name = "Phiếu lương cá nhân"
         verbose_name_plural = "Phiếu lương cá nhân"
-        unique_together = ('bang_luong', 'nhan_vien')
+        unique_together = ('bang_luong', 'nhan_vien', 'tenant_id')
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    objects = ChiTietLuongManager()
+
+    @staticmethod
+    def to_decimal_safe(val):
+        """Chuyển đổi giá trị sang Decimal an toàn và làm tròn (SSOT Section 7)."""
+        if val is None or val == "":
+            return Decimal('0')
+        try:
+            # Clean currency formatting (commas, spaces) before conversion
+            clean_val = str(val).replace(',', '').replace(' ', '')
+            # Làm tròn về 0 chữ số thập phân (VNĐ) theo chuẩn ROUND_HALF_UP
+            return Decimal(clean_val).quantize(Decimal('1'), rounding=ROUND_HALF_UP)
+        except Exception:
+            return Decimal('0')
 
     @property
     def tong_thu_nhap(self):
         """Tổng các khoản tiền được nhận trước khi trừ phí"""
         return self.luong_chinh + self.thuong_chuyen_can + self.phu_cap_khac
+
+    @property
+    def tong_phu_cap(self):
+        """Compatibility alias for legacy templates and reports."""
+        return self.phu_cap_khac
 
     @property
     def tong_khau_tru(self):
@@ -199,39 +283,60 @@ class ChiTietLuong(models.Model):
                 self.bao_hiem + self.phi_cong_doan)
 
     def save(self, *args, **kwargs):
-        """Ghi đè phương thức save để chuẩn hóa Decimal và tự động quyết toán thực lĩnh"""
-        
-        def to_decimal_safe(val): 
-            """Chuyển đổi dữ liệu sang Decimal an toàn cho nghiệp vụ kế toán"""
-            try:
-                if val is None: return Decimal('0')
-                return Decimal(str(val)).quantize(Decimal('1'), rounding=ROUND_HALF_UP)
-            except (ValueError, TypeError):
-                return Decimal('0')
+        """Save đơn thuần: Enforce multi-tenancy và cập nhật bảng tổng."""
+        # 0. Thực thi Multi-tenancy
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
 
-        # 1. Đồng bộ và chuẩn hóa toàn bộ các trường tiền tệ
-        fields_to_clean = [
-            'luong_chinh', 'thuong_chuyen_can', 'phu_cap_khac',
-            'ung_luong', 'phat_vi_pham', 'tien_dong_phuc',
-            'tien_den_bu', 'bao_hiem', 'phi_cong_doan'
-        ]
-        for field in fields_to_clean:
-            current_val = getattr(self, field)
-            setattr(self, field, to_decimal_safe(current_val))
-
-        # 2. Tính toán thực lĩnh: (Thu nhập) - (Khấu trừ)
-        # Sử dụng thuộc tính đã được chuẩn hóa ở bước 1
-        thu_nhap_tong = self.luong_chinh + self.thuong_chuyen_can + self.phu_cap_khac
-        khau_tru_tong = (self.ung_luong + self.phat_vi_pham + self.tien_dong_phuc + 
-                         self.tien_den_bu + self.bao_hiem + self.phi_cong_doan)
-        
-        self.thuc_lanh = thu_nhap_tong - khau_tru_tong
-        
-        # 3. Lưu dữ liệu với tính năng transaction để đảm bảo an toàn dữ liệu
+        # Infrastructure Layer only. 
+        # Side effects (update_totals) must be called explicitly by the Orchestrator/UseCase.
         with transaction.atomic():
             super().save(*args, **kwargs)
-            # 4. Kích hoạt cập nhật lại tổng số liệu trên Bảng Lương Tháng chủ quản
-            self.bang_luong.update_totals()
     
     def __str__(self): 
         return f"Phiếu lương: {self.nhan_vien.ma_nhan_vien} | Thực nhận: {self.thuc_lanh:,.0f} VNĐ"
+
+
+class PhanHoiLuong(models.Model):
+    """
+    Lưu trữ các phản hồi/khiếu nại về lương từ nhân viên.
+    Tuân thủ Audit Trail (Section 12.3 - DOCUMENTATION.md).
+    """
+    TRANG_THAI = [
+        ('MOI', 'Mới tiếp nhận'),
+        ('DANG_XU_LY', 'Đang xử lý'),
+        ('DA_GIAI_QUYET', 'Đã giải quyết'),
+        ('TU_CHOI', 'Từ chối'),
+    ]
+
+    tenant_id = models.UUIDField("Tenant ID", db_index=True)
+    chi_tiet_luong = models.ForeignKey(
+        ChiTietLuong, 
+        on_delete=models.CASCADE, 
+        related_name="danh_sach_phan_hoi",
+        verbose_name="Phiếu lương khiếu nại"
+    )
+    nhan_vien = models.ForeignKey(
+        NhanVien, 
+        on_delete=models.CASCADE,
+        verbose_name="Nhân viên phản hồi"
+    )
+    noi_dung = models.TextField("Nội dung phản hồi/thắc mắc")
+    phan_hoi_admin = models.TextField("Phản hồi từ kế toán", blank=True)
+    trang_thai = models.CharField(
+        "Trạng thái xử lý", 
+        max_length=20, 
+        choices=TRANG_THAI, 
+        default='MOI'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Phản hồi lương"
+        verbose_name_plural = "2. Phản hồi lương (Dispute)"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Phản hồi: {self.nhan_vien.ho_ten} - Kỳ {self.chi_tiet_luong.bang_luong}"

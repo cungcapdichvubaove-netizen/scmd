@@ -12,6 +12,7 @@ Description: Unit Tests cho Module Tính Lương.
              Đảm bảo tiền nong chính xác tuyệt đối.
 """
 
+from unittest.mock import patch, MagicMock
 from django.test import TestCase
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -21,9 +22,10 @@ from users.models import NhanVien
 from clients.models import MucTieu, HopDong
 from operations.models import PhanCongCaTruc, CaLamViec, ViTriChot, ChamCong
 from inspection.models import BienBanViPham
-from accounting.models import CauHinhLuong, BangLuongThang, ChiTietLuong
+from accounting.models import CauHinhLuong, BangLuongThang, ChiTietLuong, AuditLog
 from accounting.models_soquy import SoQuy
 from accounting.services.payroll import PayrollService
+from accounting.tasks import accounting_calculate_monthly_payroll
 
 class PayrollServiceTest(TestCase):
     def setUp(self):
@@ -132,3 +134,75 @@ class PayrollServiceTest(TestCase):
         self.assertEqual(phieu.ung_luong, 100000)
         self.assertEqual(phieu.thuc_lanh, 1150000) # 300k + 1000k - 50k - 100k
         print("✅ Test 2 (Phạt/Ứng): PASS")
+
+class AccountingTaskTest(TestCase):
+    """Test Celery Tasks cho module Kế toán"""
+
+    @patch('accounting.tasks.timezone.now')
+    @patch('accounting.services.payroll.PayrollService.tinh_luong_thang')
+    def test_calculate_payroll_date_logic(self, mock_service, mock_now):
+        """Đảm bảo Task xác định đúng tháng/năm cần quyết toán dựa trên ngày chạy"""
+        # Giả lập Task instance (vì task có bind=True)
+        mock_task = MagicMock()
+        mock_service.return_value = (True, "Hoàn tất")
+
+        # Kịch bản 1: Chạy vào ngày 01/02/2026 -> Phải quyết toán cho tháng 01/2026
+        mock_now.return_value = datetime(2026, 2, 1, 1, 0, 0, tzinfo=timezone.utc)
+        accounting_calculate_monthly_payroll(mock_task)
+        mock_service.assert_called_with(1, 2026)
+
+        # Kịch bản 2: Chạy vào ngày 01/01/2026 -> Phải quyết toán cho tháng 12/2025 (Chuyển năm)
+        mock_now.return_value = datetime(2026, 1, 1, 1, 0, 0, tzinfo=timezone.utc)
+        accounting_calculate_monthly_payroll(mock_task)
+        mock_service.assert_called_with(12, 2025)
+
+        print("✅ Test 3 (Task Date Logic): PASS")
+
+class AccountingIntegrationTest(TestCase):
+    """Integration Test kiểm tra luồng nghiệp vụ thực tế từ Task đến Database"""
+
+    def setUp(self):
+        """Thiết lập dữ liệu nền cho Integration Test"""
+        # Tạo nhân viên và cấu hình lương
+        self.nv = NhanVien.objects.create(
+            ma_nhan_vien="INT-001", ho_ten="NV Integration Test",
+            ngay_sinh="1995-05-05", trang_thai_lam_viec="CHINHTHUC"
+        )
+        CauHinhLuong.objects.create(nhan_vien=self.nv, phu_cap_trach_nhiem=100000)
+        
+        # Thiết lập tổ chức (SSOT Context)
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+
+    @patch('accounting.tasks.timezone.now')
+    def test_task_creates_real_records(self, mock_now):
+        """Kiểm tra việc tạo BangLuongThang và AuditLog thực tế sau khi Task chạy"""
+        # 1. Giả lập hôm nay là ngày 01/06/2026 (Quyết toán cho tháng 5)
+        mock_now.return_value = datetime(2026, 6, 1, 1, 0, 0, tzinfo=timezone.utc)
+        
+        # 2. Thực thi Task
+        mock_task = MagicMock()
+        accounting_calculate_monthly_payroll(mock_task)
+
+        # 3. KIỂM TRA DATABASE (Assertions)
+        
+        # Kiểm tra bảng lương tổng đã được tạo đúng kỳ
+        bang_luong_exists = BangLuongThang.objects.filter(thang=5, nam=2026).exists()
+        self.assertTrue(bang_luong_exists, "BangLuongThang cho tháng 05/2026 chưa được tạo!")
+        
+        bang_luong = BangLuongThang.objects.get(thang=5, nam=2026)
+        self.assertEqual(bang_luong.trang_thai, 'NHAP')
+
+        # Kiểm tra phiếu lương chi tiết đã được tạo cho nhân viên
+        chi_tiet_exists = ChiTietLuong.objects.filter(bang_luong=bang_luong, nhan_vien=self.nv).exists()
+        self.assertTrue(chi_tiet_exists, f"Chưa tạo ChiTietLuong cho nhân viên {self.nv.ma_nhan_vien}")
+
+        # Kiểm tra Audit Log (Tuân thủ Rule 8: Observability)
+        audit_log_exists = AuditLog.objects.filter(
+            module='accounting',
+            model_name='BangLuongThang',
+            object_id=str(bang_luong.pk),
+            action=AuditLog.Action.EXECUTE
+        ).exists()
+        self.assertTrue(audit_log_exists, "AuditLog cho hành động quyết toán chưa được ghi nhận!")
+
+        print(f"✅ Test 4 (Integration Payroll): PASS - BangLuongThang ID: {bang_luong.pk}")

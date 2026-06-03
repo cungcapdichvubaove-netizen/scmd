@@ -1,19 +1,20 @@
 {
-  "name": "SCMD Security",
-  "short_name": "SCMD",
+  "name": "SCMD Pro",
+  "short_name": "SCMD Pro",
   "start_url": "/operations/mobile/dashboard/",
   "display": "standalone",
-  "background_color": "#1d232a",
-  "theme_color": "#dc2626",
+  "background_color": "#f8fafc",
+  "theme_color": "#0f172a",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/static/img/logo_moi.png",
+      "src": "/static/img/logo_192.png", 
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "/static/img/logo_moi.png",
+      "src": "/static/img/logo_512.png",
       "sizes": "512x512",
       "type": "image/png"
     }

@@ -1,0 +1,151 @@
+/*
+Security Command (SCMD) System
+------------------------------
+Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
+
+File: static/css/custom_admin.css
+Author: Mr. Anh
+Created Date: 2025-12-05
+Description: Tùy biến giao diện Admin.
+             FINAL FIX: Tăng độ ưu tiên CSS để fix lỗi hiển thị nút Import/Export.
+*/
+
+/* 1. DESIGN TOKENS */
+:root {
+    --primary: #4F46E5;      /* Indigo */
+    --sidebar-bg: #0F172A;   /* Slate 900 */
+    --sidebar-hover: #1E293B;/* Slate 800 */
+    --text-sidebar: #94A3B8; /* Slate 400 */
+    --text-main: #1E293B;
+    --bg-body: #F8FAFC;      /* Slate 50 */
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100&display=swap');
+
+/* FIX LỖI FONT */
+body, 
+.main-sidebar, .main-header, .content-wrapper, .control-sidebar,
+.btn, .form-control, .nav-link, .brand-link .brand-text,
+h1, h2, h3, h4, h5, h6, p, span, a, div, table {
+    font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif !important;
+    font-size: 0.9rem;
+}
+
+body { background-color: var(--bg-body); color: var(--text-main); }
+
+/* 2. LOGIN PAGE */
+body.login-page {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+}
+.login-box {
+    background: rgba(255, 255, 255, 0.98); border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(255,255,255,0.1);
+}
+.login-logo a { color: var(--primary) !important; font-weight: 800; letter-spacing: 1px; }
+.login-card-body .btn-primary { background-color: var(--primary); border: none; }
+
+/* 3. SIDEBAR */
+.main-sidebar { background-color: var(--sidebar-bg) !important; border-right: 1px solid rgba(255,255,255,0.05); box-shadow: 4px 0 10px rgba(0,0,0,0.1); }
+.brand-link { background-color: #0F172A !important; border-bottom: 1px solid #1E293B !important; color: white !important; }
+.nav-sidebar .nav-item > .nav-link { color: var(--text-sidebar) !important; border-radius: 6px; padding: 10px 15px; margin: 2px 8px; font-weight: 500; }
+.nav-sidebar .nav-item > .nav-link:hover { background-color: rgba(255,255,255,0.08) !important; color: white !important; }
+.nav-sidebar .nav-item > .nav-link.active { background-color: var(--primary) !important; color: white !important; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4) !important; font-weight: 600; }
+.nav-sidebar .nav-icon { color: inherit; margin-right: 10px; width: 20px; text-align: center; font-size: 1.1rem; }
+.nav-treeview > .nav-item > .nav-link { padding-left: 3rem; font-size: 0.85rem; }
+
+/* 4. GRID DASHBOARD */
+#content-main .app-container {
+    background: white; border-radius: 12px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1); border: 1px solid #E2E8F0; transition: all 0.2s ease;
+}
+#content-main .app-container:hover {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); border-color: var(--primary); transform: translateY(-2px);
+}
+
+/* 5. WORDING HACK (CŨ): THÊM - SỬA */
+.btn-group .btn-success, a.addlink {
+    font-size: 0 !important; padding: 6px 12px !important; min-width: 80px; 
+    text-align: center; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px;
+}
+.btn-group .btn-success::after, a.addlink::after {
+    content: "THÊM"; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+}
+.btn-group .btn-success i, a.addlink i { font-size: 12px !important; margin-right: 6px; display: inline-block; }
+
+.btn-group .btn-info, .btn-group .btn-secondary, a.changelink, a.viewlink {
+    font-size: 0 !important; padding: 6px 12px !important; min-width: 80px; 
+    text-align: center; display: inline-flex; align-items: center; justify-content: center; 
+    background-color: #F1F5F9 !important; border: 1px solid #CBD5E1 !important; color: #475569 !important; border-radius: 4px;
+}
+.btn-group .btn-info:hover, .btn-group .btn-secondary:hover, a.changelink:hover { background-color: #E2E8F0 !important; }
+
+/* CSS này là nguyên nhân gây lỗi, nhưng ta giữ lại cho các nút khác */
+.btn-group .btn-info::after, .btn-group .btn-secondary::after, a.changelink::after, a.viewlink::after {
+    content: "SỬA"; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+}
+.btn-group .btn-info i, .btn-group .btn-secondary i, a.changelink i { font-size: 12px !important; margin-right: 6px; color: #64748b; }
+
+/* 6. FIX LỖI IMPORT/EXPORT (GHI ĐÈ MẠNH MẼ) */
+/* Sử dụng selector có độ ưu tiên cao hơn (.btn-group a.import_link) */
+
+/* Reset chung cho nút Import/Export */
+.btn-group a.import_link, .btn-group a.export_link {
+    font-size: 0 !important; /* Ẩn chữ tiếng Anh gốc */
+    padding: 6px 12px !important;
+    min-width: 90px !important;
+    text-align: center;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    margin-left: 5px;
+    text-decoration: none !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+/* IMPORT (Màu Cam) */
+.btn-group a.import_link {
+    background-color: #F59E0B !important; 
+    border: 1px solid #D97706 !important;
+    color: white !important;
+}
+/* Dùng !important cho content để chắc chắn đè được chữ SỬA */
+.btn-group a.import_link::after {
+    content: "NHẬP FILE" !important; 
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+}
+.btn-group a.import_link:hover { background-color: #D97706 !important; }
+
+/* EXPORT (Màu Xanh) */
+.btn-group a.export_link {
+    background-color: #10B981 !important; 
+    border: 1px solid #059669 !important;
+    color: white !important;
+}
+.btn-group a.export_link::after {
+    content: "XUẤT FILE" !important; 
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+}
+.btn-group a.export_link:hover { background-color: #059669 !important; }
+
+/* Hiện lại icon */
+.btn-group a.import_link i, .btn-group a.export_link i {
+    font-size: 12px !important; 
+    margin-right: 6px; 
+    color: white !important;
+    display: inline-block !important;
+}
+
+/* Header & Table */
+.main-header { border-bottom: 1px solid #e2e8f0; }
+.card { border-radius: 8px; border: none; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.card-header { background-color: #f8fafc; border-bottom: 1px solid #e2e8f0; }

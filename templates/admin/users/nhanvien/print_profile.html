@@ -1,10 +1,11 @@
 {% load static %}
+{% load tailwind_tags %}
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>HỒ SƠ LÝ LỊCH - SCMD SYSTEM</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Hồ sơ lý lịch - SCMD Pro</title>
+    {% tailwind_css %}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
@@ -93,7 +94,7 @@
             <img src="{% static 'img/logo_scmd.png' %}" class="w-16 h-16 object-contain">
             <div>
                 <h2 class="text-xl font-bold text-blue-900 uppercase">Công ty TNHH Dịch vụ Bảo vệ SCMD</h2>
-                <p class="text-xs font-bold text-gray-600">SCMD ENTERPRISE HRM SYSTEM</p>
+                <p class="text-xs font-bold text-gray-600">SCMD Pro | Hồ sơ nhân sự nội bộ</p>
             </div>
         </div>
 

@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 import math
 
 # Models & Forms
@@ -150,7 +150,7 @@ def thuc_hien_tuan_tra(request, luot_id):
     return render(request, 'inspection/mobile/tuan_tra.html', {'luot_tuan_tra': luot, 'cac_diem': cac_diem, 'da_quet_ids': da_quet_ids})
 
 # --- CORE LOGIC: XỬ LÝ QUÉT QR ---
-@csrf_exempt
+@require_POST
 @login_required
 def ghi_nhan_diem(request):
     if request.method == "POST":
@@ -159,7 +159,7 @@ def ghi_nhan_diem(request):
         lat_req = request.POST.get('lat') # Nhận GPS từ Client
         lng_req = request.POST.get('lng')
 
-        luot = get_object_or_404(LuotTuanTra, id=luot_id)
+        luot = get_object_or_404(LuotTuanTra, id=luot_id, nhan_vien=request.user.nhan_vien)
         diem = DiemTuanTra.objects.filter(loai_tuan_tra=luot.loai_tuan_tra, ma_qr=ma_qr).first()
         
         if not diem:
@@ -207,7 +207,7 @@ def ghi_nhan_diem(request):
 
 @login_required
 def hoan_thanh_tuan_tra(request, luot_id):
-    luot = get_object_or_404(LuotTuanTra, id=luot_id)
+    luot = get_object_or_404(LuotTuanTra, id=luot_id, nhan_vien=request.user.nhan_vien)
     luot.trang_thai = 'HOAN_THANH'; luot.thoi_gian_ket_thuc = timezone.now(); luot.save()
     messages.success(request, "Đã hoàn thành tuần tra!")
     return redirect('inspection:mobile_tuan_tra_list')

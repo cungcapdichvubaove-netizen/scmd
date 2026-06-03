@@ -1,5 +1,8 @@
 # file: operations/tests.py
-from django.test import TestCase
+from datetime import timedelta
+from unittest.mock import patch
+from django.test import TestCase, Client
+from django.contrib.messages import get_messages
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils import timezone
@@ -35,6 +38,30 @@ class OperationsModelTest(TestCase):
         # SC (3) + YYYYMMDD (8) + - (1) + UUID 6 chars (6) = 18 ký tự
         self.assertEqual(len(su_co.ma_su_co), 18) 
 
+    def test_bao_cao_su_co_generates_unique_codes_across_direct_creates(self):
+        first = BaoCaoSuCo.objects.create(
+            tieu_de="Su co 1",
+            muc_tieu=self.muc_tieu
+        )
+        second = BaoCaoSuCo.objects.create(
+            tieu_de="Su co 2",
+            muc_tieu=self.muc_tieu
+        )
+
+        self.assertNotEqual(first.ma_su_co, second.ma_su_co)
+        self.assertNotEqual(first.ma_su_co, "PENDING")
+        self.assertNotEqual(second.ma_su_co, "PENDING")
+
+    def test_bao_cao_su_co_replaces_legacy_pending_placeholder(self):
+        su_co = BaoCaoSuCo.objects.create(
+            tieu_de="Su co legacy",
+            muc_tieu=self.muc_tieu,
+            ma_su_co="PENDING"
+        )
+
+        self.assertTrue(su_co.ma_su_co.startswith("SC-"))
+        self.assertNotEqual(su_co.ma_su_co, "PENDING")
+
     def test_cham_cong_checkin(self):
         cham_cong = ChamCong.objects.create(ca_truc=self.phan_cong)
         cham_cong.thoi_gian_check_in = timezone.now()
@@ -44,8 +71,13 @@ class OperationsModelTest(TestCase):
 class OperationsAPITest(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.user = User.objects.create_user(username='bv1', password='password')
-        self.nhan_vien = NhanVien.objects.create(user=self.user, ho_ten="Bảo vệ API", ngay_sinh="1990-01-01", gioi_tinh="M", sdt_chinh="+84999888777")
+        self.user = User.objects.create_user(username='bv1', email='bv1@example.com', password='password')
+        self.nhan_vien = self.user.nhan_vien
+        self.nhan_vien.ho_ten = "Bao ve API"
+        self.nhan_vien.ngay_sinh = "1990-01-01"
+        self.nhan_vien.gioi_tinh = "M"
+        self.nhan_vien.sdt_chinh = "+84999888777"
+        self.nhan_vien.save()
         self.client.force_authenticate(user=self.user)
 
         self.kh = KhachHangTiemNang.objects.create(ten_cong_ty="KH API", email="api@kh.com", sdt="0888")
@@ -74,3 +106,164 @@ class OperationsAPITest(TestCase):
             
         self.assertEqual(len(data_list), 1)
         self.assertEqual(data_list[0]['vi_tri_chot']['ten_vi_tri'], "Chốt 1")
+
+
+    def test_checkin_api_rejects_other_employee_shift(self):
+        other_user = User.objects.create_user(username='bv2', email='bv2@example.com', password='password')
+        other_employee = other_user.nhan_vien
+        other_employee.ho_ten = "Bao ve khac"
+        other_employee.ngay_sinh = "1991-01-01"
+        other_employee.gioi_tinh = "M"
+        other_employee.sdt_chinh = "+84991111222"
+        other_employee.save()
+        other_shift = PhanCongCaTruc.objects.create(
+            vi_tri_chot=self.vi_tri,
+            nhan_vien=other_employee,
+            ca_lam_viec=self.ca,
+            ngay_truc=timezone.now().date()
+        )
+
+        response = self.client.post(
+            reverse('operations:mobile_checkin_api'),
+            {
+                'ca_truc_id': other_shift.id,
+                'lat': '10.0',
+                'lng': '106.0',
+            },
+            format='multipart',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_checkout_api_rejects_other_employee_shift(self):
+        other_user = User.objects.create_user(username='bv3', email='bv3@example.com', password='password')
+        other_employee = other_user.nhan_vien
+        other_employee.ho_ten = "Bao ve checkout"
+        other_employee.ngay_sinh = "1992-01-01"
+        other_employee.gioi_tinh = "M"
+        other_employee.sdt_chinh = "+84992222333"
+        other_employee.save()
+        other_shift = PhanCongCaTruc.objects.create(
+            vi_tri_chot=self.vi_tri,
+            nhan_vien=other_employee,
+            ca_lam_viec=self.ca,
+            ngay_truc=timezone.now().date()
+        )
+
+        response = self.client.post(
+            reverse('operations:mobile_checkout_api'),
+            {
+                'ca_truc_id': other_shift.id,
+                'lat': '10.0',
+                'lng': '106.0',
+            },
+            format='multipart',
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+class OperationsAttendanceViewSecurityTest(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = User.objects.create_user(username='bvweb', email='bvweb@example.com', password='password')
+        self.nhan_vien = self.user.nhan_vien
+        self.nhan_vien.ho_ten = "Bao ve web"
+        self.nhan_vien.ngay_sinh = "1990-01-01"
+        self.nhan_vien.gioi_tinh = "M"
+        self.nhan_vien.sdt_chinh = "+84993333444"
+        self.nhan_vien.save()
+        self.client.login(username='bvweb', password='password')
+
+        self.hop_dong = HopDong.objects.create(
+            so_hop_dong="HD-WEB",
+            ngay_ky=timezone.now(),
+            ngay_hieu_luc=timezone.now(),
+            ngay_het_han=timezone.now(),
+            gia_tri=5000,
+        )
+        self.muc_tieu = MucTieu.objects.create(
+            hop_dong=self.hop_dong,
+            ten_muc_tieu="Muc tieu web",
+            sdt_lien_he="0222",
+        )
+        self.vi_tri = ViTriChot.objects.create(muc_tieu=self.muc_tieu, ten_vi_tri="Chot web")
+        self.ca = CaLamViec.objects.create(ten_ca="Ca Web", gio_bat_dau="06:00", gio_ket_thuc="14:00")
+
+    def test_checkin_view_rejects_other_employee_shift(self):
+        other_user = User.objects.create_user(username='bvweb2', email='bvweb2@example.com', password='password')
+        other_employee = other_user.nhan_vien
+        other_employee.ho_ten = "Bao ve web khac"
+        other_employee.ngay_sinh = "1993-01-01"
+        other_employee.gioi_tinh = "M"
+        other_employee.sdt_chinh = "+84994444555"
+        other_employee.save()
+        other_shift = PhanCongCaTruc.objects.create(
+            vi_tri_chot=self.vi_tri,
+            nhan_vien=other_employee,
+            ca_lam_viec=self.ca,
+            ngay_truc=timezone.now().date(),
+        )
+
+        response = self.client.post(
+            reverse('operations:check_in', args=[other_shift.id]),
+            {'lat': '10.0', 'lng': '106.0'},
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        message_texts = [str(message) for message in get_messages(response.wsgi_request)]
+        self.assertTrue(any('khong tim thay ca truc hop le' in text.lower() or 'khong co quyen' in text.lower() for text in message_texts))
+
+
+class CeleryTaskIdempotencyTest(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='testuser', email='testuser@example.com', password='password')
+        self.nhan_vien = self.user.nhan_vien
+        self.nhan_vien.ho_ten = "Test NV"
+        self.nhan_vien.save()
+        self.kh = KhachHangTiemNang.objects.create(ten_cong_ty="KH Test", sdt="0123456789")
+        self.hd = HopDong.objects.create(so_hop_dong="HD001", ngay_ky=timezone.now().date(), ngay_hieu_luc=timezone.now().date(), ngay_het_han=timezone.now().date() + timedelta(days=365), gia_tri=1000000)
+        self.muc_tieu = MucTieu.objects.create(hop_dong=self.hd, ten_muc_tieu="Mục tiêu Test", vi_do=10.0, kinh_do=106.0, ban_kinh_cho_phep=100)
+        self.vi_tri = ViTriChot.objects.create(muc_tieu=self.muc_tieu, ten_vi_tri="Chốt Test")
+        self.ca = CaLamViec.objects.create(ten_ca="Ca Test", gio_bat_dau="08:00", gio_ket_thuc="17:00")
+        self.phan_cong = PhanCongCaTruc.objects.create(
+            nhan_vien=self.nhan_vien,
+            vi_tri_chot=self.vi_tri,
+            ca_lam_viec=self.ca,
+            ngay_truc=timezone.now().date()
+        )
+        self.cham_cong = ChamCong.objects.create(
+            ca_truc=self.phan_cong,
+            thoi_gian_check_in=timezone.now() - timedelta(hours=8),
+            thoi_gian_check_out=timezone.now(),
+            thuc_lam_gio=0.0 # Initial value
+        )
+
+    @patch('operations.tasks.CalculateWorkHoursUseCase.execute')
+    def test_process_timesheet_async_idempotency(self, mock_calculate_work_hours):
+        """
+        Đảm bảo task process_timesheet_async là idempotent.
+        Nghĩa là gọi nhiều lần không làm thay đổi kết quả sau lần gọi đầu tiên.
+        """
+        from operations.tasks import process_timesheet_async
+
+        # Mock the calculation to return a fixed value
+        mock_calculate_work_hours.return_value = 8.5
+
+        # First call to the task
+        process_timesheet_async(self.cham_cong.id)
+        self.cham_cong.refresh_from_db()
+        self.assertEqual(self.cham_cong.thuc_lam_gio, 8.5)
+        mock_calculate_work_hours.assert_called_once_with(self.cham_cong)
+
+        # Reset mock for second call
+        mock_calculate_work_hours.reset_mock()
+        mock_calculate_work_hours.return_value = 8.5 # Still returns the same value
+
+        # Second call to the task
+        process_timesheet_async(self.cham_cong.id)
+        self.cham_cong.refresh_from_db()
+        self.assertEqual(self.cham_cong.thuc_lam_gio, 8.5) # Value should not change
+        # The calculation should still be performed, as the task is designed to update the field.
+        # The idempotency here means it won't *incorrectly* modify the value if called again.
+        mock_calculate_work_hours.assert_called_once_with(self.cham_cong)

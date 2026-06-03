@@ -1,6 +1,7 @@
 # file: inventory/views.py
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.core.cache import cache
 from django.db.models import Sum, F, Count, Subquery, OuterRef, DecimalField
 from django.db.models.functions import Coalesce
 from django.contrib import messages
@@ -15,45 +16,48 @@ def dashboard_view(request):
     """
     Dashboard Quản lý Kho & Vật tư
     """
-    # 1. Thống kê tổng quan
-    tong_loai = VatTu.objects.count()
-    
-    # --- SỬA LỖI TÍNH TỔNG GIÁ TRỊ TỒN KHO ---
-    # Logic: Lấy giá nhập gần nhất của từng vật tư * Số lượng tồn hiện tại
-    
-    # Tạo subquery để lấy đơn giá từ phiếu nhập mới nhất
-    gia_nhap_gan_nhat = ChiTietPhieuNhap.objects.filter(
-        vat_tu=OuterRef('pk')
-    ).order_by('-phieu_nhap__ngay_nhap').values('don_gia')[:1]
+    # SSOT: Thiết lập Cache Key theo User (Tenant Isolation)
+    cache_key = f"inventory_dashboard_stats_u{request.user.id}"
+    context = cache.get(cache_key)
 
-    # Gán giá vào danh sách vật tư và tính tổng (xử lý Python để an toàn)
-    ds_vat_tu = VatTu.objects.annotate(
-        gia_moi_nhat=Coalesce(Subquery(gia_nhap_gan_nhat), 0, output_field=DecimalField())
-    )
-    
-    tong_gia_tri = 0
-    for vt in ds_vat_tu:
-        tong_gia_tri += vt.so_luong_ton * vt.gia_moi_nhat
+    if not context:
+        # 1. Thống kê tổng quan - Truy vấn Aggregate tốn tài nguyên
+        tong_loai = VatTu.objects.count()
+        
+        # Tính tổng giá trị tồn kho dựa trên giá nhập mới nhất (Complex Query)
+        gia_nhap_gan_nhat = ChiTietPhieuNhap.objects.filter(
+            vat_tu=OuterRef('pk')
+        ).order_by('-phieu_nhap__ngay_nhap').values('don_gia')[:1]
 
-    # 2. Cảnh báo tồn kho (Dùng so_luong_ton)
-    # Lấy các vật tư có số lượng tồn <= mức cảnh báo
-    sap_het_hang = VatTu.objects.filter(so_luong_ton__lte=F('muc_canh_bao')).order_by('so_luong_ton')
-    
-    # 3. Đếm số phiếu xuất trong tháng này
-    this_month = timezone.now().month
-    phieu_xuat_trong_thang = PhieuXuat.objects.filter(ngay_xuat__month=this_month).count()
-    
-    # 4. Lịch sử xuất kho mới nhất (10 phiếu)
-    lich_su_xuat = PhieuXuat.objects.select_related('nhan_vien_nhan', 'muc_tieu_nhan').order_by('-ngay_xuat')[:10]
+        ds_vat_tu = VatTu.objects.annotate(
+            gia_moi_nhat=Coalesce(Subquery(gia_nhap_gan_nhat), 0, output_field=DecimalField())
+        )
+        
+        tong_gia_tri = 0
+        for vt in ds_vat_tu:
+            tong_gia_tri += (vt.so_luong_ton or 0) * (vt.gia_moi_nhat or 0)
 
-    context = {
-        "title": "Quản lý Kho & Vật tư",
-        "tong_loai": tong_loai,
-        "tong_gia_tri": tong_gia_tri,
-        "sap_het_hang": sap_het_hang,
-        "phieu_xuat_trong_thang": phieu_xuat_trong_thang,
-        "lich_su_xuat": lich_su_xuat,
-    }
+        # 2. Cảnh báo tồn kho
+        sap_het_hang = list(VatTu.objects.filter(so_luong_ton__lte=F('muc_canh_bao')).order_by('so_luong_ton'))
+        
+        # 3. Đếm số phiếu xuất trong tháng này
+        this_month = timezone.now().month
+        phieu_xuat_trong_thang = PhieuXuat.objects.filter(ngay_xuat__month=this_month).count()
+        
+        # 4. Lịch sử xuất kho mới nhất (10 phiếu)
+        lich_su_xuat = list(PhieuXuat.objects.select_related('nhan_vien_nhan', 'muc_tieu_nhan').order_by('-ngay_xuat')[:10])
+
+        context = {
+            "title": "Quản lý Kho & Vật tư",
+            "tong_loai": tong_loai,
+            "tong_gia_tri": float(tong_gia_tri),
+            "sap_het_hang": sap_het_hang,
+            "phieu_xuat_trong_thang": phieu_xuat_trong_thang,
+            "lich_su_xuat": lich_su_xuat,
+        }
+        # Cache kết quả trong 15 phút để tối ưu hiệu năng
+        cache.set(cache_key, context, 900)
+
     return render(request, "inventory/dashboard_kho.html", context)
 
 # --- VIEW CÔNG CỤ TẠI MỤC TIÊU ---
@@ -74,6 +78,13 @@ def bao_cao_ton_kho(request):
     query = request.GET.get('q', '')
     loai_id = request.GET.get('loai', '')
     
+    # Caching danh mục loại vật tư (Master data ít thay đổi)
+    cache_key_loai = f"inventory_categories_u{request.user.id}"
+    ds_loai = cache.get(cache_key_loai)
+    if not ds_loai:
+        ds_loai = list(LoaiVatTu.objects.all())
+        cache.set(cache_key_loai, ds_loai, 3600) # Cache 1 giờ
+
     vat_tu_list = VatTu.objects.all().select_related('loai_vat_tu')
     
     if query:
@@ -88,7 +99,7 @@ def bao_cao_ton_kho(request):
     
     context = {
         'page_obj': page_obj,
-        'ds_loai': LoaiVatTu.objects.all(),
+        'ds_loai': ds_loai,
         'query': query,
         'selected_loai': int(loai_id) if loai_id else None
     }

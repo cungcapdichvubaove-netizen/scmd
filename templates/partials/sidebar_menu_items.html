@@ -1,68 +1,37 @@
-{# file: templates/partials/sidebar_menu_items.html #}
-{% load static %}
-
 <div class="mb-5">
-    <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] mb-3 sidebar-text opacity-70">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
         Tổng quan
     </p>
-    
-    <a href="{% url 'dashboard:main' %}" 
-       title="Bảng điều khiển trung tâm"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group
-       {% if '/dashboard/' in request.path and '/operations/' not in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if '/dashboard/' in request.path and '/operations/' not in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+
+    <a href="{% url 'dashboard:main' %}" title="Tổng quan vận hành" class="scmd-nav-link {% if '/dashboard/' in request.path and '/operations/' not in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-th-large text-sm"></i>
         </div>
-        <span class="sidebar-text">Dashboard CEO</span>
+        <span class="sidebar-text">Tổng quan</span>
     </a>
 </div>
 
 <div class="mb-5">
-    <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] mb-3 sidebar-text opacity-70">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
         Vận hành
     </p>
-    
-    <a href="{% url 'operations:dashboard_vanhanh' %}" 
-       title="Giám sát vị trí trực tuyến"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1
-       {% if 'operations/dashboard' in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'operations/dashboard' in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+
+    <a href="{% url 'operations:dashboard_vanhanh' %}" title="Dashboard vận hành" class="scmd-nav-link {% if 'operations/dashboard' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-map-marked-alt text-sm"></i>
         </div>
-        <span class="sidebar-text">Bản đồ Live</span>
+        <span class="sidebar-text">Bản đồ live</span>
     </a>
-    
-    <a href="{% url 'operations:xep_lich' %}"
-       title="Quản lý ca trực và phân công"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1
-       {% if 'xep-lich' in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'xep-lich' in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+
+    <a href="{% url 'operations:xep_lich' %}" title="Xếp lịch trực" class="scmd-nav-link {% if 'xep-lich' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="far fa-calendar-alt text-sm"></i>
         </div>
         <span class="sidebar-text">Xếp lịch trực</span>
     </a>
 
-    <a href="{% url 'inspection:dashboard' %}"
-       title="Quản lý thanh tra và tuần tra"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group
-       {% if 'inspection' in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'inspection' in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+    <a href="{% url 'inspection:dashboard' %}" title="Thanh tra và tuần tra" class="scmd-nav-link {% if 'inspection' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-user-secret text-sm"></i>
         </div>
         <span class="sidebar-text">Thanh tra & Tuần tra</span>
@@ -70,18 +39,11 @@
 </div>
 
 <div class="mb-5">
-    <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] mb-3 sidebar-text opacity-70">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
         Kinh doanh
     </p>
-    <a href="{% url 'clients:dashboard_crm' %}" 
-       title="Quản lý khách hàng và hợp đồng"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group
-       {% if 'clients' in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'clients' in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+    <a href="{% url 'clients:dashboard_crm' %}" title="CRM và hợp đồng" class="scmd-nav-link {% if 'clients' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-chart-pie text-sm"></i>
         </div>
         <span class="sidebar-text">CRM & Hợp đồng</span>
@@ -89,18 +51,11 @@
 </div>
 
 <div class="mb-5">
-    <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] mb-3 sidebar-text opacity-70">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
         Nhân sự
     </p>
-    <a href="{% url 'users:dashboard' %}" 
-       title="Hồ sơ nhân viên và đào tạo"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group
-       {% if 'users' in request.path and 'profile' not in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'users' in request.path and 'profile' not in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+    <a href="{% url 'users:dashboard' %}" title="Hồ sơ nhân viên và đào tạo" class="scmd-nav-link {% if 'users' in request.path and 'profile' not in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-users text-sm"></i>
         </div>
         <span class="sidebar-text">Hồ sơ & Đào tạo</span>
@@ -108,18 +63,11 @@
 </div>
 
 <div class="mb-5">
-    <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] mb-3 sidebar-text opacity-70">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
         Văn phòng số
     </p>
-    <a href="{% url 'workflow:dashboard' %}" 
-       title="Quy trình công việc và đề xuất"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group
-       {% if 'workflow' in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'workflow' in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+    <a href="{% url 'workflow:dashboard' %}" title="Công việc và đề xuất" class="scmd-nav-link {% if 'workflow' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-tasks text-sm"></i>
         </div>
         <span class="sidebar-text">Công việc & Đề xuất</span>
@@ -127,33 +75,19 @@
 </div>
 
 <div class="mb-5">
-    <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] mb-3 sidebar-text opacity-70">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
         Tài chính & Kho
     </p>
-    
-    <a href="{% url 'accounting:dashboard' %}" 
-       title="Kế toán, lương và chi phí"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1
-       {% if 'accounting' in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'accounting' in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+
+    <a href="{% url 'accounting:dashboard' %}" title="Kế toán và lương" class="scmd-nav-link {% if 'accounting' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-file-invoice-dollar text-sm"></i>
         </div>
         <span class="sidebar-text">Kế toán & Lương</span>
     </a>
 
-    <a href="{% url 'inventory:dashboard' %}" 
-       title="Quản lý kho vật tư và tài sản"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group
-       {% if 'inventory' in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'inventory' in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+    <a href="{% url 'inventory:dashboard' %}" title="Kho và vật tư" class="scmd-nav-link {% if 'inventory' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-boxes text-sm"></i>
         </div>
         <span class="sidebar-text">Kho & Vật tư</span>
@@ -161,20 +95,13 @@
 </div>
 
 <div class="mb-5">
-    <p class="px-4 text-[10px] font-extrabold text-slate-500 uppercase tracking-[0.2em] mb-3 sidebar-text opacity-70">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
         Báo cáo
     </p>
-    <a href="{% url 'reports:report_dashboard' %}" 
-       title="Báo cáo phân tích và thống kê"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group
-       {% if 'reports' in request.path %}
-            bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-900/40
-       {% else %}
-            text-slate-400 hover:bg-slate-800/50 hover:text-white
-       {% endif %}">
-        <div class="w-8 h-8 flex items-center justify-center rounded-lg {% if 'reports' in request.path %}bg-white/20{% else %}bg-slate-800 group-hover:bg-slate-700{% endif %} transition-colors">
+    <a href="{% url 'reports:report_dashboard' %}" title="Báo cáo tổng hợp" class="scmd-nav-link {% if 'reports' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
             <i class="fas fa-chart-line text-sm"></i>
         </div>
-        <span class="sidebar-text">Báo cáo Tổng hợp</span>
+        <span class="sidebar-text">Báo cáo tổng hợp</span>
     </a>
 </div>

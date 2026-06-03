@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block title %}Đối soát Khấu trừ Lương - SCMD ERP{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50 pb-10">
+    <!-- Header Báo cáo -->
+    <div class="bg-slate-800 text-white p-6 shadow-md print:bg-white print:text-black print:shadow-none">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold uppercase tracking-wider">Báo cáo Đối soát Khấu trừ</h1>
+                <p class="opacity-80 text-sm mt-1">Kỳ lương: {{ report.ky_luong }} | {{ report.bang_luong }}</p>
+            </div>
+            <div class="flex gap-2 print:hidden">
+                <a href="{% url 'accounting:export_doi_soat_khau_tru_excel' report.bang_luong_id|default:request.resolver_match.kwargs.pk %}" class="btn btn-sm btn-success text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Xuất Excel
+                </a>
+                <button onclick="window.print()" class="btn btn-sm btn-ghost bg-white/10 hover:bg-white/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    In báo cáo
+                </button>
+                <a href="{% url 'accounting:dashboard' %}" class="btn btn-sm btn-outline btn-info">
+                    Quay lại Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto mt-6 px-4">
+        {% if report.status == "error" %}
+            <div class="alert alert-error shadow-lg">
+                <span>Lỗi hệ thống: {{ report.message }}</span>
+            </div>
+        {% else %}
+            <!-- Tóm tắt chỉ số -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div class="stats shadow bg-white">
+                    <div class="stat">
+                        <div class="stat-title text-slate-500 uppercase font-semibold text-xs">Tổng nhân sự đối soát</div>
+                        <div class="stat-value text-slate-800 text-2xl">{{ report.summary.total_checked|default:report.data|length }}</div>
+                        <div class="stat-desc text-slate-400 italic text-[10px]">Dựa trên danh sách có phát sinh tạm ứng</div>
+                    </div>
+                </div>
+
+                <div class="stats shadow bg-white">
+                    <div class="stat">
+                        <div class="stat-title text-slate-500 uppercase font-semibold text-xs">Tổng chênh lệch</div>
+                        <div class="stat-value {% if report.summary.total_variance != 0 %}text-error{% else %}text-success{% endif %} text-2xl">
+                            {{ report.summary.total_variance|floatformat:0|intcomma }} ₫
+                        </div>
+                        <div class="stat-desc text-slate-400 italic text-[10px]">Lương khấu trừ - Sổ quỹ thực chi</div>
+                    </div>
+                </div>
+
+                <div class="stats shadow bg-white">
+                    <div class="stat">
+                        <div class="stat-title text-slate-500 uppercase font-semibold text-xs">Trạng thái rủi ro</div>
+                        <div class="stat-value text-sm flex items-center gap-2">
+                            {% if report.summary.total_variance != 0 %}
+                                <div class="badge badge-error gap-2 p-3 font-bold text-white">CẢNH BÁO SAI LỆCH</div>
+                            {% else %}
+                                <div class="badge badge-success gap-2 p-3 font-bold text-white">AN TOÀN</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng chi tiết -->
+            <div class="card bg-white shadow-xl overflow-hidden">
+                <div class="card-body p-0">
+                    <div class="overflow-x-auto">
+                        <table class="table w-full table-zebra">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-700">
+                                    <th class="w-16">STT</th>
+                                    <th>Nhân viên</th>
+                                    <th>Mã NV</th>
+                                    <th class="text-right">Khấu trừ Lương (A)</th>
+                                    <th class="text-right">Thực chi Sổ quỹ (B)</th>
+                                    <th class="text-right">Chênh lệch (A-B)</th>
+                                    <th class="text-center print:hidden">Ghi chú</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in report.data %}
+                                <tr class="hover">
+                                    <td class="text-center text-slate-400 text-xs">{{ forloop.counter }}</td>
+                                    <td>
+                                        <div class="font-bold text-slate-800">{{ item.nhan_vien }}</div>
+                                    </td>
+                                    <td class="text-xs font-mono">{{ item.ma_nv }}</td>
+                                    <td class="text-right font-semibold text-slate-600">
+                                        {{ item.khau_tru_luong|floatformat:0|intcomma }}
+                                    </td>
+                                    <td class="text-right font-semibold text-slate-600">
+                                        {{ item.thuc_chi_so_quy|floatformat:0|intcomma }}
+                                    </td>
+                                    <td class="text-right">
+                                        {% if item.chenh_lech != 0 %}
+                                            <span class="text-error font-bold text-md">
+                                                {{ item.chenh_lech|floatformat:0|intcomma }} ₫
+                                            </span>
+                                        {% else %}
+                                            <span class="text-success font-medium">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center print:hidden">
+                                        {% if item.is_warning %}
+                                            <div class="tooltip tooltip-left" data-tip="Dữ liệu chênh lệch cần kiểm tra lại">
+                                                <span class="badge badge-error badge-xs animate-pulse"></span>
+                                            </div>
+                                        {% else %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-success mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                            </svg>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-10 text-slate-400 italic">
+                                        Không tìm thấy dữ liệu đối soát cho kỳ lương này.
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <!-- Footer tổng -->
+                            <tfoot class="bg-slate-50">
+                                <tr class="text-slate-700 font-bold border-t-2 border-slate-200">
+                                    <td colspan="5" class="text-right uppercase">Tổng biến động tài chính:</td>
+                                    <td class="text-right text-lg {% if report.summary.total_variance != 0 %}text-error{% endif %}">
+                                        {{ report.summary.total_variance|floatformat:0|intcomma }} ₫
+                                    </td>
+                                    <td class="print:hidden"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ghi chú chân trang in -->
+            <div class="hidden print:block mt-10">
+                <div class="flex justify-between px-10">
+                    <div class="text-center">
+                        <p class="font-bold">Người lập báo cáo</p>
+                        <p class="mt-20 text-slate-300 italic">(Ký và ghi rõ họ tên)</p>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold text-slate-800">Kế toán trưởng phê duyệt</p>
+                        <p class="mt-20 text-slate-300 italic">(Ký và đóng dấu)</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,12 +1,27 @@
 # docker-compose.prod.yml
-version: '3.8'
-
 services:
+  migrate:
+    build: .
+    container_name: scmd_migrate_prod
+    command: ["/app/scripts/entrypoint.sh", "python", "manage.py", "migrate", "--noinput"]
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SCMD_ORGANIZATION_ID=${SCMD_ORGANIZATION_ID}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: "no"
+
   # --- 1. WEB APP (DAPHNE) ---
   web:
     build: .
     container_name: scmd_web_prod
-    command: /app/scripts/entrypoint.sh
+    command: ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
     expose:
       - "8000" # Chỉ mở nội bộ cho Nginx thấy
     volumes:
@@ -17,10 +32,18 @@ services:
     environment:
       - DB_HOST=db
       - DB_PORT=5432
+      - SCMD_ORGANIZATION_ID=${SCMD_ORGANIZATION_ID} # Load from .env for production
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   # --- 2. NGINX (GATEWAY) ---
   nginx:
@@ -43,8 +66,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: always
 
   # --- 4. BEAT (SCHEDULED TASKS) ---
@@ -54,8 +79,10 @@ services:
     env_file:
       - .env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     restart: always
 
   # --- 5. DATABASE (POSTGIS) ---
@@ -69,12 +96,22 @@ services:
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   # --- 6. REDIS ---
   redis:
     image: redis:7-alpine
     container_name: scmd_redis_prod
     restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 volumes:
   postgres_data_prod:

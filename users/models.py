@@ -7,7 +7,8 @@ Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 File: users/models.py
 Author: Mr. Anh
 Created Date: 2025-12-05
-Updated Date: 2026-03-21
+Updated Date: 2026-04-28
+Version: v1.1.0
 Description: Model quản lý cấu trúc nhân sự, định danh và hồ sơ nghiệp vụ SCMD.
              ENHANCEMENT: Tối ưu Manager, gia cố logic Atomic và chuẩn hóa PEP8.
 """
@@ -22,6 +23,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from core.infrastructure.security import decrypt_aes256
 
 # Logger cho hệ thống SCMD
 logger = logging.getLogger(__name__)
@@ -130,8 +132,8 @@ class NhanVien(models.Model):
     )
     
     # Thông tin tổ chức
-    phong_ban = models.ForeignKey(PhongBan, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Phòng ban"))
-    chuc_danh = models.ForeignKey(ChucDanh, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Chức danh"))
+    phong_ban = models.ForeignKey(PhongBan, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Phòng ban"), related_name="cac_nhan_vien")
+    chuc_danh = models.ForeignKey(ChucDanh, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Chức danh"), related_name="cac_nhan_vien")
     ma_nhan_vien = models.CharField(_("Mã số NV"), max_length=20, unique=True, editable=False, db_index=True)
     
     # Thông tin cá nhân
@@ -150,7 +152,14 @@ class NhanVien(models.Model):
         blank=True,
         help_text=_("Định dạng: 0xxxxxxxxx (10 số)")
     )
-    so_cccd = models.CharField(_("Số CCCD/CMND"), max_length=20, unique=True, null=True, blank=True)
+    fcm_token = models.CharField(
+        _("FCM Token"), 
+        max_length=255, 
+        null=True, 
+        blank=True,
+        help_text=_("Token định danh thiết bị cho Firebase Cloud Messaging")
+    )
+    so_cccd = models.CharField(_("Số CCCD/CMND (Encrypted)"), max_length=255, unique=True, null=True, blank=True)
     email = models.EmailField(_("Email cá nhân"), unique=True, null=True, blank=True)
     dia_chi_thuong_tru = models.CharField(_("Địa chỉ thường trú"), max_length=255, blank=True)
     dia_chi_tam_tru = models.CharField(_("Địa chỉ tạm trú"), max_length=255, blank=True)
@@ -159,6 +168,7 @@ class NhanVien(models.Model):
     
     # Thông tin công tác
     ngay_vao_lam = models.DateField(_("Ngày vào làm"), null=True, blank=True)
+    ngay_nghi_viec = models.DateField(_("Ngày nghỉ việc"), null=True, blank=True)
     trang_thai_lam_viec = models.CharField(
         _("Trạng thái nhân sự"), 
         max_length=50, 
@@ -168,7 +178,7 @@ class NhanVien(models.Model):
     loai_hop_dong = models.CharField(_("Loại hợp đồng"), max_length=50, choices=LoaiHopDong.choices, blank=True)
     
     # Tài chính
-    so_tai_khoan = models.CharField(_("Số tài khoản"), max_length=50, blank=True)
+    so_tai_khoan = models.CharField(_("Số tài khoản (Encrypted)"), max_length=255, blank=True)
     ngan_hang = models.CharField(_("Ngân hàng"), max_length=255, blank=True)
     chi_nhanh_ngan_hang = models.CharField(_("Chi nhánh"), max_length=255, blank=True)
 
@@ -182,6 +192,77 @@ class NhanVien(models.Model):
 
     def __str__(self):
         return f"{self.ma_nhan_vien} - {self.ho_ten}"
+        
+    def _audit_pii_access(self, field_label: str):
+        """
+        Ghi lại nhật ký truy cập dữ liệu cá nhân nhạy cảm (PII).
+        Tuân thủ Section 12.3 - DOCUMENTATION.md.
+        """
+        from crum import get_current_user, get_current_request
+        from main.models import AuditLog
+
+        actor = "SYSTEM/UNKNOWN"
+        user = None
+        ip = ""
+        ua = ""
+
+        try:
+            user = get_current_user()
+            request = get_current_request()
+            
+            if user and user.is_authenticated:
+                actor = user.username
+
+            if request:
+                # Trích xuất IP chính xác (xử lý qua Load Balancer/Proxy)
+                x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+                ip = x_forwarded_for.split(',')[0] if x_forwarded_for else request.META.get('REMOTE_ADDR')
+                ua = request.META.get('HTTP_USER_AGENT', '')
+        except (ImportError, Exception):
+            pass
+
+        # 1. Ghi ra log file (dự phòng cho hệ thống giám sát log tập trung)
+        logger.info(
+            f"[PII-ACCESS-AUDIT] Actor: {actor} | Action: VIEW | Field: {field_label} | "
+            f"Target: {self.ma_nhan_vien} ({self.ho_ten}) | ID: {self.pk}"
+        )
+
+        # 2. Lưu vào Database AuditLog (Nguồn sự thật cho báo cáo hậu kiểm)
+        try:
+            AuditLog.log_access(
+                user=user if user and user.is_authenticated else None,
+                model_instance=self,
+                field_name=field_label,
+                tenant_id=getattr(self, 'tenant_id', settings.SCMD_ORGANIZATION_ID),
+                ip=ip,
+                ua=ua
+            )
+        except Exception as e:
+            logger.error(f"CRITICAL: Failed to save AuditLog for PII access: {str(e)}")
+
+    @property
+    def decrypted_cccd(self):
+        """Giải mã CCCD khi cần hiển thị (Yêu cầu quyền hạn phù hợp)"""
+        self._audit_pii_access("Số CCCD")
+        return decrypt_aes256(self.so_cccd)
+
+    @property
+    def masked_cccd(self):
+        """Hiển thị CCCD dạng che dấu (VD: ********1234)"""
+        val = self.decrypted_cccd
+        return f"{'*' * (len(val)-4)}{val[-4:]}" if val else "-"
+
+    @property
+    def masked_stk(self):
+        """Hiển thị Số tài khoản dạng che dấu"""
+        val = self.decrypted_stk
+        return f"{'*' * (len(val)-3)}{val[-3:]}" if val else "-"
+
+    @property
+    def decrypted_stk(self):
+        """Giải mã số tài khoản ngân hàng"""
+        self._audit_pii_access("Số tài khoản")
+        return decrypt_aes256(self.so_tai_khoan)
         
     @property
     def avatar_url(self):
@@ -200,65 +281,28 @@ class NhanVien(models.Model):
 
     def save(self, *args, **kwargs):
         """Xử lý logic tự động hóa trước khi lưu."""
-        is_new = self.pk is None
-        
-        # 1. Tự động sinh mã nhân viên an toàn với Lock Database
+        # Sinh mã nhân viên nếu chưa có (Trường hợp tạo từ Signal hoặc Admin)
         if not self.ma_nhan_vien:
             try:
                 with transaction.atomic():
+                    # Khóa bản ghi cấu hình để tránh trùng mã khi concurrency cao (Race Condition protection)
                     config = CauHinhMaNhanVien.objects.select_for_update().first()
                     if not config:
                         config = CauHinhMaNhanVien.objects.create(tien_to="NV", do_dai_so=4, so_hien_tai=0)
+                    
                     config.so_hien_tai += 1
                     config.save()
+                    
                     self.ma_nhan_vien = f"{config.tien_to}{str(config.so_hien_tai).zfill(config.do_dai_so)}"
             except Exception as e:
-                logger.error(f"Lỗi sinh mã NV: {str(e)}")
-                raise ValidationError(_(f"Hệ thống không thể tạo mã nhân viên mới: {str(e)}"))
-
-        # 2. Tạo tài khoản hệ thống cho nhân sự mới
-        if is_new and not self.user:
-            self._create_system_user()
+                logger.error(f"Lỗi tự động sinh mã nhân viên tại model layer: {str(e)}")
 
         super().save(*args, **kwargs)
-
-    def _create_system_user(self):
-        """Khởi tạo tài khoản Django User dựa trên mã nhân viên."""
-        username = self.ma_nhan_vien
-        password = "scmd@123" # Mật khẩu mặc định hệ thống
-        full_name = self.ho_ten.strip()
-        names = full_name.split(' ')
-        first_name = names[-1] if names else ""
-        last_name = " ".join(names[:-1]) if len(names) > 1 else ""
-        
-        try:
-            with transaction.atomic():
-                final_email = self.email if self.email else None
-                # Kiểm tra trùng email để tránh lỗi Integrity
-                if final_email and User.objects.filter(email=final_email).exists():
-                    final_email = None
-
-                user = User.objects.create_user(
-                    username=username, 
-                    password=password, 
-                    email=final_email, 
-                    first_name=first_name, 
-                    last_name=last_name
-                )
-                self.user = user
-                # Đảm bảo 1 user chỉ liên kết với 1 nhân viên duy nhất
-                NhanVien.objects.filter(user=user).exclude(pk=self.pk).update(user=None)
-        except IntegrityError:
-            user = User.objects.filter(username=username).first()
-            if user:
-                self.user = user
-        except Exception as e:
-            logger.error(f"Lỗi tạo User cho {self.ma_nhan_vien}: {str(e)}")
 
 
 # --- MODEL HỖ TRỢ HỒ SƠ ---
 class HocVan(models.Model):
-    nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, related_name="hoc_van")
+    nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, related_name="cac_hoc_van")
     truong_dao_tao = models.CharField(_("Trường đào tạo"), max_length=255)
     chuyen_nganh = models.CharField(_("Chuyên ngành"), max_length=255)
     trinh_do = models.CharField(_("Trình độ"), max_length=100)
@@ -271,7 +315,7 @@ class HocVan(models.Model):
 
 
 class BangCapChungChi(models.Model):
-    nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, related_name="bang_cap")
+    nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, related_name="cac_bang_cap")
     ten_bang_cap = models.CharField(_("Tên bằng cấp"), max_length=255)
     noi_cap = models.CharField(_("Nơi cấp"), max_length=255)
     ngay_cap = models.DateField(_("Ngày cấp"))
@@ -284,10 +328,10 @@ class BangCapChungChi(models.Model):
 
 
 class LichSuCongTac(models.Model):
-    nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, related_name="lich_su_cong_tac")
+    nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, related_name="cac_lich_su_cong_tac")
     muc_tieu = models.ForeignKey("clients.MucTieu", on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Mục tiêu bảo vệ"))
     chuc_danh_kiem_nhiem = models.ForeignKey(ChucDanh, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Chức danh kiêm nhiệm"))
-    quan_ly_truc_tiep = models.ForeignKey(NhanVien, on_delete=models.SET_NULL, null=True, blank=True, related_name="nhan_vien_cap_duoi", verbose_name=_("Quản lý trực tiếp"))
+    quan_ly_truc_tiep = models.ForeignKey(NhanVien, on_delete=models.SET_NULL, null=True, blank=True, related_name="cac_nhan_vien_cap_duoi", verbose_name=_("Quản lý trực tiếp"))
     ngay_bat_dau = models.DateField(_("Ngày bắt đầu"), db_index=True)
     ngay_ket_thuc = models.DateField(_("Ngày kết thúc"), null=True, blank=True)
     

@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count
 from django.utils import timezone
 from datetime import timedelta
+from django.conf import settings
 import json
 
 from .models import KhachHangTiemNang, HopDong, CoHoiKinhDoanh
@@ -16,20 +17,20 @@ def dashboard_view(request):
     today = timezone.now().date()
     
     # 1. KPI TỔNG QUAN
-    total_leads = KhachHangTiemNang.objects.count()
-    active_contracts = HopDong.objects.filter(trang_thai='HIEU_LUC').count()
+    total_leads = KhachHangTiemNang.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).count()
+    active_contracts = HopDong.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(trang_thai='HIEU_LUC').count()
     
     # Tổng giá trị hợp đồng đang chạy (Doanh thu tháng dự kiến)
-    monthly_revenue = HopDong.objects.filter(trang_thai='HIEU_LUC').aggregate(Sum('gia_tri'))['gia_tri__sum'] or 0
+    monthly_revenue = HopDong.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(trang_thai='HIEU_LUC').aggregate(Sum('gia_tri'))['gia_tri__sum'] or 0
     
     # Cơ hội đang theo đuổi
-    open_opportunities = CoHoiKinhDoanh.objects.exclude(
+    open_opportunities = CoHoiKinhDoanh.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).exclude(
         trang_thai__in=['THANHCONG', 'THATBAI']
     ).count()
 
     # 2. CẢNH BÁO HỢP ĐỒNG (30 ngày tới)
     next_30_days = today + timedelta(days=30)
-    expiring_contracts = HopDong.objects.filter(
+    expiring_contracts = HopDong.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(
         ngay_het_han__range=[today, next_30_days]
     ).select_related('co_hoi__khach_hang_tiem_nang').order_by('ngay_het_han')
 
@@ -49,7 +50,7 @@ def dashboard_view(request):
         chart_data.append(status_dict.get(stage, 0))
 
     # 4. KHÁCH HÀNG MỚI NHẤT
-    recent_leads = KhachHangTiemNang.objects.order_by('-ngay_tao')[:5]
+    recent_leads = KhachHangTiemNang.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).order_by('-ngay_tao')[:5]
 
     context = {
         'total_leads': total_leads,
@@ -72,7 +73,7 @@ def pipeline_view(request):
     pipeline_stages = {}
 
     for stage_key, stage_name in stages:
-        opportunities = CoHoiKinhDoanh.objects.filter(
+        opportunities = CoHoiKinhDoanh.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(
             trang_thai=stage_key
         ).select_related("khach_hang_tiem_nang", "nguoi_phu_trach")
 

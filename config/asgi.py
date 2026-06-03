@@ -1,24 +1,11 @@
 # file: config/asgi.py
 
 import os
+import django
 from django.core.asgi import get_asgi_application
-from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
-from django.urls import re_path
-from operations.consumers import NotificationConsumer
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
 
-# Define routing directly here to avoid circular imports
-websocket_urlpatterns = [
-    re_path(r'ws/notifications/$', NotificationConsumer.as_asgi()),
-]
-
-application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
-    "websocket": AuthMiddlewareStack(
-        URLRouter(
-            websocket_urlpatterns
-        )
-    ),
-})
+# Import application từ config.routing sau khi django.setup()
+from config.routing import application

@@ -2,11 +2,13 @@
 """
 Security Command (SCMD) System
 ------------------------------
-Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
+Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
 File: operations/views.py
 Author: Mr. Anh
 Created Date: 2025-12-09
+Updated Date: 2026-04-28
+Version: v1.1.0
 Description: Views xử lý logic Vận hành.
              UPDATED: dashboard_vanhanh_view chuyển sang render Skeleton (tối ưu hiệu năng).
              PRESERVED: Giữ nguyên toàn bộ logic Mobile Views và Xếp lịch từ file gốc.
@@ -14,6 +16,7 @@ Description: Views xử lý logic Vận hành.
 
 import os
 import json
+import logging
 from datetime import datetime, timedelta, date
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -23,12 +26,25 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.views.decorators.cache import cache_control
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.core.exceptions import ValidationError
 
 from .models import PhanCongCaTruc, BaoCaoSuCo, ChamCong, KiemTraQuanSo, ViTriChot, CaLamViec, BaoCaoDeXuat
 from users.models import NhanVien
 from clients.models import MucTieu
 from .forms import BaoCaoSuCoForm, BaoCaoDeXuatForm
-from .services.attendance_service import AttendanceService
+from .application.attendance_use_cases import CheckInUseCase, CheckOutUseCase, GetMobileDashboardUseCase, TriggerSOSUseCase, ConfirmAliveCheckUseCase
+from .api_serializers import CheckInCheckOutSerializer
+from .access_policies import ShiftAccessPolicy
+from rolepermissions.checkers import has_role
+from rolepermissions.decorators import has_permission_decorator
+
+logger = logging.getLogger(__name__)
+
+
+def _handle_mobile_operation_error(request, message, log_message):
+    logger.exception(log_message)
+    messages.error(request, message)
 
 # --- HELPER ---
 def get_client_ip(request):
@@ -37,8 +53,14 @@ def get_client_ip(request):
     return request.META.get('REMOTE_ADDR')
 
 def get_mobile_context(request):
-    try: return request.user.nhan_vien
-    except: return None
+    """
+    Lấy hồ sơ nhân viên một cách an toàn. 
+    Chỉ bắt lỗi khi quan hệ OneToOne không tồn tại hoặc user chưa login.
+    """
+    try:
+        return request.user.nhan_vien
+    except (AttributeError, NhanVien.DoesNotExist):
+        return None
 
 @login_required
 def dashboard_vanhanh_view(request):
@@ -54,39 +76,8 @@ def mobile_dashboard(request):
     nhan_vien = get_mobile_context(request)
     if not nhan_vien: return render(request, "operations/mobile/error_no_profile.html")
     
-    today = timezone.now().date()
-    yesterday = today - timedelta(days=1)
-    
-    phan_congs = PhanCongCaTruc.objects.filter(nhan_vien=nhan_vien, ngay_truc__range=[yesterday, today]).select_related('vi_tri_chot__muc_tieu', 'ca_lam_viec').order_by('ngay_truc', 'ca_lam_viec__gio_bat_dau')
-    ca_truc_hom_nay = None
-    trang_thai_checkin = False 
-
-    # Logic tìm ca trực ưu tiên
-    for pc in phan_congs:
-        if hasattr(pc, 'chamcong') and pc.chamcong.thoi_gian_check_in and not pc.chamcong.thoi_gian_check_out:
-            ca_truc_hom_nay = pc; trang_thai_checkin = True; break
-            
-    if not ca_truc_hom_nay:
-        current_dt = timezone.now()
-        for pc in phan_congs:
-            if hasattr(pc, 'chamcong') and pc.chamcong.thoi_gian_check_out: continue 
-            
-            start_real = timezone.make_aware(datetime.combine(pc.ngay_truc, pc.ca_lam_viec.gio_bat_dau))
-            if pc.ca_lam_viec.is_night_shift:
-                end_real = timezone.make_aware(datetime.combine(pc.ngay_truc + timedelta(days=1), pc.ca_lam_viec.gio_ket_thuc))
-            else:
-                end_real = timezone.make_aware(datetime.combine(pc.ngay_truc, pc.ca_lam_viec.gio_ket_thuc))
-            
-            if end_real > current_dt and start_real - timedelta(minutes=60) <= current_dt:
-                ca_truc_hom_nay = pc; trang_thai_checkin = False; break
-        
-        if not ca_truc_hom_nay:
-             ca_truc_hom_nay = phan_congs.filter(ngay_truc=today, chamcong__thoi_gian_check_in__isnull=True).first()
-
-    if not ca_truc_hom_nay:
-        last_pc = phan_congs.last()
-        if last_pc and hasattr(last_pc, 'chamcong') and last_pc.chamcong.thoi_gian_check_out:
-             ca_truc_hom_nay = last_pc; trang_thai_checkin = "DONE" 
+    # SSOT: Delegate logic tìm ca trực sang Application Layer
+    ca_truc_hom_nay, trang_thai_checkin = GetMobileDashboardUseCase.execute(nhan_vien)
 
     alive_check_pending = None
     if ca_truc_hom_nay:
@@ -107,50 +98,79 @@ def mobile_dashboard(request):
 @login_required
 def check_in_view(request, phan_cong_id):
     if request.method == 'POST':
+        data = request.POST.copy()
+        data['ca_truc_id'] = phan_cong_id
+        serializer = CheckInCheckOutSerializer(data=data)
+
+        if not serializer.is_valid():
+            messages.error(request, f"Du lieu khong hop le: {serializer.errors}")
+            return redirect('operations:mobile_dashboard')
+
         try:
-            pc = PhanCongCaTruc.objects.get(id=phan_cong_id, nhan_vien=request.user.nhan_vien)
-            note = request.POST.get('note', '')
-            
-            success, msg, _ = AttendanceService.process_check_in(
-                phan_cong=pc,
-                lat=request.POST.get('lat'),
-                lng=request.POST.get('lng'),
-                image=request.FILES.get('anh_check_in'),
-                ip=get_client_ip(request),
-                device_info=request.META.get('HTTP_USER_AGENT', '')
+            pc = ShiftAccessPolicy.get_accessible_shift_for_attendance(
+                user=request.user,
+                shift_id=phan_cong_id,
+                tenant_id=settings.SCMD_ORGANIZATION_ID,
             )
-            
-            if success and note and hasattr(pc, 'chamcong'):
-                cc = pc.chamcong; cc.ghi_chu = (cc.ghi_chu or "") + " " + note; cc.save()
-                
+            success, msg, _, err_code = CheckInUseCase.execute(
+                phan_cong=pc,
+                lat=serializer.validated_data['lat'],
+                lng=serializer.validated_data['lng'],
+                image=request.FILES.get('anh_check_in') or serializer.validated_data.get('image'),
+                ip=get_client_ip(request),
+                device_info=request.META.get('HTTP_USER_AGENT', ''),
+                note=serializer.validated_data.get('note', ''),
+                user=request.user
+            )
+
             if success: messages.success(request, msg)
             else: messages.error(request, msg)
-        except PhanCongCaTruc.DoesNotExist: messages.error(request, "Ca trực không tồn tại.")
-        except Exception as e: messages.error(request, f"Lỗi hệ thống: {str(e)}")
+        except PermissionDenied as exc:
+            messages.error(request, str(exc))
+        except ValidationError as exc:
+            messages.error(request, str(exc))
+        except Exception:
+            _handle_mobile_operation_error(
+                request,
+                "Khong the xu ly check-in luc nay. Vui long thu lai hoac lien he quan tri.",
+                "Unexpected error while checking in from mobile web",
+            )
     return redirect('operations:mobile_dashboard')
 
 @login_required
 def check_out_view(request, phan_cong_id):
     if request.method == 'POST':
         try:
-            pc = PhanCongCaTruc.objects.get(id=phan_cong_id, nhan_vien=request.user.nhan_vien)
+            pc = ShiftAccessPolicy.get_accessible_shift_for_attendance(
+                user=request.user,
+                shift_id=phan_cong_id,
+                tenant_id=settings.SCMD_ORGANIZATION_ID,
+            )
             note = request.POST.get('note', '')
 
-            success, msg, _ = AttendanceService.process_check_out(
+            success, msg, _, err_code = CheckOutUseCase.execute(
                 phan_cong=pc,
                 lat=request.POST.get('lat'),
                 lng=request.POST.get('lng'),
                 image=request.FILES.get('anh_check_out'),
                 ip=get_client_ip(request),
-                device_info=request.META.get('HTTP_USER_AGENT', '')
+                device_info=request.META.get('HTTP_USER_AGENT', ''),
+                note=note,
+                user=request.user
             )
-            
-            if success and note and hasattr(pc, 'chamcong'):
-                cc = pc.chamcong; cc.ghi_chu = (cc.ghi_chu or "") + " " + note; cc.save()
 
             if success: messages.success(request, msg)
             else: messages.error(request, msg)
-        except Exception as e: messages.error(request, f"Lỗi: {str(e)}")
+        except PermissionDenied as exc:
+            messages.error(request, str(exc))
+        except ValidationError as exc:
+            messages.error(request, str(exc))
+        except Exception:
+            _handle_mobile_operation_error(
+                request,
+                "Khong the xu ly check-out luc nay. Vui long thu lai hoac lien he quan tri.",
+                "Unexpected error while checking out from mobile web",
+            )
     return redirect('operations:mobile_dashboard')
 
 @login_required
@@ -159,10 +179,9 @@ def trigger_sos(request):
         nhan_vien = get_mobile_context(request)
         if nhan_vien:
             lat, lng = request.POST.get('lat', ''), request.POST.get('lng', '')
-            ca_truc = PhanCongCaTruc.objects.filter(nhan_vien=nhan_vien, chamcong__thoi_gian_check_in__isnull=False, chamcong__thoi_gian_check_out__isnull=True).last()
-            muc_tieu = ca_truc.vi_tri_chot.muc_tieu if ca_truc else None
-            BaoCaoSuCo.objects.create(tieu_de=f"🆘 CẤP CỨU: {nhan_vien.ho_ten.upper()}", nhan_vien_bao_cao=nhan_vien, muc_do='NGUY_HIEM', trang_thai='CHO_XU_LY', thoi_gian_phat_hien=timezone.now(), muc_tieu=muc_tieu, ca_truc=ca_truc, mo_ta_chi_tiet=f"SOS từ Mobile. GPS: {lat}, {lng}")
-            messages.warning(request, "ĐÃ GỬI TÍN HIỆU KHẨN CẤP!")
+            # Rule 3.2: Delegated to TriggerSOSUseCase
+            success, msg, _, _ = TriggerSOSUseCase.execute(nhan_vien, lat, lng)
+            if success: messages.warning(request, msg)
     return redirect('operations:mobile_dashboard')
 
 @login_required
@@ -174,26 +193,31 @@ def mobile_cham_cong_view(request):
             lat = request.POST.get('lat')
             lng = request.POST.get('lng')
             note = request.POST.get('note', '')
-            today = timezone.now().date(); yesterday = today - timedelta(days=1)
-            phan_congs = PhanCongCaTruc.objects.filter(nhan_vien=nhan_vien, ngay_truc__range=[yesterday, today]).order_by('ngay_truc', 'ca_lam_viec__gio_bat_dau')
             
-            target_pc = None
-            if action in ['OUT', 'check_out']:
-                for pc in phan_congs:
-                    if hasattr(pc, 'chamcong') and pc.chamcong.thoi_gian_check_in and not pc.chamcong.thoi_gian_check_out: target_pc = pc; break
-            else:
-                for pc in phan_congs:
-                    if not hasattr(pc, 'chamcong') or not pc.chamcong.thoi_gian_check_in: target_pc = pc; break
+            # DRY: Tái sử dụng logic xác định ca trực từ GetMobileDashboardUseCase
+            target_pc, status_pc = GetMobileDashboardUseCase.execute(nhan_vien)
             
-            if not target_pc: messages.error(request, "Không tìm thấy ca trực!"); return redirect('operations:mobile_dashboard')
+            if not target_pc: 
+                messages.error(request, "Không tìm thấy ca trực hợp lệ!"); 
+                return redirect('operations:mobile_dashboard')
 
-            if action in ['IN', 'check_in']: success, msg, _ = AttendanceService.process_check_in(target_pc, lat, lng, request.FILES.get('anh_check_in'), get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''))
-            else: success, msg, _ = AttendanceService.process_check_out(target_pc, lat, lng, request.FILES.get('anh_check_out'), get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''))
+            if action in ['IN', 'check_in']: 
+                success, msg, _, _ = CheckInUseCase.execute(target_pc, lat, lng, request.FILES.get('anh_check_in'), get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''), note=note, user=request.user)
+            else: 
+                success, msg, _, _ = CheckOutUseCase.execute(target_pc, lat, lng, request.FILES.get('anh_check_out'), get_client_ip(request), request.META.get('HTTP_USER_AGENT', ''), note=note, user=request.user)
             
-            if note and hasattr(target_pc, 'chamcong'): cc = target_pc.chamcong; cc.ghi_chu = (cc.ghi_chu or "") + " " + note; cc.save()
             if success: messages.success(request, msg)
             else: messages.error(request, msg)
-        except Exception as e: messages.error(request, f"Lỗi: {str(e)}")
+        except PermissionDenied as exc:
+            messages.error(request, str(exc))
+        except ValidationError as exc:
+            messages.error(request, str(exc))
+        except Exception:
+            _handle_mobile_operation_error(
+                request,
+                "Khong the xu ly cham cong luc nay. Vui long thu lai hoac lien he quan tri.",
+                "Unexpected error while processing mobile attendance",
+            )
     return redirect('operations:mobile_dashboard')
 
 @login_required
@@ -219,10 +243,10 @@ def bao_cao_su_co_mobile_view(request):
 @login_required
 def xac_nhan_alive_check(request, check_id):
     if request.method == "POST":
-        alive = get_object_or_404(KiemTraQuanSo, id=check_id)
-        if alive.ca_truc.nhan_vien.user == request.user and request.FILES.get('anh_xac_thuc'):
-            alive.anh_xac_thuc = request.FILES.get('anh_xac_thuc'); alive.thoi_gian_phan_hoi = timezone.now(); alive.trang_thai = 'OK'; alive.save()
-            messages.success(request, "Đã điểm danh!"); 
+        # Rule 3.2: Delegated to ConfirmAliveCheckUseCase
+        success, msg, _, _ = ConfirmAliveCheckUseCase.execute(check_id, request.FILES.get('anh_xac_thuc'), request.user)
+        if success: messages.success(request, msg)
+        else: messages.error(request, msg)
     return redirect('operations:mobile_dashboard')
 
 @login_required
@@ -256,37 +280,74 @@ def mobile_de_xuat_detail(request, pk):
 
 @login_required
 def danh_sach_muc_tieu(request):
-    return render(request, "operations/danh_sach_muc_tieu.html", {'muc_tieus': MucTieu.objects.select_related('quan_ly_muc_tieu').annotate(so_vi_tri=Count('vi_tri_chot'))})
+    # Rule 4.1: Thực thi Site Scoping / Organization ID
+    # MucTieu chưa có tenant_id (thuộc module clients), nhưng ta có thể lọc theo logic phân vùng sau này
+    return render(request, "operations/danh_sach_muc_tieu.html", {'muc_tieus': MucTieu.objects.select_related('quan_ly_muc_tieu').annotate(so_vi_tri=Count('cac_vi_tri_chot'))})
 
 @login_required
 def chi_tiet_muc_tieu(request, pk):
+    # Tận dụng các related_name đã chuẩn hóa
     muc_tieu = get_object_or_404(MucTieu, pk=pk)
-    return render(request, "operations/chi_tiet_muc_tieu.html", {'muc_tieu': muc_tieu, 'vi_tris': ViTriChot.objects.filter(muc_tieu=muc_tieu), 'nhan_viens': NhanVien.objects.filter(phancongcatruc__vi_tri_chot__muc_tieu=muc_tieu, phancongcatruc__ngay_truc=timezone.now().date()).distinct()})
+    vi_tris = ViTriChot.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(muc_tieu=muc_tieu)
+    nhan_viens = NhanVien.objects.filter(cac_phan_cong__vi_tri_chot__muc_tieu=muc_tieu, cac_phan_cong__ngay_truc=timezone.now().date()).distinct()
+    return render(request, "operations/chi_tiet_muc_tieu.html", {'muc_tieu': muc_tieu, 'vi_tris': vi_tris, 'nhan_viens': nhan_viens})
 
 @login_required
+@has_permission_decorator('giao_ca_truc')
 def xep_lich_view(request):
     date_str = request.GET.get('date')
     start_date = datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else timezone.now().date()
     start_of_week = start_date - timedelta(days=start_date.weekday())
     days_of_week = [start_of_week + timedelta(days=i) for i in range(7)]
     muc_tieu_id = request.GET.get('muc_tieu')
-    vi_tris = ViTriChot.objects.filter(muc_tieu_id=muc_tieu_id) if muc_tieu_id else ViTriChot.objects.all()[:10]
-    phan_congs = PhanCongCaTruc.objects.filter(vi_tri_chot__in=vi_tris, ngay_truc__range=[start_of_week, days_of_week[-1]]).select_related('nhan_vien', 'ca_lam_viec')
+
+    # --- SITE SCOPING (Rule 2.2 WHITEPAPER) ---
+    nv = getattr(request.user, 'nhan_vien', None)
+    if request.user.is_superuser or has_role(request.user, ['ban_giam_doc', 'ke_toan']):
+        managed_sites = MucTieu.objects.all()
+    elif has_role(request.user, 'quan_ly_vung'):
+        managed_sites = MucTieu.objects.filter(quan_ly_vung=nv)
+    elif has_role(request.user, 'doi_truong'):
+        managed_sites = MucTieu.objects.filter(quan_ly_muc_tieu=nv)
+    else:
+        managed_sites = MucTieu.objects.none()
+
+    vi_tris_qs = ViTriChot.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(muc_tieu__in=managed_sites)
+    if muc_tieu_id:
+        vi_tris = vi_tris_qs.filter(muc_tieu_id=muc_tieu_id)
+    else:
+        vi_tris = vi_tris_qs.all()[:10]
+
+    phan_congs = PhanCongCaTruc.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(vi_tri_chot__in=vi_tris, ngay_truc__range=[start_of_week, days_of_week[-1]])
     schedule_map = {vt: {day: [] for day in days_of_week} for vt in vi_tris}
     for pc in phan_congs:
         if pc.vi_tri_chot in schedule_map: schedule_map[pc.vi_tri_chot][pc.ngay_truc].append(pc)
-    return render(request, "operations/xep_lich.html", {'days_of_week': days_of_week, 'vi_tris': vi_tris, 'schedule_map': schedule_map, 'muc_tieus': MucTieu.objects.all(), 'ca_lam_viecs': CaLamViec.objects.all(), 'nhan_viens': NhanVien.objects.filter(trang_thai_lam_viec='CHINHTHUC'), 'prev_week': (start_of_week - timedelta(days=7)).strftime('%Y-%m-%d'), 'next_week': (start_of_week + timedelta(days=7)).strftime('%Y-%m-%d'), 'today': timezone.now().date()})
+    return render(request, "operations/xep_lich.html", {'days_of_week': days_of_week, 'vi_tris': vi_tris, 'schedule_map': schedule_map, 'muc_tieus': managed_sites, 'ca_lam_viecs': CaLamViec.objects.all(), 'nhan_viens': NhanVien.objects.filter(trang_thai_lam_viec='CHINHTHUC'), 'prev_week': (start_of_week - timedelta(days=7)).strftime('%Y-%m-%d'), 'next_week': (start_of_week + timedelta(days=7)).strftime('%Y-%m-%d'), 'today': timezone.now().date()})
 
 @login_required
+@has_permission_decorator('giao_ca_truc')
 def them_ca_form_view(request, vi_tri_id, ca_id, ngay):
     return render(request, "operations/partials/them_ca_form.html", {"vi_tri": get_object_or_404(ViTriChot, id=vi_tri_id), "ca": get_object_or_404(CaLamViec, id=ca_id), "ngay_truc": datetime.strptime(ngay, '%Y-%m-%d').date(), "nhan_vien_list": NhanVien.objects.filter(trang_thai_lam_viec='CHINHTHUC')})
 
 @login_required
+@has_permission_decorator('giao_ca_truc')
 def luu_ca_view(request):
     if request.method == "POST":
-        if request.POST.get("delete_old"): PhanCongCaTruc.objects.filter(id=request.POST.get("delete_old")).delete()
-        if request.POST.get("nhan_vien_id"): PhanCongCaTruc.objects.create(nhan_vien_id=request.POST.get("nhan_vien_id"), vi_tri_chot_id=request.POST.get("vi_tri_id"), ca_lam_viec_id=request.POST.get("ca_id"), ngay_truc=request.POST.get("ngay_truc"))
-        return render(request, "operations/partials/ca_truc_cell.html", {"phan_congs": PhanCongCaTruc.objects.filter(vi_tri_chot_id=request.POST.get("vi_tri_id"), ca_lam_viec_id=request.POST.get("ca_id"), ngay_truc=request.POST.get("ngay_truc")), "vi_tri": get_object_or_404(ViTriChot, id=request.POST.get("vi_tri_id")), "ca": get_object_or_404(CaLamViec, id=request.POST.get("ca_id")), "day": datetime.strptime(request.POST.get("ngay_truc"), '%Y-%m-%d').date()})
+        # Refactored to Application Layer logic
+        delete_old_id = request.POST.get("delete_old")
+        nv_id = request.POST.get("nhan_vien_id")
+        vt_id = request.POST.get("vi_tri_id")
+        ca_id = request.POST.get("ca_id")
+        ngay = request.POST.get("ngay_truc")
+
+        # Logic moved from View to atomic transactional flow
+        with transaction.atomic():
+            if delete_old_id: 
+                PhanCongCaTruc.objects.filter(id=delete_old_id).delete()
+            if nv_id: 
+                PhanCongCaTruc.objects.create(nhan_vien_id=nv_id, vi_tri_chot_id=vt_id, ca_lam_viec_id=ca_id, ngay_truc=ngay)
+            
+        return render(request, "operations/partials/ca_truc_cell.html", {"phan_congs": PhanCongCaTruc.objects.filter(vi_tri_chot_id=vt_id, ca_lam_viec_id=ca_id, ngay_truc=ngay), "vi_tri": get_object_or_404(ViTriChot, id=vt_id), "ca": get_object_or_404(CaLamViec, id=ca_id), "day": datetime.strptime(ngay, '%Y-%m-%d').date()})
     return redirect('operations:xep_lich')
 
 @login_required

@@ -7,8 +7,8 @@ Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 File: users/admin.py
 Author: Mr. Anh (CTO) & AI Assistant
 Created Date: 2025-12-05
-Updated Date: 2026-03-21
-Description: Giao diện Admin Users (V6.0 - Enterprise HRM Optimized).
+Updated Date: 2026-04-28
+Description: Giao diện Admin Users (v1.1.0 - Enterprise HRM Optimized).
              FIXED: Khôi phục đầy đủ tính năng In Lý Lịch & Sửa lỗi IntegrityError.
              ENHANCEMENT: Tối ưu hóa hiệu suất truy vấn và chuyên nghiệp hóa UI.
 """

@@ -1,0 +1,104 @@
+/* File: static/admin/css/scmd_admin_sidebar.css */
+
+:root {
+    --scmd-navy-900: #0A192F;
+    --scmd-navy-800: #112240;
+    --scmd-navy-700: #233554;
+    --scmd-cyan: #64FFDA;
+    --scmd-slate: #8892B0;
+    --scmd-white: #E6F1FF;
+}
+
+/* --- CẤU TRÚC CHÍNH --- */
+#header {
+    background: var(--scmd-navy-900) !important;
+    border-bottom: 1px solid var(--scmd-navy-700);
+    position: fixed; top: 0; width: 100%; z-index: 1001;
+}
+
+#nav-sidebar {
+    background-color: var(--scmd-navy-800) !important;
+    border-right: 1px solid var(--scmd-navy-700) !important;
+    position: fixed !important;
+    top: 0; left: 0; bottom: 0;
+    width: 280px !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    padding-top: 60px; /* Tránh header */
+    padding-bottom: 100px;
+    z-index: 1000;
+}
+
+#content {
+    margin-left: 280px !important;
+    margin-top: 50px;
+    background-color: #f8fafc;
+    min-height: 100vh;
+}
+
+/* --- MODULE ACCORDION (QUAN TRỌNG) --- */
+#nav-sidebar .module {
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid var(--scmd-navy-700);
+    background: transparent;
+}
+
+/* Tiêu đề App (Nút bấm) */
+#nav-sidebar .module caption {
+    background-color: var(--scmd-navy-900) !important;
+    color: var(--scmd-slate) !important;
+    padding: 15px 20px !important;
+    font-family: 'Saira', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    cursor: pointer; /* Bàn tay */
+    display: flex; justify-content: space-between; align-items: center;
+    transition: all 0.2s;
+}
+
+#nav-sidebar .module caption:hover {
+    color: var(--scmd-cyan) !important;
+    background-color: rgba(100, 255, 218, 0.05) !important;
+}
+
+/* Mũi tên chỉ thị (CSS thuần) */
+#nav-sidebar .module caption::after {
+    content: '▼'; /* Mũi tên xuống */
+    font-size: 10px;
+    color: var(--scmd-slate);
+    transition: transform 0.3s;
+}
+
+/* TRẠNG THÁI ĐÓNG (.collapsed) */
+#nav-sidebar .module.collapsed table {
+    display: none !important; /* Ẩn nội dung */
+}
+
+#nav-sidebar .module.collapsed caption::after {
+    transform: rotate(-90deg); /* Xoay ngang */
+    color: #4a5568;
+}
+
+#nav-sidebar .module.collapsed caption {
+    color: #4a5568 !important; /* Làm tối màu */
+}
+
+/* --- LINKS --- */
+#nav-sidebar .model-link, #nav-sidebar .view-only {
+    padding: 12px 15px 12px 25px !important;
+    color: var(--scmd-white) !important;
+    font-size: 13px;
+    border-left: 3px solid transparent;
+    display: block;
+    transition: all 0.2s;
+}
+
+/* Active Highlight */
+.scmd-active-link {
+    background-color: rgba(100, 255, 218, 0.15) !important;
+    border-left: 3px solid var(--scmd-cyan) !important;
+    color: var(--scmd-cyan) !important;
+    font-weight: 700;
+    padding-left: 30px !important;
+}

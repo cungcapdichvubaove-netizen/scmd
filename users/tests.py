@@ -5,6 +5,8 @@ from django.urls import reverse
 from django.core.exceptions import PermissionDenied # Import exception
 from .models import NhanVien, CauHinhMaNhanVien, PhongBan, ChucDanh
 from datetime import date
+from main.models import AuditLog
+from rest_framework.test import APIClient
 from .views import export_ly_lich_pdf
 
 class NhanVienModelTestCase(TestCase):
@@ -82,3 +84,72 @@ class PDFExportTestCase(TestCase):
         response = export_ly_lich_pdf(request, self.nhan_vien.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/pdf')
+
+class HRAlertHistoryAPITest(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user = User.objects.create_user(username='hr_user', password='password')
+        self.client.force_authenticate(user=self.user)
+        self.url = reverse('users:hralerthistory-list')
+
+        # Create some AuditLog entries for testing
+        self.alert1 = AuditLog.objects.create(
+            user=self.user,
+            action=AuditLog.Action.EXECUTE,
+            module='users',
+            model_name='SystemAlert',
+            note='hr_alert_summary',
+            changes={'title': 'Alert 1', 'message': 'Message 1', 'count': 5},
+            timestamp=timezone.now() - timedelta(days=5),
+            status='SUCCESS'
+        )
+        self.alert2 = AuditLog.objects.create(
+            user=self.user,
+            action=AuditLog.Action.EXECUTE,
+            module='users',
+            model_name='SystemAlert',
+            note='hr_alert_summary',
+            changes={'title': 'Alert 2', 'message': 'Another message', 'count': 10},
+            timestamp=timezone.now() - timedelta(days=10),
+            status='WARNING'
+        )
+        self.alert3 = AuditLog.objects.create(
+            user=self.user,
+            action=AuditLog.Action.EXECUTE,
+            module='users',
+            model_name='SystemAlert',
+            note='hr_alert_summary',
+            changes={'title': 'Critical Alert', 'message': 'Important info', 'count': 1},
+            timestamp=timezone.now() - timedelta(days=1),
+            status='CRITICAL'
+        )
+        # Non-HR alert, should not be returned
+        AuditLog.objects.create(
+            user=self.user,
+            action=AuditLog.Action.CREATE,
+            module='operations',
+            model_name='ChamCong',
+            note='Check-in',
+            timestamp=timezone.now() - timedelta(days=2),
+            status='SUCCESS'
+        )
+
+    def test_list_hr_alerts(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(response.data['results'][0]['title'], 'Critical Alert') # Ordered by timestamp desc
+
+    def test_filter_by_date_range(self):
+        start_date = (timezone.now() - timedelta(days=6)).strftime('%Y-%m-%d')
+        end_date = (timezone.now() - timedelta(days=4)).strftime('%Y-%m-%d')
+        response = self.client.get(f"{self.url}?start_date={start_date}&end_date={end_date}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['title'], 'Alert 1')
+
+    def test_filter_by_search(self):
+        response = self.client.get(f"{self.url}?search=Critical")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['title'], 'Critical Alert')

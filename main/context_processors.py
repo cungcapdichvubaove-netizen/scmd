@@ -1,13 +1,14 @@
-# main/context_processors.py
-from .models import CompanyProfile
+﻿# main/context_processors.py
+from django.apps import apps
+
 
 def company_info(request):
     """
-    Tự động đưa thông tin công ty vào tất cả các template của hệ thống SCMD.
+    Tu dong dua thong tin cong ty vao tat ca cac template cua he thong SCMD.
     """
     try:
-        # Lấy bản ghi đầu tiên (thường profile công ty chỉ có 1)
-        profile = CompanyProfile.objects.first()
+        CompanyProfile = apps.get_model('main', 'CompanyProfile')
+        profile = CompanyProfile.objects.first() if CompanyProfile else None
         return {
             'COMPANY': profile
         }

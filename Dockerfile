@@ -1,55 +1,45 @@
-# Dockerfile
-# Base image: Python 3.11 Slim Bookworm (Stable & Light)
-FROM python:3.11-slim-bookworm
+FROM python:3.11-slim
 
-# 1. Thiết lập biến môi trường
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
-# Quan trọng: Chế độ Production
-ENV DJANGO_SETTINGS_MODULE config.settings
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
-# 2. Cài đặt thư viện hệ thống
-# - GeoDjango: binutils, libproj-dev, gdal-bin
-# - Database: libpq-dev, gcc
-# - WeasyPrint: libpango...
-# - Utils: gettext (i18n), netcat-openbsd (để check DB port)
-RUN apt-get update && apt-get install -y \
-    binutils \
-    libproj-dev \
-    gdal-bin \
-    libpq-dev \
-    gcc \
-    libpango-1.0-0 \
-    libpangoft2-1.0-0 \
-    libgdk-pixbuf-2.0-0 \
-    libffi-dev \
-    shared-mime-info \
-    libcairo2 \
-    gettext \
-    netcat-openbsd \
-    && rm -rf /var/lib/apt/lists/*
-
-# 3. Tạo thư mục làm việc
 WORKDIR /app
 
-# 4. Copy và cài đặt requirements
-COPY requirements.txt /app/
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    gettext \
+    binutils \
+    libcairo2 \
+    libgdk-pixbuf-2.0-0 \
+    libglib2.0-0 \
+    libharfbuzz-subset0 \
+    libharfbuzz0b \
+    libpango-1.0-0 \
+    libpangocairo-1.0-0 \
+    libproj-dev \
+    gdal-bin \
+    libgdal-dev \
+    shared-mime-info \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# 5. Copy toàn bộ mã nguồn
-COPY . /app/
+COPY requirements.txt .
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# 6. Tạo thư mục cho Static/Media
-# Nginx sẽ mount vào đây để phục vụ file
-RUN mkdir -p /app/staticfiles
-RUN mkdir -p /app/media
+COPY . .
 
-# 7. Copy và cấp quyền cho Entrypoint Script
-COPY ./scripts/entrypoint.sh /app/scripts/entrypoint.sh
-RUN chmod +x /app/scripts/entrypoint.sh
+# Desktop/runtime images consume the committed Tailwind output instead of
+# rebuilding CSS inside Docker. This avoids depending on a Node base-image pull
+# during local deploy when Docker Hub or DNS is unstable.
+RUN test -f /app/theme/static/css/dist/styles.css
 
-# 8. Mở cổng 8000 (Daphne sẽ chạy ở đây)
-EXPOSE 8000
+# Keep these explicit until the dependency layer history is fully normalized.
+RUN pip install --no-cache-dir phonenumbers qrcode==8.2 reportlab==4.4.2
 
-# 9. Chạy Entrypoint
-ENTRYPOINT ["/bin/bash", "/app/scripts/entrypoint.sh"]
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

@@ -25,6 +25,8 @@ urlpatterns = [
     path('tinh-luong/', views.tinh_luong_view, name='tinh_luong'),
     path('bang-luong/<int:pk>/', views.chi_tiet_bang_luong, name='bang_luong_detail'),
     path('chot-luong/<int:pk>/', views.chot_luong_view, name='chot_luong'),
+    path('doi-soat-khau-tru/<int:pk>/', views.bao_cao_doi_soat_khau_tru, name='doi_soat_khau_tru'),
+    path('export-doi-soat-khau-tru/<int:pk>/', views.export_doi_soat_khau_tru_excel, name='export_doi_soat_khau_tru_excel'),
     
     # MOBILE APP (Nhân viên xem lương)
     path('mobile/luong/', views.mobile_phieu_luong_list, name='mobile_phieu_luong_list'),
