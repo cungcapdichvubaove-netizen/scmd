@@ -1,9 +1,5 @@
 /*
-<<<<<<< HEAD
  * SCMD Pro - GPS & Live Map Module
-=======
- * Security Command (SCMD) System - GPS & Live Map Module
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
  * File: static/js/scmd_gps.js
  * Updated: 2025-12-11 (Live Map Integrated)
  */
@@ -186,7 +182,4 @@ const SCMD_Socket = {
             oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // A4
             oscillator.connect(audioCtx.destination);
             oscillator.start();
-            oscillator.stop(audioCtx.currentTime + 0.5); // Kêu 0.5s
-        } catch (e) { console.warn("Audio context not supported"); }
-    }
-};
+            oscilla

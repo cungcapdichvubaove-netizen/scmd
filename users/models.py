@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-<<<<<<< HEAD
 SCMD Pro
-=======
-Security Command (SCMD) System
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
@@ -18,17 +14,13 @@ Description: Model quản lý cấu trúc nhân sự, định danh và hồ sơ 
 """
 
 import logging
-<<<<<<< HEAD
 import uuid
 from datetime import timedelta
-=======
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.db import models, transaction, IntegrityError
 from django.contrib.auth.models import Group, User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
-<<<<<<< HEAD
 from django.core.validators import MinValueValidator, RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -37,13 +29,6 @@ from django.utils.translation import gettext_lazy as _ # noqa: F401
 from core.infrastructure.security import decrypt_aes256
 from core.managers import TenantAwareManager, TenantScopedModel, organization_id
 from core.workflow_transition_policy import WorkflowTransitionPolicy
-=======
-from django.core.validators import RegexValidator
-from django.core.exceptions import ValidationError
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
-from core.infrastructure.security import decrypt_aes256
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # Logger cho hệ thống SCMD
 logger = logging.getLogger(__name__)
@@ -56,7 +41,6 @@ phone_validator = RegexValidator(
 
 
 # --- MANAGERS TỐI ƯU HÓA TRUY VẤN ---
-<<<<<<< HEAD
 class NhanVienManager(TenantAwareManager):
     """Organization-scoped employee manager safe for read and write paths.
 
@@ -84,12 +68,6 @@ class NhanVienManager(TenantAwareManager):
             if getattr(obj, "email", None) == "":
                 obj.email = None
         return super().bulk_create(objs, *args, **kwargs)
-=======
-class NhanVienManager(models.Manager):
-    """Tối ưu hóa hiệu suất bằng cách tự động join các bảng liên quan."""
-    def get_queryset(self):
-        return super().get_queryset().select_related('phong_ban', 'chuc_danh', 'user')
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 class LichSuCongTacManager(models.Manager):
@@ -132,32 +110,19 @@ class ChucDanh(models.Model):
     class Meta:
         verbose_name = _("Chức danh")
         verbose_name_plural = _("1. Danh mục Chức danh")
-<<<<<<< HEAD
-    
 
 class PhongBan(TenantScopedModel):
-=======
-
-
-class PhongBan(models.Model):
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ten_phong_ban = models.CharField(_("Tên phòng ban"), max_length=100, unique=True)
     mo_ta = models.TextField(_("Mô tả"), blank=True, null=True)
     nhom_quyen = models.ForeignKey(
         Group, 
         on_delete=models.SET_NULL, 
         null=True, 
-<<<<<<< HEAD
         blank=True,
         verbose_name=_("Nhóm quyền mặc định")
     )
 
     objects = TenantAwareManager()
-=======
-        blank=True, 
-        verbose_name=_("Nhóm quyền mặc định")
-    )
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     def __str__(self):
         return self.ten_phong_ban
@@ -168,11 +133,7 @@ class PhongBan(models.Model):
 
 
 # --- MODEL NHÂN VIÊN (CORE ENTITY) ---
-<<<<<<< HEAD
 class NhanVien(TenantScopedModel):
-=======
-class NhanVien(models.Model):
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     class GioiTinh(models.TextChoices):
         NAM = "M", _("Nam")
         NU = "F", _("Nữ")
@@ -1087,45 +1048,4 @@ class LichSuCongTac(models.Model):
     ngay_ket_thuc = models.DateField(_("Ngày kết thúc"), null=True, blank=True)
     
 <<<<<<< HEAD
-    objects = TenantAwareManager()
-=======
-    objects = LichSuCongTacManager()
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
-
-    class Meta:
-        verbose_name = _("Lịch sử công tác")
-        verbose_name_plural = _("Lịch sử công tác")
-        ordering = ["-ngay_bat_dau"]
-
-
-# --- SIGNALS (AUTOMATION) ---
-@receiver(post_save, sender=NhanVien)
-def cap_nhat_quyen_tu_dong(sender, instance, created, **kwargs):
-    """Tự động gán User vào các nhóm quyền dựa trên Phòng ban và Chức danh."""
-    if instance.user:
-        user = instance.user
-        try:
-            with transaction.atomic():
-                # Xóa quyền cũ để cập nhật quyền mới theo chức vụ hiện tại
-                user.groups.clear()
-                new_groups = []
-                
-                if instance.chuc_danh and instance.chuc_danh.nhom_quyen:
-                    new_groups.append(instance.chuc_danh.nhom_quyen)
-                
-                if instance.phong_ban and instance.phong_ban.nhom_quyen:
-                    new_groups.append(instance.phong_ban.nhom_quyen)
-                
-                if new_groups:
-                    user.groups.add(*new_groups)
-                
-                # Tự động cấp quyền Staff để truy cập Admin Dashboard
-                if instance.chuc_danh and not user.is_staff:
-                    user.is_staff = True
-                    user.save()
-        except Exception as e:
-            logger.error(f"Lỗi đồng bộ quyền cho {instance.ma_nhan_vien}: {str(e)}")
-<<<<<<< HEAD
-from .models_assignment import NhanVienRegionAssignment, Region  # noqa: E402,F401
-=======
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
+    objects = TenantAwareMa
