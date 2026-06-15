@@ -1,0 +1,46 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-shift-console">
+    <div class="scmd-shift-head">
+        <div>
+            <div class="scmd-shift-eyebrow">Thanh tra · đào tạo nội bộ</div>
+            <h1 class="scmd-shift-title">Quản trị buổi huấn luyện</h1>
+            <p class="scmd-shift-subtitle">
+                Ghi nhận đào tạo, điều lệnh và phổ biến nghiệp vụ cho nhân sự bảo vệ. Dữ liệu này hỗ trợ đối soát năng lực, kỷ luật và tuân thủ vận hành.
+            </p>
+        </div>
+        <div class="scmd-shift-actions">
+            <a class="scmd-shift-btn" href="{{ scmd_training_links.add }}">+ Thêm buổi huấn luyện</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_training_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_training_links.employees }}">Nhân sự</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_training_links.violations }}">Vi phạm</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_training_links.inspection_reports }}">Biên bản TT</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_training_links.inspection_runs }}">Đợt TT</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_training_links.dashboard }}">Bảng điều hành</a>
+        </div>
+    </div>
+
+    <div class="scmd-shift-grid">
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.list }}"><span>Tổng buổi</span><strong>{{ scmd_training_stats.total }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.today }}"><span>Hôm nay</span><strong>{{ scmd_training_stats.today }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.month }}"><span>Tháng này</span><strong>{{ scmd_training_stats.month }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.no_participants }}"><span>Chưa có học viên</span><strong>{{ scmd_training_stats.no_participants }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.missing_trainer }}"><span>Thiếu giảng viên</span><strong>{{ scmd_training_stats.missing_trainer }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.missing_topic }}"><span>Thiếu chủ đề</span><strong>{{ scmd_training_stats.missing_topic }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.missing_location }}"><span>Thiếu địa điểm</span><strong>{{ scmd_training_stats.missing_location }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.small_class }}"><span>Lớp nhỏ</span><strong>{{ scmd_training_stats.small_class }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_training_links.large_class }}"><span>Lớp đông</span><strong>{{ scmd_training_stats.large_class }}</strong></a>
+    </div>
+
+    <div class="scmd-shift-note">
+        Gợi ý kiểm soát: buổi huấn luyện thiếu chủ đề, người đào tạo, địa điểm hoặc danh sách học viên nên được bổ sung trước khi dùng làm căn cứ đánh giá năng lực và tuân thủ.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

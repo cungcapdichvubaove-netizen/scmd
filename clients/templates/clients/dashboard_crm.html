@@ -1,0 +1,360 @@
+﻿{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Kinh doanh & CRM{% endblock %}
+{% block header_title %}Kinh doanh & CRM{% endblock %}
+
+{% block extra_css %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/dashboard_modules.css' %}">
+<style>
+    .sales-shell { display: grid; gap: 14px; }
+    .sales-command-compact { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .sales-hero {
+        padding: 14px 16px;
+        border-radius: 20px;
+    }
+    .sales-hero-compact {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        align-items: start;
+    }
+    .sales-hero-copy { display: grid; gap: 10px; min-width: 0; }
+    .sales-hero-summary { max-width: 760px; }
+    .sales-hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+        align-self: center;
+    }
+    .sales-hero-metrics {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 2px;
+    }
+    .sales-hero-metric {
+        min-height: 0;
+        padding: 10px 12px;
+        text-decoration: none;
+        color: inherit;
+    }
+    .sales-hero-metric .hint { white-space: normal; line-height: 1.35; }
+    .sales-hero-metric:hover { background: color-mix(in srgb, var(--scmd-surface) 90%, transparent); }
+    .sales-main-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(340px, .95fr);
+        gap: 14px;
+        align-items: start;
+    }
+    .sales-main-stack, .sales-side-stack { display: grid; gap: 14px; }
+    .sales-funnel-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+    }
+    .sales-stage-card {
+        display: grid;
+        gap: 7px;
+        padding: 11px 12px;
+        border: 1px solid rgba(148, 163, 184, .24);
+        border-radius: 16px;
+        background: var(--scmd-surface);
+        text-decoration: none;
+        color: inherit;
+    }
+    .sales-stage-card__label { color: var(--scmd-text-muted); font-size: .7rem; font-weight: 800; }
+    .sales-stage-card__value { color: var(--scmd-text); font-size: 1.35rem; font-weight: 900; line-height: 1; letter-spacing: -.04em; }
+    .sales-stage-card__money { color: var(--scmd-text-soft); font-size: .75rem; line-height: 1.3; min-height: 2.1em; }
+    .sales-stage-card__cta { color: var(--scmd-info); font-size: .75rem; font-weight: 800; }
+    .sales-inline-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
+    .sales-inline-list { display: grid; gap: 10px; }
+    .sales-inline-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: start;
+        padding: 0 0 10px;
+        border-bottom: 1px solid var(--scmd-border);
+    }
+    .sales-inline-item:last-child { border-bottom: 0; padding-bottom: 0; }
+    .sales-inline-title { color: var(--scmd-text); font-size: .86rem; font-weight: 800; line-height: 1.35; }
+    .sales-inline-meta { margin-top: .26rem; color: var(--scmd-text-muted); font-size: .76rem; line-height: 1.35; }
+    .sales-inline-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .sales-mini-link { color: var(--scmd-info); font-size: .75rem; font-weight: 800; text-decoration: none; white-space: nowrap; }
+    .sales-table th, .sales-table td { padding: .72rem .8rem; }
+    .sales-card.compact-table .sales-table thead th { font-size: .67rem; }
+    .sales-card.compact-table .sales-table tbody tr td { line-height: 1.35; }
+    .sales-chip-link {
+        display: inline-flex;
+        align-items: center;
+        gap: .35rem;
+        padding: .35rem .6rem;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, .28);
+        background: var(--scmd-surface-muted);
+        color: var(--scmd-text-soft);
+        font-size: .72rem;
+        font-weight: 800;
+        text-decoration: none;
+    }
+    @media (max-width: 1280px) {
+        .sales-command-compact, .sales-main-grid, .sales-hero-compact { grid-template-columns: 1fr; }
+        .sales-hero-actions { justify-content: flex-start; }
+        .sales-funnel-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 920px) {
+        .sales-funnel-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+        .sales-funnel-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="sales-shell">
+    <section class="sales-command-compact">
+        <section class="sales-hero">
+            <div class="sales-hero-compact">
+                <div class="sales-hero-copy">
+                    <div class="sales-pill">
+                        <i class="fas fa-chart-line"></i>
+                        Bộ phận kinh doanh
+                    </div>
+                    <div class="sales-title-row">
+                        <span class="sales-title-icon"><i class="fas fa-handshake"></i></span>
+                        <div class="min-w-0">
+                            <h1>Kinh doanh & CRM</h1>
+                            
+                        </div>
+                    </div>
+                    <div class="sales-period">
+                        <a href="?period=today" class="sales-cta px-3 py-2 text-xs {% if period == 'today' %}active{% endif %}">Hôm nay</a>
+                        <a href="?period=7d" class="sales-cta px-3 py-2 text-xs {% if period == '7d' %}active{% endif %}">7 ngày</a>
+                        <a href="?period=30d" class="sales-cta px-3 py-2 text-xs {% if period == '30d' %}active{% endif %}">30 ngày</a>
+                        <a href="?period=month" class="sales-cta px-3 py-2 text-xs {% if period == 'month' %}active{% endif %}">Tháng này</a>
+                    </div>
+                    <div class="sales-hero-actions">
+                        {% if urls.add_lead %}<a href="{{ urls.add_lead }}" class="sales-cta sales-cta-primary"><i class="fas fa-user-plus"></i> Lead</a>{% endif %}
+                        {% if urls.add_opportunity %}<a href="{{ urls.add_opportunity }}" class="sales-cta sales-cta-success"><i class="fas fa-funnel-dollar"></i> Cơ hội</a>{% endif %}
+                        {% if urls.add_contract %}<a href="{{ urls.add_contract }}" class="sales-cta sales-cta-ghost"><i class="fas fa-file-signature"></i> Hợp đồng</a>{% endif %}
+                        {% if urls.pipeline %}<a href="{{ urls.pipeline }}" class="sales-cta sales-cta-ghost"><i class="fas fa-columns"></i> Pipeline</a>{% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="sales-hero-metrics">
+                {% for metric in hero_metrics %}
+                <a href="{{ metric.url }}" class="sales-hero-metric {% if metric.alert %}alert{% endif %}">
+                    <div class="label">{{ metric.label }}</div>
+                    <div class="value">{% if metric.money %}{{ metric.value|floatformat:0|intcomma }}{% else %}{{ metric.value }}{% endif %}</div>
+                    
+                </a>
+                {% endfor %}
+            </div>
+        </section>
+    </section>
+
+    <section class="sales-main-grid">
+        <div class="sales-main-stack">
+            <section class="sales-card p-4">
+                <div class="sales-inline-head">
+                    <div>
+                        <h2 class="sales-section-title"><i class="fas fa-sitemap text-blue-600"></i> Phễu bán hàng</h2>
+                        
+                    </div>
+                    {% if urls.pipeline %}<a href="{{ urls.pipeline }}" class="sales-chip-link">Mở pipeline</a>{% endif %}
+                </div>
+                <div class="sales-funnel-grid">
+                    {% for stage in pipeline_stages %}
+                    {% if stage.url %}<a href="{{ stage.url }}" class="sales-stage-card">
+                        <div class="sales-stage-card__label">{{ stage.label }}</div>
+                        <div class="sales-stage-card__value">{{ stage.count }}</div>
+                        <div class="sales-bar-track"><div class="sales-bar-fill" style="width: {{ stage.percent }}%;"></div></div>
+                        <div class="sales-stage-card__money">{{ stage.value|floatformat:0|intcomma }} đ</div>
+                        <div class="sales-stage-card__cta">Mở danh sách</div>
+                    </a>{% endif %}
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="sales-card overflow-hidden compact-table">
+                <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                    <div>
+                        <h2 class="sales-section-title"><i class="fas fa-clock text-red-500"></i> Hợp đồng cần tái ký trong 30 ngày</h2>
+                        
+                    </div>
+                    {% if urls.contract_list %}<a href="{{ urls.contract_list }}" class="sales-chip-link">Tất cả hợp đồng</a>{% endif %}
+                </div>
+                <div class="sales-table-wrap">
+                    <table class="sales-table text-sm">
+                        <thead><tr><th>Số HĐ</th><th>Khách hàng</th><th>Hết hạn</th><th class="text-right">Giá trị tháng</th><th></th></tr></thead>
+                        <tbody>
+                        {% for hd in expiring_contracts %}
+                            <tr>
+                                <td class="font-mono font-black text-slate-800">{{ hd.so_hop_dong }}</td>
+                                <td>{% if hd.khach_hang_cu %}{{ hd.khach_hang_cu.ten_cong_ty }}{% elif hd.co_hoi and hd.co_hoi.khach_hang_tiem_nang %}{{ hd.co_hoi.khach_hang_tiem_nang.ten_cong_ty }}{% else %}Khách hàng{% endif %}</td>
+                                <td class="font-black text-red-600">{{ hd.ngay_het_han|date:"d/m/Y" }}</td>
+                                <td class="text-right font-mono font-black">{{ hd.gia_tri|floatformat:0|intcomma }}</td>
+                                <td class="text-right"><a href="/admin/clients/hopdong/{{ hd.id }}/change/" class="font-black text-blue-600 hover:underline">Tái ký</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="py-8 text-center text-slate-400">Không có hợp đồng sắp hết hạn.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="sales-card overflow-hidden compact-table">
+                <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                    <div>
+                        <h2 class="sales-section-title"><i class="fas fa-file-contract text-blue-600"></i> Hợp đồng mới cập nhật</h2>
+                        
+                    </div>
+                    {% if urls.add_contract %}<a href="{{ urls.add_contract }}" class="sales-cta sales-cta-primary px-3 py-2 text-xs">Tạo hợp đồng</a>{% endif %}
+                </div>
+                <div class="sales-table-wrap">
+                    <table class="sales-table text-sm">
+                        <thead><tr><th>Số HĐ</th><th>Khách hàng</th><th>Hiệu lực</th><th>Hết hạn</th><th>Trạng thái</th><th class="text-right">Giá trị tháng</th><th></th></tr></thead>
+                        <tbody>
+                        {% for hd in recent_contracts %}
+                            <tr>
+                                <td class="font-mono font-black text-slate-800">{{ hd.so_hop_dong }}</td>
+                                <td>{% if hd.khach_hang_cu %}{{ hd.khach_hang_cu.ten_cong_ty }}{% else %}—{% endif %}</td>
+                                <td>{{ hd.ngay_hieu_luc|date:"d/m/Y" }}</td>
+                                <td>{{ hd.ngay_het_han|date:"d/m/Y" }}</td>
+                                <td><span class="sales-badge {% if hd.trang_thai == 'HIEU_LUC' %}sales-badge-ok{% elif hd.trang_thai == 'SAP_HET_HAN' %}sales-badge-mid{% else %}sales-badge-high{% endif %}">{{ hd.get_trang_thai_display }}</span></td>
+                                <td class="text-right font-mono font-black">{{ hd.gia_tri|floatformat:0|intcomma }}</td>
+                                <td class="text-right"><a href="/admin/clients/hopdong/{{ hd.id }}/change/" class="font-black text-blue-600 hover:underline">Mở</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="7" class="py-8 text-center text-slate-400">Chưa có hợp đồng.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <aside class="sales-side-stack">
+            <section class="sales-card p-4">
+                <div class="sales-inline-head">
+                    <div>
+                        <h2 class="sales-section-title"><i class="fas fa-list-check text-blue-600"></i> Việc cần xử lý</h2>
+                        
+                    </div>
+                    {% if urls.opportunity_list %}<a href="{{ urls.opportunity_list }}" class="sales-chip-link">Mở hồ sơ</a>{% endif %}
+                </div>
+                <div>
+                    {% for item in action_items %}
+                    <div class="sales-action-row">
+                        <div class="sales-kpi-icon"><i class="fas {{ item.icon }}"></i></div>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span class="sales-badge {% if item.priority == 'Cao' %}sales-badge-high{% elif item.priority == 'Vừa' %}sales-badge-mid{% else %}sales-badge-ok{% endif %}">{{ item.priority }}</span>
+                                <span class="text-xs font-black tracking-wider text-slate-400">{{ item.type }}</span>
+                            </div>
+                            <h3 class="mt-1 font-black text-slate-900">{{ item.title }}</h3>
+                            
+                        </div>
+                        {% if item.url %}<a href="{{ item.url }}" class="sales-cta sales-cta-ghost px-3 py-2 text-xs">Xử lý</a>{% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="sales-card overflow-hidden compact-table">
+                <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                    <div>
+                        <h2 class="sales-section-title"><i class="fas fa-fire text-orange-500"></i> Lead cần chăm sóc</h2>
+                        
+                    </div>
+                    {% if urls.lead_list %}<a href="{{ urls.lead_list }}" class="sales-chip-link">Tất cả lead</a>{% endif %}
+                </div>
+                <div class="sales-table-wrap">
+                    <table class="sales-table text-sm">
+                        <thead><tr><th>Khách hàng</th><th>Liên hệ</th><th>Nguồn</th><th>Trạng thái</th><th></th></tr></thead>
+                        <tbody>
+                        {% for lead in hot_leads %}
+                            <tr>
+                                <td><div class="font-black text-slate-900">{{ lead.ten_cong_ty }}</div><div class="text-xs text-slate-400">{{ lead.ngay_tao|date:"d/m/Y" }}</div></td>
+                                <td><div class="font-semibold text-slate-700">{{ lead.nguoi_lien_he|default:"—" }}</div><div class="text-xs text-slate-500">{{ lead.sdt|default:"—" }}</div></td>
+                                <td>{{ lead.get_nguon_display }}</td>
+                                <td><span class="sales-badge sales-badge-mid">{{ lead.get_trang_thai_display }}</span></td>
+                                <td class="text-right"><a href="/admin/clients/khachhangtiemnang/{{ lead.id }}/change/" class="font-black text-blue-600 hover:underline">Mở</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="py-8 text-center text-slate-400">Chưa có lead cần chăm sóc.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="sales-card overflow-hidden compact-table">
+                <div class="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+                    <div>
+                        <h2 class="sales-section-title"><i class="fas fa-gem text-blue-600"></i> Cơ hội trọng điểm</h2>
+                        
+                    </div>
+                    {% if urls.pipeline %}<a href="{{ urls.pipeline }}" class="sales-chip-link">Pipeline</a>{% endif %}
+                </div>
+                <div class="sales-table-wrap">
+                    <table class="sales-table text-sm">
+                        <thead><tr><th>Cơ hội</th><th>Khách hàng</th><th>Giai đoạn</th><th class="text-right">Giá trị</th><th></th></tr></thead>
+                        <tbody>
+                        {% for opp in key_opportunities %}
+                            <tr>
+                                <td><div class="font-black text-slate-900">{{ opp.ten_co_hoi }}</div><div class="text-xs text-slate-400">{{ opp.ngay_tao|date:"d/m/Y" }}</div></td>
+                                <td>{{ opp.khach_hang_tiem_nang.ten_cong_ty }}</td>
+                                <td><span class="sales-badge sales-badge-mid">{{ opp.get_trang_thai_display }}</span></td>
+                                <td class="text-right font-mono font-black">{{ opp.gia_tri_uoc_tinh|floatformat:0|intcomma }}</td>
+                                <td class="text-right"><a href="/admin/clients/cohoikinhdoanh/{{ opp.id }}/change/" class="font-black text-blue-600 hover:underline">Mở</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="py-8 text-center text-slate-400">Không có cơ hội đang mở.</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="sales-card p-4">
+                <div class="sales-inline-head">
+                    <div>
+                        <h2 class="sales-section-title"><i class="fas fa-bullhorn text-blue-600"></i> Nguồn lead</h2>
+                        
+                    </div>
+                </div>
+                <div class="sales-inline-list">
+                    {% for source in lead_sources %}
+                    {% if source.url %}<a href="{{ source.url }}" class="sales-inline-item">
+                        <div>
+                            <div class="sales-inline-title">{{ source.label }}</div>
+                            
+                            <div class="sales-bar-track mt-2"><div class="sales-bar-fill" style="width: {{ source.percent }}%;"></div></div>
+                        </div>
+                        <div class="sales-inline-side">
+                            <strong class="text-slate-900">{{ source.count }}</strong>
+                            <span class="sales-mini-link">M?</span>
+                        </div>
+                    </a>{% endif %}
+                    {% empty %}
+                    <div class="py-8 text-center text-slate-400">Chưa có dữ liệu nguồn lead.</div>
+                    {% endfor %}
+                </div>
+            </section>
+        </aside>
+    </section>
+</div>
+{% endblock %}
+
+

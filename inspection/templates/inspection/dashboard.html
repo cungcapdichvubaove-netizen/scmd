@@ -1,0 +1,516 @@
+﻿{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Thanh tra & Giám sát | SCMD Pro{% endblock %}
+{% block header_title %}Thanh tra & Giám sát{% endblock %}
+
+{% block extra_css %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/dashboard_modules.css' %}">
+<style>
+    .ix-shell { display: grid; gap: 14px; }
+    .ix-command {
+        background: var(--scmd-surface);
+        border: 1px solid var(--scmd-border);
+        border-radius: 18px;
+        box-shadow: 0 16px 34px color-mix(in srgb, var(--scmd-text) 7%, transparent);
+        overflow: hidden;
+    }
+    .ix-command__top {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 14px;
+        padding: 14px 16px 12px;
+        align-items: start;
+    }
+    .ix-command__meta { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+    .ix-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--scmd-border);
+        background: var(--scmd-surface-muted);
+        color: var(--scmd-text-soft);
+        font-size: 11px;
+        font-weight: 800;
+        text-decoration: none;
+    }
+    .ix-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+        font-size: clamp(24px, 2vw, 30px);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        font-weight: 900;
+        color: var(--scmd-text);
+    }
+    .ix-title__icon {
+        width: 38px;
+        height: 38px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: var(--scmd-brand-700);
+        color: var(--scmd-surface);
+        flex: 0 0 auto;
+    }
+    .ix-subtitle {
+        margin: 8px 0 0;
+        max-width: 820px;
+        color: var(--scmd-text-soft);
+        font-size: 13px;
+        line-height: 1.45;
+    }
+    .ix-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+        align-self: center;
+    }
+    .ix-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 36px;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid transparent;
+        background: var(--scmd-brand-700);
+        color: var(--scmd-surface);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 800;
+        white-space: nowrap;
+        box-shadow: 0 10px 20px color-mix(in srgb, var(--scmd-text) 9%, transparent);
+    }
+    .ix-btn--ghost {
+        background: var(--scmd-surface);
+        color: var(--scmd-brand-900);
+        border-color: var(--scmd-border);
+        box-shadow: none;
+    }
+    .ix-command__bottom {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 16px;
+        border-top: 1px solid var(--scmd-border);
+        background: var(--scmd-surface-strong);
+    }
+    .ix-filter { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ix-filter a {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: var(--scmd-surface);
+        border: 1px solid var(--scmd-border);
+        color: var(--scmd-text-soft);
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 800;
+    }
+    .ix-filter a.is-active {
+        background: var(--scmd-brand-900);
+        color: var(--scmd-surface);
+        border-color: var(--scmd-brand-900);
+    }
+    .ix-summary { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+    .ix-priority {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .ix-priority__card {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: start;
+        padding: 14px 16px;
+        border-radius: 16px;
+        border: 1px solid var(--scmd-border);
+        background: var(--scmd-surface);
+        text-decoration: none;
+        color: inherit;
+        box-shadow: 0 12px 28px color-mix(in srgb, var(--scmd-text) 6%, transparent);
+    }
+    .ix-priority__icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--scmd-danger-soft);
+        color: var(--scmd-danger);
+        font-size: 14px;
+    }
+    .ix-priority__card--warning .ix-priority__icon { background: var(--scmd-warning-soft); color: var(--scmd-warning); }
+    .ix-priority__card--info .ix-priority__icon { background: var(--scmd-info-soft); color: var(--scmd-info); }
+    .ix-priority__title { margin: 0; color: var(--scmd-text); font-size: 13px; font-weight: 800; }
+    .ix-priority__note { margin: 4px 0 0; color: var(--scmd-text-muted); font-size: 12px; line-height: 1.4; }
+    .ix-priority__value { font-size: 26px; line-height: 1; font-weight: 900; letter-spacing: -0.04em; color: var(--scmd-text); }
+    .ix-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(320px, .95fr);
+        gap: 14px;
+        align-items: start;
+    }
+    .ix-left, .ix-right { display: grid; gap: 14px; }
+    .ix-inline-list { display: grid; gap: 10px; padding: 12px 14px 14px; }
+    .ix-inline-item {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 10px;
+        align-items: start;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--scmd-neutral-soft);
+    }
+    .ix-inline-item:last-child { border-bottom: 0; padding-bottom: 0; }
+    .ix-inline-title { color: var(--scmd-text); font-size: 13px; font-weight: 800; line-height: 1.35; }
+    .ix-inline-meta { margin-top: 4px; color: var(--scmd-text-muted); font-size: 12px; line-height: 1.35; }
+    .ix-inline-side { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+    .ix-mini-link { color: var(--scmd-info); text-decoration: none; font-size: 12px; font-weight: 800; white-space: nowrap; }
+    .ix-progress-row { display: grid; gap: 6px; }
+    .ix-progress-head {
+        display: grid;
+        grid-template-columns: minmax(0, .95fr) minmax(0, 1.2fr) auto;
+        gap: 10px;
+        align-items: start;
+    }
+    .ix-progress-track {
+        min-width: 108px;
+        display: grid;
+        gap: 5px;
+        align-content: start;
+    }
+    .ix-progress-track .idt-progress-track { height: 7px; }
+    .ix-progress-track .idt-progress-text { margin-top: 0; text-align: right; }
+    .ix-secondary-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+    .ix-empty-compact {
+        padding: 14px;
+        color: var(--scmd-text-muted);
+        font-size: 12px;
+        line-height: 1.45;
+        text-align: center;
+    }
+    @media (max-width: 1280px) {
+        .ix-priority { grid-template-columns: 1fr; }
+        .ix-secondary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 1024px) {
+        .ix-command__top, .ix-command__bottom, .ix-grid { grid-template-columns: 1fr; }
+        .ix-actions, .ix-summary { justify-content: flex-start; }
+    }
+    @media (max-width: 720px) {
+        .ix-progress-head { grid-template-columns: 1fr; }
+        .ix-secondary-grid { grid-template-columns: 1fr; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="inspection-dashboard ix-shell">
+    <section class="ix-command">
+        <div class="ix-command__top">
+            <div>
+                <div class="ix-command__meta">
+                    <span class="ix-pill"><i class="fas fa-shield-alt"></i> Phòng Thanh tra & Giám sát</span>
+                    <span class="ix-pill"><i class="fas fa-building"></i> {{ dashboard_scope_label }}</span>
+                    <span class="ix-pill"><i class="fas fa-calendar-day"></i> {{ dashboard_timeframe_label }}</span>
+                </div>
+                <h1 class="ix-title">
+                    <span class="ix-title__icon"><i class="fas fa-clipboard-check"></i></span>
+                    Thanh tra & Giám sát
+                </h1>
+                
+            </div>
+            <div class="ix-actions" aria-label="Thao tác nhanh">
+                {% if urls.add_violation %}<a href="{{ urls.add_violation }}" class="ix-btn"><i class="fas fa-file-signature"></i> Lập biên bản</a>{% endif %}
+                {% if urls.add_inspection %}<a href="{{ urls.add_inspection }}" class="ix-btn"><i class="fas fa-search-location"></i> Tạo đợt thanh tra</a>{% endif %}
+                {% if urls.add_training %}<a href="{{ urls.add_training }}" class="ix-btn"><i class="fas fa-chalkboard-teacher"></i> Lịch đào tạo</a>{% endif %}
+                {% if urls.inspections %}<a href="{{ urls.inspections }}" class="ix-btn ix-btn--ghost"><i class="fas fa-list-check"></i> Hồ sơ</a>{% endif %}
+            </div>
+        </div>
+        <div class="ix-command__bottom" aria-label="Bộ lọc dashboard inspection">
+            <div class="ix-filter">
+                <a href="?period=today" class="{% if period == 'today' %}is-active{% endif %}"><i class="fas fa-calendar-day"></i> Hôm nay</a>
+                <a href="?period=7d" class="{% if period == '7d' %}is-active{% endif %}"><i class="fas fa-calendar-week"></i> 7 ngày</a>
+                <a href="?period=month" class="{% if period == 'month' %}is-active{% endif %}"><i class="fas fa-calendar-alt"></i> Tháng này</a>
+            </div>
+            <div class="ix-summary">
+                <span class="ix-pill"><i class="fas fa-bolt"></i> {{ urgent_attention_total }} việc cần chú ý</span>
+                <span class="ix-pill"><i class="fas fa-person-walking"></i> {{ live_patrols_count }} tuần tra live</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="ix-priority" aria-label="Ưu tiên hành động">
+        {% if urls.violations %}<a href="{{ urls.violations }}" class="ix-priority__card">
+            <span class="ix-priority__icon"><i class="fas fa-file-circle-exclamation"></i></span>
+            <div>
+                <p class="ix-priority__title">Biên bản chờ duyệt</p>
+                <p class="ix-priority__note">Chốt bằng chứng, số tiền phạt và hướng xử lý trước khi kết luận.</p>
+            </div>
+            <div class="ix-priority__value">{{ pending_violations_count }}</div>
+        </a>{% endif %}
+        {% if urls.inspections %}<a href="{{ urls.inspections }}" class="ix-priority__card ix-priority__card--warning">
+            <span class="ix-priority__icon"><i class="fas fa-triangle-exclamation"></i></span>
+            <div>
+                <p class="ix-priority__title">Mục tiêu không đạt</p>
+                <p class="ix-priority__note">Ưu tiên kế hoạch khắc phục hoặc tái kiểm tra trong kỳ hiện tại.</p>
+            </div>
+            <div class="ix-priority__value">{{ failed_inspections_period_count }}</div>
+        </a>{% endif %}
+        {% if urls.routes %}<a href="{{ urls.routes }}" class="ix-priority__card ix-priority__card--info">
+            <span class="ix-priority__icon"><i class="fas fa-satellite-dish"></i></span>
+            <div>
+                <p class="ix-priority__title">Bất thường tuần tra</p>
+                <p class="ix-priority__note">Rà soát GPS bất thường, lượt bỏ dở và các tuyến đang diễn ra.</p>
+            </div>
+            <div class="ix-priority__value">{{ patrol_anomalies_count|add:skipped_patrols_count }}</div>
+        </a>{% endif %}
+    </section>
+
+    <section class="ix-grid">
+        <div class="ix-left">
+            <div class="idt-panel">
+                <div class="idt-panel-header">
+                    <div>
+                        <h2 class="idt-panel-title"><i class="fas fa-list-check"></i> Việc cần xử lý</h2>
+                        <p class="idt-panel-subtitle">Bảng ưu tiên để duyệt hồ sơ và xử lý các mục tiêu không đạt trong cùng một màn hình.</p>
+                    </div>
+                    {% if urls.violations %}<a href="{{ urls.violations }}" class="idt-panel-link">Mở danh sách <i class="fas fa-arrow-right"></i></a>{% endif %}
+                </div>
+                <div class="idt-table-wrap">
+                    <table class="idt-table">
+                        <thead>
+                            <tr>
+                                <th>Mức độ</th>
+                                <th>Loại việc</th>
+                                <th>Đối tượng</th>
+                                <th>Mục tiêu</th>
+                                <th>Ghi chú</th>
+                                <th style="text-align:right;">CTA</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in action_items %}
+                            <tr>
+                                <td><span class="idt-badge {% if item.tone == 'danger' %}idt-badge-danger{% else %}idt-badge-warning{% endif %}"><i class="fas fa-exclamation-circle"></i> {{ item.priority }}</span></td>
+                                <td>
+                                    <div class="idt-row-title">{{ item.type }}</div>
+                                    <div class="idt-row-sub">{{ item.time|date:"H:i d/m/Y" }}</div>
+                                </td>
+                                <td>{{ item.subject }}</td>
+                                <td>{{ item.site }}</td>
+                                <td><span title="{{ item.note }}">{{ item.note|truncatechars:96 }}</span></td>
+                                <td style="text-align:right;">{% if item.url %}<a href="{{ item.url }}" class="idt-mini-cta">{{ item.cta }} <i class="fas fa-arrow-right"></i></a>{% endif %}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="idt-empty scmd-state scmd-state--empty"><i class="fas fa-check-circle"></i>Không có việc khẩn cấp cần xử lý trong thời điểm hiện tại.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="idt-panel">
+                <div class="idt-panel-header">
+                    <div>
+                        <h2 class="idt-panel-title"><i class="fas fa-person-walking"></i> Đối chiếu tuần tra vận hành</h2>
+                        <p class="idt-panel-subtitle">Theo dõi nhân viên, tuyến và tiến độ ngay trong cùng cột thông tin.</p>
+                    </div>
+                    {% if urls.routes %}<a href="{{ urls.routes }}" class="idt-panel-link">Dữ liệu tuần tra vận hành</a>{% endif %}
+                </div>
+                <div class="ix-inline-list">
+                    {% for luot in live_patrols %}
+                    <div class="ix-progress-row">
+                        <div class="ix-progress-head">
+                            <div>
+                                <div class="ix-inline-title">{{ luot.nhan_vien.ho_ten }}</div>
+                                <div class="ix-inline-meta">Bắt đầu {{ luot.thoi_gian_bat_dau|date:"H:i" }}</div>
+                            </div>
+                            <div>
+                                <div class="ix-inline-title">{{ luot.loai_tuan_tra.ten_loai }}</div>
+                                <div class="ix-inline-meta">{{ luot.loai_tuan_tra.muc_tieu.ten_muc_tieu|default:"Tuyến chung" }}</div>
+                            </div>
+                            <div class="ix-progress-track">
+                                <div class="idt-progress-track"><div class="idt-progress-fill" style="width: {{ luot.tien_do }}%;"></div></div>
+                                <div class="idt-progress-text">{{ luot.tien_do }}%</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="ix-empty-compact">Không có lượt tuần tra đang diễn ra.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <aside class="ix-right">
+            <div class="idt-panel">
+                <div class="idt-panel-header">
+                    <div>
+                        <h2 class="idt-panel-title"><i class="fas fa-chart-simple"></i> Nhịp vận hành tuần</h2>
+                        <p class="idt-panel-subtitle">Tổng tuần tra hoàn thành, thanh tra và vi phạm theo từng ngày trong tuần hiện tại.</p>
+                    </div>
+                </div>
+                <div class="idt-week">
+                    {% for point in chart_points %}
+                    <div class="idt-week-col">
+                        <div class="idt-week-value">{{ point.total }}</div>
+                        <div class="idt-week-bar" style="height: {{ point.percent|default:4 }}%;"></div>
+                        <div class="idt-week-label">{{ point.label }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="idt-panel">
+                <div class="idt-panel-header">
+                    <div>
+                        <h2 class="idt-panel-title"><i class="fas fa-triangle-exclamation"></i> Mục tiêu không đạt</h2>
+                        <p class="idt-panel-subtitle">Danh sách gần nhất để mở trực tiếp hồ sơ thanh tra cần theo dõi.</p>
+                    </div>
+                    {% if urls.inspections %}<a href="{{ urls.inspections }}" class="idt-panel-link">Tất cả</a>{% endif %}
+                </div>
+                <div class="ix-inline-list">
+                    {% for item in recent_failed_inspections %}
+                    {% if item.dashboard_url %}<div class="ix-inline-item">
+                        <div>
+                            <div class="ix-inline-title">{{ item.muc_tieu.ten_muc_tieu|default:"Chưa rõ mục tiêu" }}</div>
+                            <div class="ix-inline-meta">{{ item.can_bo.ho_ten|default:"Chưa rõ cán bộ" }} · {{ item.thoi_gian_den|date:"H:i d/m/Y" }}</div>
+                            <div class="ix-inline-meta">{{ item.danh_gia_chung|default:"Cần cập nhật nhận xét/kiến nghị."|truncatechars:96 }}</div>
+                        </div>
+                        <div class="ix-inline-side">
+                            <span class="idt-badge idt-badge-danger">Không đạt</span>
+                            <a href="{{ item.dashboard_url }}" class="ix-mini-link">Mở hồ sơ</a>
+                        </div>
+                    </div>{% endif %}
+                    {% empty %}
+                    <div class="ix-empty-compact">Chưa có mục tiêu không đạt.</div>
+                    {% endfor %}
+                </div>
+            </div>
+        </aside>
+    </section>
+
+    <section class="ix-secondary-grid">
+        <div class="idt-panel">
+            <div class="idt-panel-header">
+                <div>
+                    <h2 class="idt-panel-title"><i class="fas fa-ranking-star"></i> Top lỗi trong kỳ</h2>
+                    <p class="idt-panel-subtitle">Nhóm lỗi dùng để xác định nội dung đào tạo lại hoặc kiểm soát tái diễn.</p>
+                </div>
+            </div>
+            <div class="idt-bars">
+                {% for item in top_violation_types %}
+                <div class="idt-bar-row">
+                    <div>
+                        <div class="idt-bar-label">{{ item.label }}</div>
+                        <div class="idt-bar-track"><div class="idt-bar-fill" style="width: {% widthratio item.total max_violation_type_count 100 %}%;"></div></div>
+                    </div>
+                    <strong>{{ item.total }}</strong>
+                </div>
+                {% empty %}
+                <div class="ix-empty-compact">Chưa có dữ liệu vi phạm trong kỳ.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="idt-panel">
+            <div class="idt-panel-header">
+                <div>
+                    <h2 class="idt-panel-title"><i class="fas fa-building-shield"></i> Điểm nóng mục tiêu</h2>
+                    <p class="idt-panel-subtitle">Mục tiêu có nhiều kết luận không đạt trong cùng kỳ theo dõi.</p>
+                </div>
+            </div>
+            <div class="ix-inline-list">
+                {% for item in top_failed_sites %}
+                <div class="ix-inline-item">
+                    <div>
+                        <div class="ix-inline-title">{{ item.muc_tieu__ten_muc_tieu|default:"Chưa rõ mục tiêu" }}</div>
+                        <div class="ix-inline-meta">Tập trung rà soát checklist, quân số và bằng chứng tại mục tiêu này.</div>
+                    </div>
+                    <div class="ix-inline-side">
+                        <span class="idt-badge idt-badge-danger">{{ item.total }} lần</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="ix-empty-compact">Chưa có điểm nóng mục tiêu trong kỳ.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="idt-panel">
+            <div class="idt-panel-header">
+                <div>
+                    <h2 class="idt-panel-title"><i class="fas fa-file-circle-exclamation"></i> Vi phạm chờ duyệt</h2>
+                    <p class="idt-panel-subtitle">Hồ sơ cần duyệt để hoàn tất xử lý kỷ luật hoặc quyết định mức phạt.</p>
+                </div>
+                {% if urls.add_violation %}<a href="{{ urls.add_violation }}" class="idt-panel-link">Lập mới</a>{% endif %}
+            </div>
+            <div class="ix-inline-list">
+                {% for item in pending_violations %}
+                {% if item.dashboard_url %}<div class="ix-inline-item">
+                    <div>
+                        <div class="ix-inline-title">{{ item.ma_bien_ban }}</div>
+                        <div class="ix-inline-meta">{{ item.doi_tuong_vi_pham.ho_ten|default:"Chưa rõ nhân viên" }} · {{ item.ngay_vi_pham|date:"H:i d/m/Y" }}</div>
+                        <div class="ix-inline-meta">{{ item.get_loai_loi_display }} · {{ item.muc_tieu.ten_muc_tieu|default:"Chưa gắn mục tiêu" }}</div>
+                    </div>
+                    <div class="ix-inline-side">
+                        <span class="idt-badge idt-badge-warning">{{ item.so_tien_phat|floatformat:0|intcomma }}</span>
+                        <a href="{{ item.dashboard_url }}" class="ix-mini-link">Duyệt hồ sơ</a>
+                    </div>
+                </div>{% endif %}
+                {% empty %}
+                <div class="ix-empty-compact">Không có biên bản chờ duyệt.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="idt-panel">
+            <div class="idt-panel-header">
+                <div>
+                    <h2 class="idt-panel-title"><i class="fas fa-chalkboard-user"></i> Lịch đào tạo sắp tới</h2>
+                    <p class="idt-panel-subtitle">Lịch gần nhất để chốt giảng viên, địa điểm và số học viên trước giờ học.</p>
+                </div>
+                {% if urls.add_training %}<a href="{{ urls.add_training }}" class="idt-panel-link">Tạo mới</a>{% endif %}
+            </div>
+            <div class="ix-inline-list">
+                {% for item in upcoming_trainings %}
+                {% if item.dashboard_url %}<div class="ix-inline-item">
+                    <div>
+                        <div class="ix-inline-title">{{ item.chu_de|default:"Buổi huấn luyện" }}</div>
+                        <div class="ix-inline-meta">{{ item.thoi_gian|date:"H:i d/m/Y" }} · {{ item.dia_diem|default:"Chưa cập nhật địa điểm" }}</div>
+                        <div class="ix-inline-meta">Phụ trách: {{ item.nguoi_dao_tao.ho_ten|default:"Chưa phân công" }}</div>
+                    </div>
+                    <div class="ix-inline-side">
+                        <span class="idt-badge idt-badge-info">{{ item.so_hoc_vien }} HV</span>
+                        <a href="{{ item.dashboard_url }}" class="ix-mini-link">Mở lịch</a>
+                    </div>
+                </div>{% endif %}
+                {% empty %}
+                <div class="ix-empty-compact">Chưa có lịch đào tạo sắp tới.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+

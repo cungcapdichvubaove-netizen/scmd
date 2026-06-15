@@ -1,0 +1,119 @@
+# =========================
+# SCMD Pro Git Ignore
+# =========================
+
+# Secrets / environment
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+secrets/
+secret/
+credentials/
+service-account*.json
+*gcloud*.json
+
+# Runtime database / backups
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+*.db
+*.dump
+*.sql
+*.sql.gz
+*.backup
+backups/
+db_backups/
+pgdata/
+postgres_data/
+redis_data/
+
+# Runtime uploaded/generated files
+media/
+staticfiles/
+collected_static/
+static_root/
+uploads/
+exports/
+reports/generated/
+tmp/
+temp/
+
+# Logs / pid
+*.log
+logs/
+deploy-scmdpro.log
+celerybeat-schedule
+celerybeat.pid
+gunicorn.pid
+daphne.pid
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.webassets-cache
+htmlcov/
+coverage.xml
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django local
+local_settings.py
+settings_local.py
+
+# Node / frontend cache
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
+.cache/
+
+# Docker local/runtime overrides
+.docker/
+docker-compose.override.yml
+*.dockerfile
+
+# Local shortcuts / workstation artifacts
+*.lnk
+.python-version
+
+# Patch / release / demo archives
+*.zip
+*.tar
+*.tar.gz
+*.7z
+release/
+releases/
+patches/
+seed_audit/
+seed_v4_work/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Test media/artifacts
+*.mp4
+*.mov
+*.avi
+*.webm

@@ -1,0 +1,38 @@
+{% extends "admin/change_form.html" %}
+
+{% block form_top %}
+<div class="scmd-permission-guide">
+    <div class="scmd-permission-guide__copy">
+        <h2>Thiết lập nhóm quyền</h2>
+        <p>Chọn quyền theo từng phân hệ nghiệp vụ để giảm nhầm lẫn khi cấp quyền. Ưu tiên nhóm quyền tối thiểu đủ dùng, tránh cấp dư thừa.</p>
+    </div>
+    <div class="scmd-permission-guide__meta">
+        <label class="scmd-permission-search">
+            <span>Tìm quyền</span>
+            <input type="search" id="scmd-permission-search" placeholder="Ví dụ: chấm công, hợp đồng, báo cáo">
+        </label>
+    </div>
+</div>
+{% endblock %}
+
+{% block after_field_sets %}
+{{ block.super }}
+{{ group_permissions_hidden_field }}
+
+{% for section in permission_sections %}
+<fieldset class="module aligned scmd-permission-section">
+    <h2>{{ section.title }}</h2>
+    <div class="description">{{ section.description }}</div>
+    {% if section.field.errors %}
+    <div class="errornote">
+        {{ section.field.errors }}
+    </div>
+    {% endif %}
+    <div class="form-row">
+        <div class="checkbox-row">
+            {{ section.field }}
+        </div>
+    </div>
+</fieldset>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,268 @@
+{% load static %}
+{% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Đăng nhập hệ thống</title>
+
+    <link rel="icon" href="{% static 'img/brand/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/favicon-16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'img/brand/favicon-48x48.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/brand/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#020817">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="SCMD Pro">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/fontawesome-free/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'common/css/login.css' %}">
+</head>
+<body class="h-full">
+    <main class="login-page" aria-label="Màn hình đăng nhập SCMD Pro">
+        <div class="login-shell">
+            <div class="login-layout">
+                <section class="login-brand-panel login-animate-in" aria-label="Định vị SCMD Pro">
+                    <div class="inline-flex items-center gap-4" aria-label="SCMD Pro">
+                        <img
+                            src="{% static 'img/brand/logo-symbol-white.png' %}"
+                            alt=""
+                            class="h-16 w-16 shrink-0 object-contain"
+                            width="64"
+                            height="64"
+                            aria-hidden="true"
+                        >
+                        <span class="text-4xl font-black tracking-tight text-white">SCMD Pro</span>
+                    </div>
+
+                    <p class="login-brand-kicker">VẬN HÀNH BẢO VỆ CHUYÊN NGHIỆP</p>
+                    <h1 class="login-brand-title">
+                        Điều hành công ty bằng dữ liệu, kỷ luật và minh bạch
+                    </h1>
+                    <p class="login-brand-subtitle">
+                        SCMD Pro giúp chuẩn hóa ca trực, quân số, tuần tra, sự cố và báo cáo vận hành trong một hệ thống thống nhất.
+                    </p>
+
+                    <div class="login-principle">
+                        <h2 class="login-principle-title">Tư duy vận hành hôm nay</h2>
+                        <p class="login-principle-copy">
+                            Kỷ luật tạo ra độ tin cậy.<br>
+                            Bình tĩnh tạo ra quyết định đúng.<br>
+                            Dữ liệu tạo ra sự minh bạch.
+                        </p>
+                    </div>
+
+                    <div class="login-pill-list" aria-label="Giá trị vận hành">
+                        <span class="login-pill">Kỷ luật</span>
+                        <span class="login-pill">Tập trung</span>
+                        <span class="login-pill">Bình tĩnh</span>
+                        <span class="login-pill">Cải tiến</span>
+                    </div>
+                </section>
+
+                <section class="login-card-area login-animate-in" style="animation-delay: 120ms;" aria-label="Form đăng nhập">
+                    <div class="login-card">
+                        <div class="login-card-inner">
+                            <div class="mb-4 hidden items-center justify-center gap-3 max-lg:flex" aria-label="SCMD Pro">
+                                <img
+                                    src="{% static 'img/brand/logo-symbol-white.png' %}"
+                                    alt=""
+                                    class="h-10 w-10 shrink-0 object-contain"
+                                    width="40"
+                                    height="40"
+                                    aria-hidden="true"
+                                >
+                                <span class="text-2xl font-black tracking-tight text-white">SCMD Pro</span>
+                            </div>
+
+                            <header class="login-form-header">
+                                <span class="login-form-eyebrow">Đăng nhập nội bộ</span>
+                                <h2 class="login-form-title">Truy cập SCMD Pro</h2>
+                                <p class="login-form-description">
+                                    Quản lý ca trực, quân số, tuần tra, sự cố và báo cáo vận hành bằng dữ liệu thực tế.
+                                </p>
+                            </header>
+
+                            {% if messages %}
+                                <div class="login-message-list" role="status" aria-live="polite">
+                                    {% for message in messages %}
+                                        <div class="login-alert {% if message.tags == 'error' %}login-alert--error{% else %}login-alert--info{% endif %}">
+                                            <i class="fas {% if message.tags == 'error' %}fa-circle-exclamation{% else %}fa-info-circle{% endif %}" aria-hidden="true"></i>
+                                            <span>{{ message }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            {% if form.non_field_errors %}
+                                <div class="login-error-list" role="alert" aria-live="assertive">
+                                    {% for error in form.non_field_errors %}
+                                        <div class="login-alert login-alert--error">
+                                            <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+                                            <span>{{ error }}</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+
+                            <form method="post" class="login-form" id="loginForm" novalidate>
+                                {% csrf_token %}
+
+                                <div class="login-field">
+                                    <label for="id_username" class="login-label">Tên đăng nhập</label>
+                                    <div class="login-input-shell">
+                                        <span class="login-input-icon" aria-hidden="true">
+                                            <i class="fas fa-user-shield"></i>
+                                        </span>
+                                        <input
+                                            type="text"
+                                            name="username"
+                                            id="id_username"
+                                            required
+                                            autocomplete="username"
+                                            class="login-input login-input--with-icon"
+                                            placeholder="Tên đăng nhập"
+                                            value="{{ form.username.value|default_if_none:'' }}"
+                                        >
+                                    </div>
+                                    {% if form.username.errors %}
+                                        <div class="login-error-list" role="alert" aria-live="assertive">
+                                            {% for error in form.username.errors %}
+                                                <div class="login-alert login-alert--error">
+                                                    <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+                                                    <span>{{ error }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="login-field">
+                                    <label for="id_password" class="login-label">Mật khẩu</label>
+                                    <div class="login-input-shell">
+                                        <span class="login-input-icon" aria-hidden="true">
+                                            <i class="fas fa-lock"></i>
+                                        </span>
+                                        <input
+                                            type="password"
+                                            name="password"
+                                            id="id_password"
+                                            required
+                                            autocomplete="current-password"
+                                            class="login-input login-input--with-icon login-input--password"
+                                            placeholder="••••••••"
+                                        >
+                                        <button
+                                            type="button"
+                                            class="login-password-toggle"
+                                            onclick="togglePassword()"
+                                            aria-label="Hiện hoặc ẩn mật khẩu"
+                                            aria-controls="id_password"
+                                        >
+                                            <i class="fas fa-eye" id="eyeIcon" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                    {% if form.password.errors %}
+                                        <div class="login-error-list" role="alert" aria-live="assertive">
+                                            {% for error in form.password.errors %}
+                                                <div class="login-alert login-alert--error">
+                                                    <i class="fas fa-circle-exclamation" aria-hidden="true"></i>
+                                                    <span>{{ error }}</span>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="login-captcha" aria-labelledby="login-captcha-title">
+                                    <div class="login-captcha-head">
+                                        <div class="login-captcha-head-main">
+                                            <span class="login-captcha-title" id="login-captcha-title">Xác thực an toàn</span>
+                                            <span class="login-captcha-required">Bước kiểm tra trước khi đăng nhập</span>
+                                        </div>
+                                        <span class="login-captcha-badge">Phép tính</span>
+                                    </div>
+
+                                    <div class="login-captcha-row">
+                                        <div class="login-captcha-problem">
+                                            <p class="login-captcha-help">Nhập kết quả phép tính sau</p>
+                                            <p class="login-captcha-question">{{ login_verification_question }}</p>
+                                        </div>
+
+                                        <div class="login-captcha-answer">
+                                            <label for="id_login_verification_answer" class="login-captcha-answer-label">Kết quả</label>
+                                            <input
+                                                type="text"
+                                                inputmode="numeric"
+                                                name="login_verification_answer"
+                                                id="id_login_verification_answer"
+                                                required
+                                                autocomplete="off"
+                                                class="login-input login-input--captcha"
+                                                placeholder="Ví dụ: 10"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="login-actions">
+                                    <button type="submit" class="login-submit">
+                                        <span>Đăng nhập an toàn</span>
+                                        <i class="fas fa-arrow-right" aria-hidden="true"></i>
+                                    </button>
+
+                                    <div class="login-reset-link-wrap">
+                                        <a href="{% url 'main:password_reset' %}" class="login-reset-link">
+                                            Khôi phục quyền truy cập
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <footer class="login-card-footer">
+                                <p>SCMD Pro · Quyền truy cập nội bộ</p>
+                            </footer>
+                        </div>
+                    </div>
+
+                    <p class="login-page-footer">&copy; 2026 SCMD. Bảo lưu mọi quyền.</p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <script defer src="{% static 'pwa/pwa-register.js' %}"></script>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('id_password');
+            const eyeIcon = document.getElementById('eyeIcon');
+
+            if (!passwordInput || !eyeIcon) {
+                return;
+            }
+
+            const shouldShow = passwordInput.type === 'password';
+            passwordInput.type = shouldShow ? 'text' : 'password';
+            eyeIcon.classList.toggle('fa-eye', !shouldShow);
+            eyeIcon.classList.toggle('fa-eye-slash', shouldShow);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const usernameInput = document.getElementById('id_username');
+            if (usernameInput) {
+                usernameInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>

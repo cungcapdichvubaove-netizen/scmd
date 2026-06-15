@@ -1,0 +1,31 @@
+{% extends "admin/change_list.html" %}
+{% load i18n humanize %}
+
+{% block content_title %}
+<div class="scmd-admin-hero payroll">
+    <div>
+        <p class="scmd-admin-eyebrow">Kế toán & Lương</p>
+        <h1>Cấu hình lương cá nhân</h1>
+        <p class="scmd-admin-note">Thiết lập lương đóng BHXH và phụ cấp cố định cho từng nhân viên trước khi đối soát, tính lương và khóa kỳ.</p>
+    </div>
+    <div class="scmd-admin-actions">
+        <a href="add/" class="scmd-admin-btn primary">Thêm cấu hình</a>
+        <a href="{{ export_csv_url }}" class="scmd-admin-btn ghost">Xuất CSV</a>
+        <a href="../bangluongthang/" class="scmd-admin-btn ghost">Kỳ lương</a>
+        <a href="../chitietluong/" class="scmd-admin-btn ghost">Phiếu lương</a>
+        <a href="{% url 'accounting:dashboard' %}" class="scmd-admin-btn ghost">Dashboard kế toán</a>
+    </div>
+</div>
+{% if salary_config_summary %}
+<div class="scmd-admin-kpis">
+    <a class="scmd-admin-kpi" href="."><span>Tổng cấu hình</span><strong>{{ salary_config_summary.total_configs|default:0 }}</strong><small>{{ salary_config_summary.total_base|default:0|floatformat:0|intcomma }} ₫ lương BHXH</small></a>
+    <a class="scmd-admin-kpi" href="?salary_config_issue=missing_base"><span>Thiếu lương BHXH</span><strong class="danger">{{ salary_config_summary.missing_base_count|default:0 }}</strong><small>Cần bổ sung trước khi đối soát</small></a>
+    <a class="scmd-admin-kpi" href="?salary_config_issue=has_allowance"><span>Có phụ cấp</span><strong class="success">{{ salary_config_summary.has_allowance_count|default:0 }}</strong><small>{{ salary_config_summary.total_responsibility|default:0|floatformat:0|intcomma }} ₫ trách nhiệm</small></a>
+    <a class="scmd-admin-kpi" href="?salary_config_issue=no_allowance"><span>Chưa có phụ cấp</span><strong class="warning">{{ salary_config_summary.no_allowance_count|default:0 }}</strong><small>Rà soát chính sách theo vị trí</small></a>
+    <a class="scmd-admin-kpi" href="?salary_config_issue=transport"><span>Xăng xe / ăn ca</span><strong>{{ salary_config_summary.transport_count|default:0 }} / {{ salary_config_summary.meal_count|default:0 }}</strong><small>{{ salary_config_summary.total_transport|default:0|floatformat:0|intcomma }} ₫ đi lại</small></a>
+</div>
+{% endif %}
+<div class="scmd-admin-guidance">
+    <strong>Nguyên tắc vận hành:</strong> Cấu hình lương là dữ liệu nền cho đối soát payroll. Khi thay đổi phụ cấp hoặc lương đóng BHXH, cần ghi rõ lý do ở hồ sơ liên quan và kiểm tra lại kỳ lương đang ở trạng thái dự thảo/đã tính trước khi khóa kỳ.
+</div>
+{% endblock %}

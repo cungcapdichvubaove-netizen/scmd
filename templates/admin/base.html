@@ -1,0 +1,437 @@
+{% load i18n static jazzmin admin_urls admin_console %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+{% get_jazzmin_settings request as jazzmin_settings %}
+{% get_jazzmin_ui_tweaks as jazzmin_ui %}
+
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <!--  Prevent admin panel being crawled by search engines -->
+    <meta name="robots" content="none, noarchive">
+
+    <title>{% block title %}{{ title }} | {{ jazzmin_settings.site_title }}{% endblock %}</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="{% static "vendor/fontawesome-free/css/all.min.css" %}">
+
+    <!-- Bootstrap and adminLTE -->
+    <link rel="stylesheet" href="{% static "vendor/adminlte/css/adminlte.min.css" %}" id="adminlte-css">
+
+    <!-- Bootswatch theme -->
+    {% if jazzmin_ui.theme.name != 'default' %}
+        <link rel="stylesheet" href="{{ jazzmin_ui.theme.src }}" id="jazzmin-theme" />
+    {% endif %}
+
+    {% if jazzmin_ui.dark_mode_theme %}
+        <link rel="stylesheet" href="{{ jazzmin_ui.dark_mode_theme.src }}" id="jazzmin-dark-mode-theme" media="(prefers-color-scheme: dark)"/>
+    {% endif %}
+
+    <!-- Custom fixes for django -->
+    <link rel="stylesheet" href="{% static "jazzmin/css/main.css" %}">
+
+    {% if jazzmin_settings.custom_css %}
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static jazzmin_settings.custom_css %}">
+    {% endif %}
+
+    <!-- favicons -->
+    <link rel="shortcut icon" href="{% static jazzmin_settings.site_icon %}" type="image/png">
+    <link rel="icon" href="{% static jazzmin_settings.site_icon %}" sizes="32x32" type="image/png">
+
+    {% block extrastyle %} {% endblock %}
+    {% block extrahead %} {% endblock %}
+</head>
+<body class="hold-transition{% if not jazzmin_settings.show_sidebar %} no-sidebar{% else %} sidebar-mini{% endif %} {% sidebar_status request %} {% if is_popup %}popup {% endif %}{% block bodyclass %}{% endblock %} {{ jazzmin_ui.body_classes }} {% if jazzmin_ui.dark_mode_theme %}theme-dark{% endif %}" data-admin-utc-offset="{% now "Z" %}">
+
+<div class="wrapper">
+
+    {% if not is_popup %}
+        {% admin_account_context request as scmd_account %}
+        <nav class="main-header navbar navbar-expand {{ jazzmin_ui.navbar_classes }}" id="jazzy-navbar">
+            <ul class="navbar-nav scmd-admin-header-nav scmd-admin-header-nav--left">
+
+                {% if jazzmin_settings.show_sidebar %}
+                    <li class="nav-item">
+                        <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href="{% url 'admin:index' %}" class="brand-link">
+                            <img src="{% static jazzmin_settings.site_logo %}" alt="{{ jazzmin_settings.site_header }} Logo" class="{{ jazzmin_settings.site_logo_classes }} brand-image scmd-brand-image-no-sidebar">
+                        </a>
+                    </li>
+                {% endif %}
+
+                {% get_top_menu user request.current_app|default:"admin" as top_menu %}
+                {% for link in top_menu %}
+                    <li class="nav-item d-none d-sm-inline-block{% if link.children %} dropdown{% endif %}">
+                        {% if link.children %}
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{ link.name }}
+                            </a>
+                            <div class="dropdown-menu">
+                                {% for child in link.children %}
+                                    <a class="dropdown-item" href="{{ child.url }}" {% if link.new_window %}target="_blank"{% endif %}>{{ child.name }}</a>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <a href="{{ link.url }}" class="nav-link" {% if link.new_window %}target="_blank"{% endif %}>{{ link.name }}</a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class="scmd-admin-breadcrumbs" aria-label="Điều hướng hiện tại">
+                {% spaceless %}
+                {% block breadcrumbs %}{% endblock %}
+                {% endspaceless %}
+            </div>
+
+            {% if jazzmin_settings.search_model %}
+                {% for search_model in jazzmin_settings.search_models_parsed %}
+                    <form action="{{ search_model.search_url }}" method="GET" class="form-inline ml-3">
+                        <div class="input-group input-group-sm">
+                            <input class="form-control form-control-navbar" name="q" type="search" placeholder="{% trans 'Search' %} {{ search_model.search_name }}..." aria-label="{% trans 'Search' %} {{ search_model.search_name }}...">
+                            <div class="input-group-append">
+                                <button class="btn btn-navbar" type="submit">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                {% endfor %}
+            {% endif %}
+
+            <ul class="navbar-nav ml-auto scmd-admin-header-nav scmd-admin-header-nav--right">
+
+                {% if jazzmin_settings.show_ui_builder %}
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="control-sidebar" data-slide="true" href="#" role="button">
+                        <i class="fas fa-th-large"></i>
+                    </a>
+                </li>
+                {% endif %}
+                {% if 'django.contrib.admindocs'|app_is_installed %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'django-admindocs-docroot' %}" role="button">
+                        <i class="fas fa-book"></i>
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if jazzmin_settings.language_chooser %}
+                    {% get_available_languages as LANGUAGES %}
+                    {% get_language_info_list for LANGUAGES as languages %}
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link btn" data-toggle="dropdown" href="#" title="Choose language">
+                            <i class="fas fa-globe" aria-hidden="true"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left" id="jazzy-languagemenu">
+                            <form action="{% url 'set_language' %}" method="post">
+                                {% csrf_token %}
+                                <input name="next" type="hidden" value="{{ request.get_full_path|remove_lang:LANGUAGE_CODE }}" />
+                                {% for language in languages %}
+                                    <button
+                                        type="submit"
+                                        name="language"
+                                        value="{{ language.code }}"
+                                        class="dropdown-item {% if language.code == LANGUAGE_CODE %}active{% endif %}"
+                                        lang="{{ language.code }}"
+                                    >
+                                        {{ language.name_local|title }}
+                                    </button>
+                                {% endfor %}
+                            </form>
+                        </div>
+                    </li>
+                {% endif %}
+
+                <li class="nav-item dropdown scmd-account-nav">
+                    <a class="nav-link scmd-account-trigger" data-toggle="dropdown" href="{{ scmd_account.profile_url }}" role="button" aria-haspopup="true" aria-expanded="false" aria-label="Mở menu tài khoản {{ scmd_account.display_name }}" title="{{ scmd_account.display_name }}">
+                        <span class="scmd-account-avatar" aria-hidden="true">{{ scmd_account.initials }}</span>
+                        <span class="scmd-account-trigger-text">
+                            <span class="scmd-account-name">{{ scmd_account.display_name }}</span>
+                            <span class="scmd-account-role">{{ scmd_account.role_label }}</span>
+                        </span>
+                        <i class="fas fa-chevron-down scmd-account-caret" aria-hidden="true"></i>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right scmd-account-menu" id="jazzy-usermenu">
+                        <div class="scmd-account-menu-head" role="presentation">
+                            <span class="scmd-account-avatar scmd-account-avatar--menu" aria-hidden="true">{{ scmd_account.initials }}</span>
+                            <span class="scmd-account-menu-identity">
+                                <strong>{{ scmd_account.display_name }}</strong>
+                                <small>{{ scmd_account.role_label }} · {{ scmd_account.scope_label }}</small>
+                            </span>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ scmd_account.profile_url }}" class="dropdown-item scmd-account-menu-item">
+                            <i class="fas fa-id-badge mr-2" aria-hidden="true"></i><span>Hồ sơ của tôi</span>
+                        </a>
+                        {% if scmd_account.password_change_url and scmd_account.password_change_url != '#' %}
+                            <a href="{{ scmd_account.password_change_url }}" class="dropdown-item scmd-account-menu-item">
+                                <i class="fas fa-key mr-2" aria-hidden="true"></i><span>Đổi mật khẩu</span>
+                            </a>
+                        {% endif %}
+                        {% if scmd_account.my_activity_url %}
+                            <a href="{{ scmd_account.my_activity_url }}" class="dropdown-item scmd-account-menu-item">
+                                <i class="fas fa-history mr-2" aria-hidden="true"></i><span>Nhật ký hoạt động</span>
+                            </a>
+                        {% endif %}
+                        {% if scmd_account.technical_links %}
+                            <div class="dropdown-divider"></div>
+                            <span class="dropdown-header scmd-account-menu-section">Công cụ kỹ thuật</span>
+                            {% for item in scmd_account.technical_links %}
+                                <a href="{{ item.url }}" class="dropdown-item scmd-account-menu-item">
+                                    <i class="{{ item.icon }} mr-2" aria-hidden="true"></i><span>{{ item.label }}</span>
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                        {% get_user_menu user request.current_app|default:"admin" as user_menu %}
+                        {% if user_menu %}
+                            <div class="dropdown-divider"></div>
+                            {% for link in user_menu %}
+                                <a href="{{ link.url }}" class="dropdown-item scmd-account-menu-item" {% if link.new_window %}target="_blank" rel="noopener noreferrer"{% endif %}>
+                                    <i class="{{ link.icon }} mr-2" aria-hidden="true"></i><span>{% trans link.name %}</span>
+                                </a>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <form id="logout-form" method="post" action="{% url 'admin:logout' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="dropdown-item scmd-account-menu-item scmd-account-menu-item--danger">
+                                <i class="fas fa-sign-out-alt mr-2" aria-hidden="true"></i><span>Đăng xuất</span>
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        </nav>
+        {% block sidebar %}
+        {% if jazzmin_settings.show_sidebar %}
+            {% get_side_menu as side_menu_list %}
+
+            <aside class="main-sidebar elevation-4 {{ jazzmin_ui.sidebar_classes }}" id="jazzy-sidebar">
+                <a href="{% url 'admin:index' %}" class="brand-link {{ jazzmin_ui.brand_classes }}" id="jazzy-logo">
+                    <img src="{% static jazzmin_settings.site_logo %}" alt="{{ jazzmin_settings.site_header }} Logo" class="{{ jazzmin_settings.site_logo_classes }} brand-image elevation-3 scmd-brand-image-sidebar">
+                    <span class="brand-text font-weight-light">{{ jazzmin_settings.site_brand }}</span>
+                </a>
+
+                <div class="sidebar">
+                    <nav class="mt-2">
+                        <ul class="nav nav-pills nav-sidebar flex-column {{ jazzmin_ui.sidebar_list_classes }}" data-widget="treeview" role="menu" data-collapsible="false">
+
+                            <li class="nav-item">
+                                <a href="{% url 'admin:index' %}" class="nav-link">
+                                    <i class="nav-icon fas fa-th-large"></i>
+                                    <p>{% trans 'Dashboard' %}</p>
+                                </a>
+                            </li>
+
+                            {% if jazzmin_settings.navigation_expanded %}
+                                {% for app in side_menu_list %}
+                                    <li class="nav-header">{{ app.name }}</li>
+                                    {% for model in app.models %}
+                                        <li class="nav-item">
+                                            {% if model.url %}
+                                            <a href="{{ model.url }}" class="nav-link">
+                                                <i class="nav-icon {{ model.icon }}"></i> <p>{{ model.name }}</p>
+                                            </a>
+                                        {% else %}
+                                            <span class="nav-link disabled">
+                                                <i class="nav-icon {{ model.icon }}"></i> <p>{{ model.name }}</p>
+                                            </span>
+                                        {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                {% endfor %}
+                            {% else %}
+                                {% for app in side_menu_list %}
+                                    <li class="nav-item has-treeview">
+                                        <a href="#" class="nav-link">
+                                            <i class="nav-icon {{ app.icon }}"></i>
+                                            <p>{{ app.name|truncatechars:21 }} <i class="fas fa-angle-left right"></i></p>
+                                        </a>
+                                        <ul class="nav nav-treeview scmd-nav-treeview-collapsed">
+                                            {% for model in app.models %}
+                                                <li class="nav-item">
+                                                    <a href="{% if model.url %}{{ model.url }}{% else %}javascript:void(0){% endif %}" class="nav-link">
+                                                        <i class="nav-icon {{ model.icon }}"></i>
+                                                        <p>{{ model.name }}</p>
+                                                    </a>
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
+                                {% endfor %}
+                            {% endif %}
+                        </ul>
+                    </nav>
+
+                    <section class="user-panel scmd-sidebar-profile-card scmd-sidebar-operator-badge" aria-label="Tài khoản đang đăng nhập">
+                        <div
+                            class="scmd-sidebar-profile-main"
+                            data-account-tooltip-trigger
+                            role="button"
+                            tabindex="0"
+                            aria-haspopup="dialog"
+                            aria-expanded="false"
+                            title="{{ scmd_account.display_name }} · {{ scmd_account.role_label }}"
+                        >
+                            <a href="{{ scmd_account.profile_url }}" class="scmd-sidebar-profile-avatar-link" aria-label="Mở hồ sơ {{ scmd_account.display_name }}">
+                                <span class="scmd-account-avatar scmd-sidebar-profile-avatar" aria-hidden="true">{{ scmd_account.initials }}</span>
+                            </a>
+                            <div class="scmd-sidebar-profile-copy">
+                                <a href="{{ scmd_account.profile_url }}" class="scmd-sidebar-profile-name">{{ scmd_account.display_name }}</a>
+                                <span class="scmd-sidebar-role">{{ scmd_account.role_label }}</span>
+                                <span class="scmd-sidebar-profile-status">
+                                    <span class="scmd-session-dot" aria-hidden="true"></span>
+                                    <span>{{ scmd_account.scope_label }} · Đang hoạt động</span>
+                                </span>
+                            </div>
+                            <form class="scmd-sidebar-logout-form scmd-sidebar-operator-action-form" method="post" action="{% url 'admin:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="scmd-sidebar-operator-action" title="Đăng xuất" aria-label="Đăng xuất khỏi tài khoản {{ scmd_account.display_name }}">
+                                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i><span class="sr-only">Đăng xuất</span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="scmd-sidebar-profile-popover" role="group" aria-label="Tác vụ tài khoản khi sidebar thu gọn">
+                            <div class="scmd-sidebar-popover-head">
+                                <span class="scmd-account-avatar scmd-sidebar-profile-avatar" aria-hidden="true">{{ scmd_account.initials }}</span>
+                                <span class="scmd-sidebar-popover-copy">
+                                    <strong>{{ scmd_account.display_name }}</strong>
+                                    <small>{{ scmd_account.role_label }} · {{ scmd_account.scope_label }}</small>
+                                </span>
+                            </div>
+                            <div class="scmd-sidebar-popover-actions">
+                                <a class="scmd-sidebar-popover-action" href="{{ scmd_account.profile_url }}">
+                                    <i class="fas fa-id-badge" aria-hidden="true"></i><span>Hồ sơ</span>
+                                </a>
+                                <form class="scmd-sidebar-logout-form" method="post" action="{% url 'admin:logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="scmd-sidebar-popover-action is-danger">
+                                        <i class="fas fa-sign-out-alt" aria-hidden="true"></i><span>Đăng xuất</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </aside>
+        {% endif %}
+        {% endblock %}
+    {% endif %}
+
+    <div class="content-wrapper{% if is_popup %} scmd-popup-content-wrapper{% endif %}">
+        {% block page_content %}
+            <div class="content">
+                <div class="container-fluid">
+                    <section id="content" class="content">
+                        {% block messages %}
+                            {% for message in messages %}
+                                {% if message.tags == 'success' %}
+                                    <div class="alert alert-success alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×
+                                        </button>
+                                        <i class="icon fa fa-check"></i>{{ message|capfirst }}
+                                    </div>
+                                {% elif message.tags == 'error' %}
+                                    <div class="alert alert-danger alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×
+                                        </button>
+                                        <i class="icon fa fa-ban"></i>{{ message|capfirst }}
+                                    </div>
+                                {% elif message.tags == 'warning' %}
+                                    <div class="alert alert-warning alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×
+                                        </button>
+                                        <i class="icon fa fa-exclamation-triangle"></i>{{ message|capfirst }}
+                                    </div>
+                                {% elif message.tags == 'info' %}
+                                    <div class="alert alert-info alert-dismissible">
+                                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×
+                                        </button>
+                                        <i class="icon fa fa-info"></i>{{ message|capfirst }}
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% endblock messages %}
+                        <div class="row">
+                            {% block content %} {% endblock %}
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+
+        {% endblock %}
+    </div>
+
+{% block footer %}
+    {% if not is_popup %}
+        <footer class="main-footer {{ jazzmin_ui.footer_classes }}">
+            <div class="float-right d-none d-sm-inline">
+                <b>{% trans 'Jazzmin version' %}</b> {% get_jazzmin_version %}
+            </div>
+            {% autoescape off %}
+                <strong>{% trans 'Copyright' %} &copy; {% now 'Y' %} {{ jazzmin_settings.copyright }}.</strong> {% trans 'All rights reserved.' %}
+            {% endautoescape %}
+        </footer>
+        {% if jazzmin_settings.show_ui_builder %}
+            {% include 'jazzmin/includes/ui_builder_panel.html' %}
+        {% endif %}
+    {% endif %}
+{% endblock %}
+
+</div>
+
+{% if jazzmin_settings.show_ui_builder %}
+<div id="codeBox" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">{% trans 'UI Configuration' %}</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>{% trans 'Copy this info your settings file to persist these UI changes' %}</p>
+                <pre><code></code></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn {{ jazzmin_ui.button_classes.danger }}" data-dismiss="modal">{% trans 'Close' %}</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endif %}
+
+<!-- jQuery -->
+<script src="{% static "admin/js/vendor/jquery/jquery.js" %}"></script>
+<!-- Bootstrap 4 -->
+<script src="{% static "vendor/bootstrap/js/bootstrap.min.js" %}"></script>
+<!-- AdminLTE App -->
+<script src="{% static "vendor/adminlte/js/adminlte.min.js" %}"></script>
+<!-- Django customisations -->
+<script src="{% static "jazzmin/js/main.js" %}"></script>
+
+{% if jazzmin_settings.custom_js %}
+<script src="{% static jazzmin_settings.custom_js %}"></script>
+{% endif %}
+
+{% if jazzmin_settings.show_ui_builder %}
+<script>
+    window.ui_changes = {{ jazzmin_ui.raw|as_json|safe }};
+</script>
+<script src="{% static "jazzmin/js/ui-builder.js" %}"></script>
+{% endif %}
+
+{% block extrajs %}{% endblock %}
+
+</body>
+</html>

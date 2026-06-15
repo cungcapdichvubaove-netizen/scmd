@@ -1,0 +1,45 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/admin_operations_compact.css' %}">
+{% endblock %}
+
+{% block object-tools %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-header" aria-label="Tổng quan điều chỉnh chấm công">
+    <div>
+      <div class="scmd-op-kicker">Đối soát / Nhật ký chấm công</div>
+      <h1 class="scmd-op-title">Lịch sử điều chỉnh chấm công</h1>
+      <p class="scmd-op-subtitle">Nhật ký kiểm toán các thay đổi giờ công, GPS, ảnh và lý do điều chỉnh.</p>
+    </div>
+    <div class="scmd-op-actions">
+      <a href="{{ scmd_adjustment_links.attendance }}" class="scmd-op-btn primary"><i class="fas fa-clock" aria-hidden="true"></i> Chấm công</a>
+      <a href="{{ scmd_adjustment_links.assignments }}" class="scmd-op-btn"><i class="fas fa-user-shield" aria-hidden="true"></i> Phân công</a>
+      <a href="{{ scmd_adjustment_links.payroll }}" class="scmd-op-btn"><i class="fas fa-money-check" aria-hidden="true"></i> Kỳ lương</a>
+      <a href="{{ scmd_adjustment_links.reports }}" class="scmd-op-btn"><i class="fas fa-chart-column" aria-hidden="true"></i> Báo cáo</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block result_list %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-metrics" aria-label="Chỉ số điều chỉnh chấm công">
+    <div class="scmd-op-metric"><span>Tổng điều chỉnh</span><strong>{{ scmd_adjustment_stats.total }}</strong></div>
+    <div class="scmd-op-metric info"><span>Hôm nay</span><strong>{{ scmd_adjustment_stats.today }}</strong></div>
+    <div class="scmd-op-metric warning"><span>Chưa gắn kỳ</span><strong>{{ scmd_adjustment_stats.no_payroll }}</strong></div>
+    <div class="scmd-op-metric danger"><span>Kỳ khóa/trả</span><strong>{{ scmd_adjustment_stats.locked_payroll }}</strong></div>
+  </section>
+  {% if scmd_adjustment_stats.no_payroll or scmd_adjustment_stats.no_actor %}
+  <details class="scmd-op-note">
+    <summary>Việc cần rà soát: {{ scmd_adjustment_stats.no_payroll }} chưa gắn kỳ · {{ scmd_adjustment_stats.no_actor }} thiếu người điều chỉnh</summary>
+    <p>Trang này chỉ phục vụ kiểm toán và đối soát; không tạo/sửa/xóa trực tiếp tại đây.</p>
+  </details>
+  {% endif %}
+</div>
+{{ block.super }}
+{% endblock %}

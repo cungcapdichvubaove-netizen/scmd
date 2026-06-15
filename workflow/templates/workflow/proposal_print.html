@@ -1,0 +1,41 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>In Tờ trình</title>
+    <style>
+        body { font-family: "Times New Roman", serif; font-size: 14pt; line-height: 1.5; width: 210mm; margin: 0 auto; padding: 20mm; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .report-logo { max-height: 52px; max-width: 190px; object-fit: contain; margin-bottom: 10px; }
+        .header h3 { font-size: 16pt; font-weight: bold; margin: 0; }
+        .signatures { margin-top: 50px; display: flex; justify-content: space-between; }
+        .sig-block { text-align: center; width: 45%; }
+        @media print { .no-print { display: none; } body { padding: 0; } }
+    </style>
+</head>
+<body>
+    <div class="no-print" style="text-align:center; margin-bottom:20px;">
+        <button onclick="window.print()" style="padding:10px 20px; font-weight:bold;">🖨️ IN NGAY</button>
+    </div>
+    <div class="header">
+        <img src="{% static 'img/brand/logo-report-header.png' %}" class="report-logo" alt="SCMD Pro"><br>
+        <strong>{{ COMPANY.display_name|default:"CÔNG TY DỊCH VỤ BẢO VỆ SCMD" }}</strong><br>{% if COMPANY.dia_chi %}<span style="font-size:11pt;">{{ COMPANY.dia_chi }}</span><br>{% endif %}{% if COMPANY.contact_phone %}<span style="font-size:11pt;">SĐT: {{ COMPANY.contact_phone }}</span><br>{% endif %}-----o0o-----<br><br>
+        <h3>TỜ TRÌNH</h3>
+        <p>V/v: {{ proposal.tieu_de }}</p>
+    </div>
+    <p><strong>Kính gửi:</strong> Ban Giám Đốc</p>
+    <p><strong>Người đề xuất:</strong> {{ proposal.nguoi_de_xuat.ho_ten }}</p>
+    <p><strong>Ngày:</strong> {{ proposal.ngay_tao|date:"d/m/Y" }}</p>
+    <hr>
+    <div>{{ proposal.noi_dung|linebreaks }}</div>
+    <div class="signatures">
+        <div class="sig-block"><h4>Người đề xuất</h4><br><br><br><strong>{{ proposal.nguoi_de_xuat.ho_ten }}</strong></div>
+        <div class="sig-block"><h4>Phê duyệt</h4>
+            {% if proposal.trang_thai == 'DA_DUYET' %}
+                <div style="color:red; border:2px solid red; padding:5px; display:inline-block; transform:rotate(-10deg);">ĐÃ PHÊ DUYỆT<br>{{ proposal.logs.last.nguoi_xu_ly.ho_ten }}</div>
+            {% else %}<br><br><br><em>(Ký tên)</em>{% endif %}
+        </div>
+    </div>
+</body>
+</html>

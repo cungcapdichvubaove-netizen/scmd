@@ -1,0 +1,254 @@
+{% extends "base_public.html" %}
+{% block title %}Chưa được phân quyền | SCMD Pro{% endblock %}
+{% block body_class %}scmd-public-shell overflow-x-hidden p-4 md:p-6{% endblock %}
+{% block public_shell_class %}mx-auto w-full max-w-[1320px] animate-enter{% endblock %}
+{% block public_main_class %}overflow-hidden rounded-[2rem] border border-white/10 bg-white/5 p-0 shadow-[0_28px_80px_rgba(2,8,23,0.32)] backdrop-blur-sm{% endblock %}
+{% block public_footer %}{% endblock %}
+{% block extra_css %}
+<style>
+    .pending-state {
+        display: grid;
+        min-height: min(660px, calc(100vh - 2.25rem));
+        grid-template-columns: minmax(0, 1fr) minmax(340px, 390px);
+        background:
+            radial-gradient(circle at top left, rgba(96, 165, 250, 0.2), transparent 30%),
+            linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(30, 41, 59, 0.92));
+    }
+
+    .pending-state__story {
+        padding: clamp(1.5rem, 2.8vw, 2.7rem);
+        color: #e2e8f0;
+    }
+
+    .pending-state__eyebrow {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0.42rem 0.76rem;
+        background: rgba(15, 23, 42, 0.38);
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        color: #bfdbfe;
+        font-size: 0.67rem;
+        font-weight: 800;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+    }
+
+    .pending-state__title {
+        margin: 1rem 0 0;
+        max-width: 11.2ch;
+        color: #f8fafc;
+        font-size: clamp(1.82rem, 2.85vw, 3rem);
+        font-weight: 900;
+        line-height: 0.94;
+        letter-spacing: -0.06em;
+    }
+
+    .pending-state__copy {
+        margin: 0.9rem 0 0;
+        max-width: 500px;
+        color: rgba(226, 232, 240, 0.78);
+        font-size: 0.91rem;
+        line-height: 1.6;
+    }
+
+    .pending-state__checklist {
+        display: grid;
+        gap: 0.74rem;
+        margin-top: 1.3rem;
+        max-width: 500px;
+    }
+
+    .pending-state__item {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.72rem;
+        align-items: start;
+        padding: 0.82rem 0.92rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(148, 163, 184, 0.14);
+        background: rgba(15, 23, 42, 0.34);
+    }
+
+    .pending-state__item-mark {
+        width: 1.75rem;
+        height: 1.75rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.68rem;
+        background: rgba(59, 130, 246, 0.18);
+        color: #93c5fd;
+        font-size: 0.84rem;
+        font-weight: 800;
+    }
+
+    .pending-state__item strong {
+        display: block;
+        color: #f8fafc;
+        font-size: 0.88rem;
+        font-weight: 800;
+    }
+
+    .pending-state__item span {
+        display: block;
+        margin-top: 0.18rem;
+        color: rgba(203, 213, 225, 0.74);
+        font-size: 0.83rem;
+        line-height: 1.44;
+    }
+
+    .pending-state__panel {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(1rem, 2vw, 1.6rem);
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248,250,252,0.96));
+    }
+
+    .pending-state__card {
+        width: min(100%, 360px);
+        padding: 1.1rem;
+        border-radius: 1.3rem;
+        border: 1px solid #bfdbfe;
+        background: #fff;
+        box-shadow: 0 18px 48px rgba(15, 23, 42, 0.12);
+        color: #0f172a;
+    }
+
+    .pending-state__card h2 {
+        margin: 0.78rem 0 0;
+        font-size: 1.4rem;
+        font-weight: 900;
+        line-height: 1.04;
+        letter-spacing: -0.05em;
+    }
+
+    .pending-state__card p {
+        margin: 0.68rem 0 0;
+        color: #475569;
+        font-size: 0.86rem;
+        line-height: 1.56;
+    }
+
+    .pending-state__badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 0.38rem 0.68rem;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-size: 0.66rem;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+    }
+
+    .pending-state__actions {
+        display: grid;
+        gap: 0.62rem;
+        margin-top: 0.95rem;
+    }
+
+    .pending-state__btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 2.5rem;
+        padding: 0.62rem 0.88rem;
+        border-radius: 0.82rem;
+        text-decoration: none;
+        font-size: 0.84rem;
+        font-weight: 800;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .pending-state__btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .pending-state__btn--primary {
+        background: linear-gradient(135deg, #0f2550, #1d4ed8);
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(37, 99, 235, 0.22);
+    }
+
+    .pending-state__btn--secondary {
+        border: 1px solid #cbd5e1;
+        background: #fff;
+        color: #0f172a;
+    }
+
+    @media (max-width: 1120px) {
+        .pending-state {
+            grid-template-columns: 1fr;
+        }
+
+        .pending-state__title {
+            max-width: none;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .pending-state__story,
+        .pending-state__panel,
+        .pending-state__card {
+            padding: 1rem;
+        }
+
+        .pending-state__title {
+            font-size: 1.68rem;
+        }
+    }
+</style>
+{% endblock %}
+{% block public_header %}{% endblock %}
+{% block content %}
+<section class="pending-state" aria-label="Thông báo phân quyền">
+    <div class="pending-state__story">
+        <div class="pending-state__eyebrow">SCMD Pro · Tài khoản chờ cấu hình</div>
+        <h1 class="pending-state__title">Tài khoản đã đăng nhập nhưng chưa sẵn sàng để làm việc</h1>
+        <p class="pending-state__copy">
+            Hệ thống chưa xác định được đúng phòng ban, chức danh hoặc nhóm quyền nghiệp vụ cho tài khoản này.
+            Trước khi vào workspace, hồ sơ truy cập cần được gắn đúng vai trò để dữ liệu vận hành hiển thị chính xác.
+        </p>
+
+        <div class="pending-state__checklist">
+            <div class="pending-state__item">
+                <div class="pending-state__item-mark">1</div>
+                <div>
+                    <strong>Liên kết tài khoản với hồ sơ nhân viên</strong>
+                    <span>Người dùng cần được gắn đúng hồ sơ nhân sự để router và phạm vi dữ liệu hoạt động chính xác.</span>
+                </div>
+            </div>
+            <div class="pending-state__item">
+                <div class="pending-state__item-mark">2</div>
+                <div>
+                    <strong>Gán đúng phòng ban hoặc chức danh</strong>
+                    <span>Các dashboard của kế toán, kho, vận hành, nhân sự hay CRM được mở dựa trên vai trò nghiệp vụ thực tế.</span>
+                </div>
+            </div>
+            <div class="pending-state__item">
+                <div class="pending-state__item-mark">3</div>
+                <div>
+                    <strong>Rà soát nhóm quyền và trạng thái tài khoản</strong>
+                    <span>Admin nên kiểm tra user có bị khóa, gán sai nhóm hoặc thiếu quyền cốt lõi trước khi bàn giao sử dụng.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pending-state__panel">
+        <div class="pending-state__card">
+            <div class="pending-state__badge">Chưa được phân quyền</div>
+            <h2>Cần hoàn tất cấu hình truy cập</h2>
+            <p>Vui lòng liên hệ quản trị hệ thống để gán đúng phòng ban, chức danh và nhóm quyền trước khi sử dụng các khu vực nghiệp vụ.</p>
+
+            <div class="pending-state__actions">
+                <a href="{% url 'main:central_hub' %}" class="pending-state__btn pending-state__btn--primary">Thử điều hướng lại</a>
+                <a href="{% url 'main:logout' %}" class="pending-state__btn pending-state__btn--secondary">Đăng xuất</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

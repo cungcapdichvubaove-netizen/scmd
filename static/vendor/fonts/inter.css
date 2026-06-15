@@ -1,0 +1,7 @@
+/* Local font contract for SCMD Pro mobile/runtime surfaces. */
+:root {
+    --scmd-mobile-font: var(--scmd-font-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif);
+}
+body, button, input, select, textarea {
+    font-family: var(--scmd-mobile-font);
+}

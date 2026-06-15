@@ -1,0 +1,146 @@
+/* Page-level centering is kept in this file instead of relying on Tailwind
+   arbitrary utility classes. 403 must stay centered even when Tailwind's
+   generated utility set changes or staticfiles is stale. */
+.access-denied-page.scmd-public-shell {
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: clamp(1rem, 3vw, 2rem);
+    overflow-x: hidden;
+}
+
+.access-denied-shell {
+    width: min(100%, 480px);
+    margin-inline: auto;
+}
+
+.access-denied-card {
+    width: 100%;
+    max-width: 480px;
+    border: 1px solid var(--scmd-public-card-border);
+    border-radius: var(--scmd-radius-lg);
+    background: var(--scmd-public-card-bg);
+    box-shadow: var(--scmd-public-card-shadow);
+    backdrop-filter: blur(16px);
+    padding: clamp(1.35rem, 4vw, 2rem);
+}
+
+.access-denied-state {
+    color: var(--scmd-text);
+}
+
+.access-denied-state__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.65rem;
+    border: 1px solid color-mix(in srgb, var(--scmd-warning) 22%, transparent);
+    border-radius: 999px;
+    background: var(--scmd-warning-soft);
+    color: var(--scmd-warning);
+    padding: 0.28rem 0.64rem;
+    font-size: 0.67rem;
+    font-weight: 850;
+    letter-spacing: var(--scmd-eyebrow-l2-tracking);
+    line-height: 1;
+}
+
+.access-denied-state__title {
+    margin: 1rem 0 0;
+    color: var(--scmd-text);
+    font-size: clamp(1.55rem, 5vw, 2rem);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.04em;
+}
+
+.access-denied-state__body {
+    margin: 0.78rem 0 0;
+    color: var(--scmd-text-soft);
+    font-size: 0.94rem;
+    line-height: 1.62;
+}
+
+.access-denied-state__actions {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: 1.35rem;
+}
+
+.access-denied-state__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.75rem;
+    border-radius: var(--scmd-radius-sm);
+    padding: 0.68rem 0.95rem;
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 800;
+    line-height: 1.2;
+    transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.16s ease, color 0.16s ease;
+}
+
+.access-denied-state__button:hover,
+.access-denied-state__button:focus-visible {
+    transform: translateY(-1px);
+}
+
+.access-denied-state__button--primary {
+    border: 1px solid var(--scmd-brand-700);
+    background: var(--scmd-brand-700);
+    color: var(--scmd-on-brand);
+    box-shadow: var(--scmd-shadow-sm);
+}
+
+.access-denied-state__button--primary:hover,
+.access-denied-state__button--primary:focus-visible {
+    background: var(--scmd-brand-600);
+    color: var(--scmd-on-brand);
+}
+
+.access-denied-state__button--secondary {
+    border: 1px solid var(--scmd-border);
+    background: var(--scmd-surface);
+    color: var(--scmd-text);
+}
+
+.access-denied-state__button--secondary:hover,
+.access-denied-state__button--secondary:focus-visible {
+    background: var(--scmd-surface-muted);
+    color: var(--scmd-text);
+}
+
+.access-denied-state__note {
+    margin: 1rem 0 0;
+    color: var(--scmd-text-muted);
+    font-size: 0.78rem;
+    line-height: 1.52;
+}
+
+.access-denied-state__code {
+    display: block;
+    margin-top: 0.36rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.access-denied-state__debug {
+    margin-top: 0.9rem;
+    border-top: 1px solid var(--scmd-border);
+    padding-top: 0.85rem;
+    color: var(--scmd-text-muted);
+    font-size: 0.75rem;
+}
+
+.access-denied-state__debug summary {
+    cursor: pointer;
+    font-weight: 800;
+}
+
+.access-denied-state__debug p {
+    margin: 0.42rem 0 0;
+    word-break: break-word;
+}

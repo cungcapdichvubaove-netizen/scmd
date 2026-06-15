@@ -1,0 +1,107 @@
+.scmd-permission-guide {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0 0 1.25rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid rgba(216, 226, 236, 0.9);
+    border-radius: 18px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+}
+
+.scmd-permission-guide__copy h2 {
+    margin: 0 0 0.35rem;
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: #162033;
+}
+
+.scmd-permission-guide__copy p {
+    margin: 0;
+    max-width: 56rem;
+    color: #5f6f86;
+    line-height: 1.5;
+}
+
+.scmd-permission-search {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: min(100%, 20rem);
+    color: #475569;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.scmd-permission-search input {
+    min-height: 42px;
+    border: 1px solid #d8e2ec;
+    border-radius: 14px;
+    padding: 0.7rem 0.9rem;
+    background: #fff;
+}
+
+.scmd-permission-section .form-row {
+    border-bottom: none;
+    padding: 0;
+}
+
+.scmd-permission-section .checkbox-row {
+    width: 100%;
+}
+
+.scmd-permission-section ul,
+.scmd-permission-section .radiolist,
+.scmd-permission-section .checkboxselectmultiple {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 0.75rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.scmd-permission-section li {
+    margin: 0;
+}
+
+.scmd-permission-section label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.65rem;
+    min-height: 56px;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid #dbe5ef;
+    border-radius: 14px;
+    background: #ffffff;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.scmd-permission-section label:hover {
+    border-color: rgba(59, 130, 246, 0.35);
+    background: #f8fbff;
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.06);
+}
+
+.scmd-permission-section input[type="checkbox"] {
+    margin-top: 0.1rem;
+    width: 1rem;
+    height: 1rem;
+    accent-color: #2563eb;
+}
+
+.scmd-permission-section .help {
+    margin-bottom: 0.9rem;
+    color: #64748b;
+}
+
+.scmd-permission-hidden {
+    display: none !important;
+}
+
+@media (max-width: 960px) {
+    .scmd-permission-guide {
+        flex-direction: column;
+    }
+}

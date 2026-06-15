@@ -1,0 +1,49 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-shift-console">
+    <div class="scmd-shift-head">
+        <div>
+            <div class="scmd-shift-eyebrow">Thanh tra & tuần tra</div>
+            <h1 class="scmd-shift-title">Nhật ký lượt tuần tra</h1>
+            <p class="scmd-shift-subtitle">
+                Theo dõi từng lượt tuần tra, tiến độ quét QR/GPS, thời gian thực hiện và bằng chứng hiện trường. Dữ liệu này là nguồn đối soát vận hành, vi phạm và đánh giá tuân thủ.
+            </p>
+        </div>
+        <div class="scmd-shift-actions">
+            <a class="scmd-shift-btn" href="{{ scmd_patrol_session_links.add }}">+ Thêm lượt</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_session_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_session_links.routes }}">Tuyến</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_session_links.points }}">Điểm QR</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_session_links.scans }}">Nhật ký quét</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_session_links.dashboard }}">Bảng điều hành</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_session_links.mobile }}">Mobile</a>
+        </div>
+    </div>
+
+    <div class="scmd-shift-grid">
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.list }}"><span>Tổng lượt</span><strong>{{ scmd_patrol_session_stats.total }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.today }}"><span>Hôm nay</span><strong>{{ scmd_patrol_session_stats.today }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.month }}"><span>Tháng này</span><strong>{{ scmd_patrol_session_stats.month }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.active }}"><span>Đang đi</span><strong>{{ scmd_patrol_session_stats.active }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.completed_today }}"><span>Hoàn thành hôm nay</span><strong>{{ scmd_patrol_session_stats.completed_today }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.abandoned }}"><span>Bỏ dở</span><strong>{{ scmd_patrol_session_stats.abandoned }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.gps_warning }}"><span>Cảnh báo GPS</span><strong>{{ scmd_patrol_session_stats.gps_warning }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.no_scan }}"><span>Chưa quét</span><strong>{{ scmd_patrol_session_stats.no_scan }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.missing_end }}"><span>Thiếu kết thúc</span><strong>{{ scmd_patrol_session_stats.missing_end }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.inspection_runs }}"><span>Đợt thanh tra</span><strong>↗</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.violations }}"><span>Biên bản</span><strong>↗</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_session_links.targets }}"><span>Mục tiêu</span><strong>↗</strong></a>
+    </div>
+
+    <div class="scmd-shift-note">
+        Gợi ý kiểm soát: ưu tiên xử lý lượt đang đi quá lâu, lượt có cảnh báo GPS, lượt chưa quét điểm nào hoặc đã bỏ dở; mọi thao tác kết thúc/bỏ dở hàng loạt đều được ghi audit.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

@@ -1,0 +1,37 @@
+﻿{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block extrahead %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="scmd-lead-console">
+  <section class="scmd-lead-head">
+    <div>
+      <div class="scmd-lead-kicker">CRM / Khách hàng tiềm năng</div>
+      <h1 class="scmd-lead-title">Quản trị khách hàng tiềm năng</h1>
+      
+    </div>
+    <div class="scmd-lead-actions">
+      <a class="scmd-lead-btn primary" href="{{ scmd_lead_links.add_lead }}"><i class="fas fa-plus-circle"></i> Thêm khách hàng</a>
+      <a class="scmd-lead-btn" href="{{ scmd_lead_links.add_opportunity }}"><i class="fas fa-bolt"></i> Tạo cơ hội</a>
+      <a class="scmd-lead-btn" href="{{ scmd_lead_links.opportunity_list }}"><i class="fas fa-stream"></i> Pipeline</a>
+      <a class="scmd-lead-btn" href="{{ scmd_lead_links.contract_list }}"><i class="fas fa-file-contract"></i> Hợp đồng</a>
+      <a class="scmd-lead-btn" href="{{ scmd_lead_links.crm_dashboard }}"><i class="fas fa-chart-line"></i> CRM dashboard</a>
+    </div>
+  </section>
+
+  <section class="scmd-lead-metrics" aria-label="Chỉ số khách hàng tiềm năng">
+    <div class="scmd-lead-metric"><strong>{{ scmd_lead_stats.total }}</strong><span>Tổng lead</span></div>
+    <div class="scmd-lead-metric"><strong>{{ scmd_lead_stats.new }}</strong><span>Mới tiếp nhận</span></div>
+    <div class="scmd-lead-metric"><strong>{{ scmd_lead_stats.nurturing }}</strong><span>Đang chăm sóc</span></div>
+    <div class="scmd-lead-metric"><strong>{{ scmd_lead_stats.quoted }}</strong><span>Đã báo giá</span></div>
+    <div class="scmd-lead-metric"><strong>{{ scmd_lead_stats.won }}</strong><span>Đã chốt</span></div>
+    <div class="scmd-lead-metric"><strong>{{ scmd_lead_stats.missing_contact }}</strong><span>Thiếu liên hệ</span></div>
+  </section>
+  <div class="scmd-lead-hint"><b>Gợi ý thao tác:</b> dùng tìm kiếm theo tên/SĐT/email; lọc “Chưa có cơ hội” để tạo pipeline; dùng thao tác hàng loạt để chuyển trạng thái chăm sóc.</div>
+</div>
+{{ block.super }}
+{% endblock %}
+

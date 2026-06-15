@@ -1,0 +1,37 @@
+{% extends "admin/change_list.html" %}
+{% load i18n humanize %}
+
+{% block content_title %}
+<div class="scmd-admin-hero inventory">
+    <div>
+        <p class="scmd-admin-eyebrow">Kho vật tư</p>
+        <h1>Danh mục vật tư & CCHT</h1>
+        <p class="scmd-admin-note">Trung tâm kiểm soát vật tư, đồng phục và công cụ hỗ trợ: tồn kho hiện tại, mức cảnh báo, giá vốn, giá trừ lương và lịch sử luân chuyển.</p>
+    </div>
+    <div class="scmd-admin-actions">
+        <a href="{{ inventory_material_links.add }}" class="scmd-admin-btn primary">Thêm vật tư</a>
+        <a href="{{ inventory_material_export_url }}" class="scmd-admin-btn secondary">Xuất CSV</a>
+        <a href="{{ inventory_material_links.categories }}" class="scmd-admin-btn ghost">Loại vật tư</a>
+        <a href="{{ inventory_material_links.stock_report }}" class="scmd-admin-btn ghost">Báo cáo tồn</a>
+        <a href="{{ inventory_material_links.dashboard }}" class="scmd-admin-btn ghost">Dashboard kho</a>
+    </div>
+</div>
+{% if inventory_material_summary %}
+<div class="scmd-admin-kpis inventory">
+    <a class="scmd-admin-kpi" href="."><span>Tổng vật tư</span><strong>{{ inventory_material_summary.total_items|default:0 }}</strong><small>{{ inventory_material_summary.total_stock|default:0|intcomma }} đơn vị tồn kho</small></a>
+    <a class="scmd-admin-kpi" href="?material_issue=low_stock"><span>Cảnh báo tồn</span><strong class="danger">{{ inventory_material_summary.low_stock|default:0 }}</strong><small>{{ inventory_material_summary.out_of_stock|default:0 }} vật tư đã hết tồn</small></a>
+    <a class="scmd-admin-kpi" href="?material_issue=no_category"><span>Thiếu phân loại</span><strong class="warning">{{ inventory_material_summary.no_category|default:0 }}</strong><small>Cần chuẩn hóa để báo cáo đúng</small></a>
+    <a class="scmd-admin-kpi" href="?material_issue=payroll_deductible"><span>Có giá trừ lương</span><strong>{{ inventory_material_summary.payroll_deductible|default:0 }}</strong><small>Dùng cho bán/khấu trừ nhân viên</small></a>
+    <a class="scmd-admin-kpi" href="?material_issue=target_tools"><span>CCHT tại mục tiêu</span><strong class="success">{{ inventory_material_summary.target_tools|default:0 }}</strong><small>Công cụ đang bàn giao hiện trường</small></a>
+    <a class="scmd-admin-kpi" href="?material_issue=no_cost"><span>Thiếu giá vốn</span><strong>{{ inventory_material_summary.no_cost|default:0 }}</strong><small>Ảnh hưởng giá trị tồn kho</small></a>
+</div>
+{% endif %}
+<div class="scmd-admin-note-card inventory">
+    <strong>Nguyên tắc thủ kho:</strong> Số tồn phải đi từ phiếu nhập/xuất đã ghi sổ. Không chỉnh tay tồn kho nếu chưa có biên bản đối soát; vật tư có phát sinh cấp phát, trừ lương hoặc CCHT tại mục tiêu phải được rà soát trước khi đổi giá/tên.
+    <span>
+        <a href="{{ inventory_material_links.receipts }}">Phiếu nhập</a>
+        <a href="{{ inventory_material_links.issues }}">Phiếu xuất</a>
+        <a href="{{ inventory_material_links.target_tools }}">CCHT tại mục tiêu</a>
+    </span>
+</div>
+{% endblock %}

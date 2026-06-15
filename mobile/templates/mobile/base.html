@@ -1,0 +1,131 @@
+{% load static tailwind_tags navigation_access %}
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+    <title>{% block title %}SCMD Pro Mobile{% endblock %}</title>
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="icon" href="{% static 'img/brand/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/brand/apple-touch-icon.png' %}">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="SCMD Pro">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+    <link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+    <script src="{% static 'vendor/dexie/dexie.min.js' %}"></script>
+    <script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+    <script src="{% static 'vendor/nprogress/nprogress.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'vendor/nprogress/nprogress.css' %}">
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+    <link rel="stylesheet" href="{% static 'common/css/mobile_shell.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="scmd-mobile-shell" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' data-scmd-accounting-dashboard-url="{% url 'accounting:dashboard' %}">
+    {% shell_route_allowed request.user "operations:mobile_tuan_tra_list" as mobile_patrol_allowed %}
+    {% shell_route_denied_message "operations:mobile_tuan_tra_list" as mobile_patrol_denied_message %}
+
+    <a href="#mobile-main-content" class="scmd-mobile-skip-link">Bỏ qua điều hướng</a>
+
+    <div class="scmd-mobile-app" data-scmd-mobile-app>
+        <header class="scmd-mobile-header" role="banner">
+            <a href="{% url 'operations:mobile_dashboard' %}" class="scmd-mobile-brand" aria-label="Về trang chính SCMD Pro">
+                <span class="scmd-mobile-brand-mark" aria-hidden="true">
+                    <img src="{% static 'img/brand/logo-symbol-blue.png' %}" alt="SCMD Pro" loading="eager">
+                </span>
+                <span class="scmd-mobile-brand-copy">
+                    <span class="scmd-mobile-screen">{% block mobile_header_title %}{% block header %}{% block header_title %}Bàn làm việc hiện trường{% endblock %}{% endblock %}{% endblock %}</span>
+                </span>
+            </a>
+            <div class="scmd-mobile-status" aria-live="polite">
+                <span class="scmd-mobile-online-dot" data-mobile-online-dot aria-hidden="true"></span>
+                <span data-mobile-online-label>Đang kết nối</span>
+            </div>
+        </header>
+
+        {% if messages %}
+        <section class="scmd-mobile-toast-stack" aria-live="polite" aria-atomic="false">
+            {% for message in messages %}
+            <div class="scmd-mobile-toast scmd-mobile-toast--{{ message.tags|default:'info' }}">
+                <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-triangle-exclamation{% else %}fa-circle-info{% endif %}" aria-hidden="true"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+        </section>
+        {% endif %}
+
+        <main id="mobile-main-content" class="scmd-mobile-content" role="main">
+            {% block content %}{% endblock %}
+        </main>
+
+        {% with current_app=request.resolver_match.app_name current_url_name=request.resolver_match.url_name %}
+        <nav class="scmd-mobile-bottom-nav" aria-label="Điều hướng hiện trường">
+            <a href="{% url 'operations:mobile_dashboard' %}" class="scmd-mobile-nav-item {% if current_url_name == 'mobile_dashboard' or current_url_name == 'mobile_dashboard_redirect' %}is-active{% endif %}" {% if current_url_name == 'mobile_dashboard' or current_url_name == 'mobile_dashboard_redirect' %}aria-current="page"{% endif %}>
+                <i class="fas fa-house" aria-hidden="true"></i>
+                <span>Trang chính</span>
+            </a>
+            <a href="{% url 'operations:mobile_lich_truc' %}" class="scmd-mobile-nav-item {% if current_url_name == 'mobile_lich_truc' %}is-active{% endif %}" {% if current_url_name == 'mobile_lich_truc' %}aria-current="page"{% endif %}>
+                <i class="fas fa-calendar-check" aria-hidden="true"></i>
+                <span>Ca trực</span>
+            </a>
+            <a href="{% url 'operations:mobile_cham_cong' %}" class="scmd-mobile-nav-item {% if current_url_name == 'mobile_cham_cong' or current_url_name == 'check_in' or current_url_name == 'check_out' or current_url_name == 'mobile_lich_su_cham_cong' %}is-active{% endif %}" {% if current_url_name == 'mobile_cham_cong' or current_url_name == 'check_in' or current_url_name == 'check_out' or current_url_name == 'mobile_lich_su_cham_cong' %}aria-current="page"{% endif %}>
+                <i class="fas fa-location-dot" aria-hidden="true"></i>
+                <span>Chấm công</span>
+            </a>
+            <a href="{% url 'operations:bao_cao_su_co' %}" class="scmd-mobile-nav-item {% if current_url_name == 'bao_cao_su_co' %}is-active{% endif %}" {% if current_url_name == 'bao_cao_su_co' %}aria-current="page"{% endif %}>
+                <i class="fas fa-triangle-exclamation" aria-hidden="true"></i>
+                <span>Sự cố</span>
+            </a>
+            <button type="button" class="scmd-mobile-nav-item {% if current_app == 'users' or current_app == 'accounting' or current_app == 'inspection' or current_url_name == 'mobile_de_xuat_list' or current_url_name == 'mobile_de_xuat_create' or current_url_name == 'mobile_de_xuat_detail' %}is-active{% endif %}" data-mobile-account-toggle aria-controls="scmd-mobile-account-panel" aria-expanded="false">
+                <i class="fas fa-user-shield" aria-hidden="true"></i>
+                <span>Thêm</span>
+            </button>
+        </nav>
+        {% endwith %}
+
+        <section id="scmd-mobile-account-panel" class="scmd-mobile-account-panel" hidden>
+            <div class="scmd-mobile-account-card">
+                <div class="scmd-mobile-account-summary">
+                    <p class="scmd-mobile-account-kicker">Tài khoản</p>
+                    <p class="scmd-mobile-account-name">{{ request.user.get_full_name|default:request.user.username }}</p>
+                </div>
+                <div class="scmd-mobile-account-actions" aria-label="Lối tắt tài khoản và nghiệp vụ">
+                    <a href="{% url 'users:mobile_profile' %}" class="scmd-mobile-account-link">
+                        <i class="fas fa-id-card" aria-hidden="true"></i> Hồ sơ
+                    </a>
+                    <a href="{% url 'users:mobile_password_change' %}" class="scmd-mobile-account-link">
+                        <i class="fas fa-key" aria-hidden="true"></i> Đổi mật khẩu
+                    </a>
+                    <a href="{% url 'accounting:mobile_phieu_luong_list' %}" class="scmd-mobile-account-link">
+                        <i class="fas fa-wallet" aria-hidden="true"></i> Lương
+                    </a>
+                    <a href="{% url 'operations:mobile_de_xuat_list' %}" class="scmd-mobile-account-link">
+                        <i class="fas fa-file-signature" aria-hidden="true"></i> Đề xuất
+                    </a>
+                    {% if mobile_patrol_allowed %}
+                    <a href="{% url 'operations:mobile_tuan_tra_list' %}" class="scmd-mobile-account-link">
+                        <i class="fas fa-person-walking" aria-hidden="true"></i> Tuần tra
+                    </a>
+                    {% else %}
+                    <span class="scmd-mobile-account-link scmd-mobile-account-link--disabled" aria-disabled="true" title="{{ mobile_patrol_denied_message }}">
+                        <i class="fas fa-lock" aria-hidden="true"></i> Tuần tra
+                    </span>
+                    {% endif %}
+                    <form action="{% url 'main:logout' %}" method="post" class="scmd-mobile-account-form">
+                        {% csrf_token %}
+                        <button type="submit" class="scmd-mobile-logout-btn">
+                            <i class="fas fa-right-from-bracket" aria-hidden="true"></i> Đăng xuất
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script defer src="{% static 'common/js/mobile_shell.js' %}"></script>
+    <script defer src="{% static 'pwa/pwa-register.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

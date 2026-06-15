@@ -1,0 +1,77 @@
+{# file: operations/templates/operations/mobile/de_xuat_form.html #}
+{% extends "mobile/base.html" %}
+{% load static %}
+
+{% block title %}Tạo đề xuất{% endblock %}
+
+{% block content %}
+<div class="space-y-4 fade-in">
+    <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'operations:mobile_de_xuat_list' %}" class="btn btn-circle btn-ghost btn-sm">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </a>
+            <div>
+                <h1 class="text-lg font-bold text-slate-800">Soạn đề xuất</h1>
+                <p class="text-xs text-slate-500">Gửi đúng nhu cầu hiện trường về chỉ huy hoặc văn phòng.</p>
+            </div>
+        </div>
+        <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-100 bg-slate-50 p-1">
+            <img src="{% static 'img/brand/logo-symbol-blue.png' %}" alt="SCMD Pro" class="h-full w-full object-contain">
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4 rounded-xl border border-slate-100 bg-white p-5 shadow-sm">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <div class="form-control">
+            <label for="{{ form.loai_de_xuat.id_for_label }}" class="label font-bold text-sm uppercase text-slate-600">Loại đề xuất</label>
+            {{ form.loai_de_xuat }}
+            {% if form.loai_de_xuat.errors %}
+            <span class="mt-1 text-xs text-red-600">{{ form.loai_de_xuat.errors|join:", " }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label for="{{ form.tieu_de.id_for_label }}" class="label font-bold text-sm uppercase text-slate-600">Tiêu đề ngắn gọn</label>
+            {{ form.tieu_de }}
+            {% if form.tieu_de.errors %}
+            <span class="mt-1 text-xs text-red-600">{{ form.tieu_de.errors|join:", " }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label for="{{ form.noi_dung.id_for_label }}" class="label font-bold text-sm uppercase text-slate-600">Nội dung chi tiết</label>
+            {{ form.noi_dung }}
+            {% if form.noi_dung.errors %}
+            <span class="mt-1 text-xs text-red-600">{{ form.noi_dung.errors|join:", " }}</span>
+            {% endif %}
+        </div>
+
+        <div class="form-control">
+            <label for="{{ form.hinh_anh.id_for_label }}" class="label font-bold text-sm uppercase text-slate-600">Hình ảnh đính kèm</label>
+            {{ form.hinh_anh }}
+            <p class="mt-1 text-xs text-slate-500">Tùy chọn. Dùng khi cần minh họa hiện trạng hoặc nhu cầu cấp vật tư.</p>
+            {% if form.hinh_anh.errors %}
+            <span class="mt-1 text-xs text-red-600">{{ form.hinh_anh.errors|join:", " }}</span>
+            {% endif %}
+        </div>
+
+        <div class="rounded-xl border border-slate-100 bg-slate-50 px-3 py-3 text-xs leading-relaxed text-slate-500">
+            Đề xuất sẽ được lưu theo đúng tài khoản nhân viên hiện trường và đi vào luồng xử lý nội bộ. Nội dung càng cụ thể thì càng dễ được xử lý nhanh.
+        </div>
+
+        <div class="pt-2">
+            <button type="submit" class="btn h-12 w-full border-none bg-blue-600 text-lg text-white shadow-md hover:bg-blue-700">
+                <i class="fas fa-paper-plane"></i> Gửi đề xuất
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "admin/change_list.html" %}
+{% load i18n humanize %}
+
+{% block content_title %}
+<div class="scmd-admin-hero payroll">
+    <div>
+        <p class="scmd-admin-eyebrow">Kế toán & Lương</p>
+        <h1>Quản lý kỳ lương</h1>
+        <p class="scmd-admin-note">Đối soát công, khấu trừ, khóa kỳ và phát hành dữ liệu lương theo đúng trạng thái kiểm soát.</p>
+    </div>
+    <div class="scmd-admin-actions">
+        <a href="add/" class="scmd-admin-btn primary">Tạo kỳ lương</a>
+        <a href="{% url 'accounting:dashboard' %}" class="scmd-admin-btn ghost">Dashboard kế toán</a>
+    </div>
+</div>
+{% if payroll_summary %}
+<div class="scmd-admin-kpis">
+    <div class="scmd-admin-kpi"><span>Tổng kỳ lương</span><strong>{{ payroll_summary.total_batches|default:0 }}</strong><small>{{ payroll_summary.total_hours|default:0|floatformat:1|intcomma }} giờ công</small></div>
+    <div class="scmd-admin-kpi"><span>Tổng chi trả</span><strong class="success">{{ payroll_summary.total_pay|default:0|floatformat:0|intcomma }} ₫</strong><small>Tổng ngân sách các kỳ đang lọc</small></div>
+    <div class="scmd-admin-kpi"><span>Dự thảo / đã tính</span><strong>{{ payroll_summary.draft_count|default:0 }} / {{ payroll_summary.calculated_count|default:0 }}</strong><small>Cần tính và kiểm tra dữ liệu nguồn</small></div>
+    <div class="scmd-admin-kpi"><span>Đã đối soát</span><strong class="warning">{{ payroll_summary.reviewed_count|default:0 }}</strong><small>Sẵn sàng khóa kỳ nếu không còn cảnh báo</small></div>
+    <div class="scmd-admin-kpi"><span>Đã khóa / đã trả</span><strong>{{ payroll_summary.locked_count|default:0 }} / {{ payroll_summary.paid_count|default:0 }}</strong><small>Không sửa trực tiếp chi tiết lương</small></div>
+</div>
+{% endif %}
+{% endblock %}

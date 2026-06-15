@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Chấm công cá nhân | SCMD Pro{% endblock %}
+{% block header_title %}Trung tâm báo cáo{% endblock %}
+{% block content %}
+<div class="space-y-4">
+  <section class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm">
+    <div class="flex flex-col xl:flex-row xl:justify-between gap-4">
+      <div><div class="text-xs font-black text-blue-700 uppercase tracking-wider">Báo cáo chấm công</div><h1 class="text-2xl font-black text-slate-900">Chấm công cá nhân</h1><p class="text-sm text-slate-500">Tìm nhanh theo mã, tên, SĐT và lọc phòng ban/chức danh trước khi chọn nhân viên.</p></div>
+      <div class="flex flex-wrap gap-2"><a class="btn btn-sm btn-outline" href="{{ urls.tong_hop }}">Bảng công</a><a class="btn btn-sm btn-outline" href="{{ urls.muc_tieu }}">Theo mục tiêu</a><a class="btn btn-sm btn-outline" href="{{ urls.dashboard }}">Trung tâm</a></div>
+    </div>
+    <form method="get" class="grid grid-cols-1 md:grid-cols-6 gap-3 mt-4 bg-slate-50 border border-slate-100 rounded-xl p-3">
+      <div class="md:col-span-2"><label class="text-xs font-bold text-slate-500 uppercase">Tìm nhân viên</label><input name="q" value="{{ filters.q }}" class="input input-sm input-bordered bg-white w-full" placeholder="Mã, họ tên, SĐT..."></div>
+      <div><label class="text-xs font-bold text-slate-500 uppercase">Phòng ban</label><select name="phong_ban_id" class="select select-sm select-bordered bg-white w-full"><option value="">Tất cả</option>{% for item in phong_ban_list %}<option value="{{ item.id }}" {% if filters.phong_ban_id|stringformat:'s' == item.id|stringformat:'s' %}selected{% endif %}>{{ item.ten_phong_ban }}</option>{% endfor %}</select></div>
+      <div><label class="text-xs font-bold text-slate-500 uppercase">Chức danh</label><select name="chuc_danh_id" class="select select-sm select-bordered bg-white w-full"><option value="">Tất cả</option>{% for item in chuc_danh_list %}<option value="{{ item.id }}" {% if filters.chuc_danh_id|stringformat:'s' == item.id|stringformat:'s' %}selected{% endif %}>{{ item.ten_chuc_danh }}</option>{% endfor %}</select></div>
+      <div><label class="text-xs font-bold text-slate-500 uppercase">Tháng</label><select name="thang" class="select select-sm select-bordered bg-white w-full">{% for m in thang_range %}<option value="{{ m }}" {% if selected_thang == m %}selected{% endif %}>Tháng {{ m }}</option>{% endfor %}</select></div>
+      <div><label class="text-xs font-bold text-slate-500 uppercase">Năm</label><select name="nam" class="select select-sm select-bordered bg-white w-full">{% for y in nam_range %}<option value="{{ y }}" {% if selected_nam == y %}selected{% endif %}>{{ y }}</option>{% endfor %}</select></div>
+      <div class="md:col-span-4"><label class="text-xs font-bold text-slate-500 uppercase">Chọn nhân viên trong kết quả lọc (hiển thị tối đa 80 người)</label><select name="nhan_vien_id" class="select select-sm select-bordered bg-white w-full"><option value="">-- Chọn nhân viên --</option>{% for nv in nhan_vien_list %}<option value="{{ nv.id }}" {% if selected_nv.id == nv.id %}selected{% endif %}>{{ nv.ma_nhan_vien }} - {{ nv.ho_ten }} · {{ nv.phong_ban|default:'Chưa phòng ban' }} · {{ nv.chuc_danh|default:'Chưa chức danh' }}</option>{% endfor %}</select><p class="text-xs text-slate-400 mt-1">Tìm thấy {{ employee_total|intcomma }} nhân sự phù hợp. Hãy nhập thêm mã/tên nếu danh sách còn nhiều.</p></div>
+      <div class="md:col-span-2 flex items-end gap-2"><button class="btn btn-sm bg-blue-700 text-white border-none flex-1" type="submit"><i class="fas fa-search"></i> Xem báo cáo</button><a class="btn btn-sm btn-ghost" href="{{ urls.ca_nhan }}">Xóa</a></div>
+    </form>
+  </section>
+
+  {% if selected_nv %}
+  <section class="grid grid-cols-2 md:grid-cols-6 gap-3">
+    <div class="bg-white border rounded-xl p-3"><p class="text-xs text-slate-500 font-bold">Tổng giờ</p><p class="text-xl font-black">{{ summary.total_hours|floatformat:1 }}</p></div>
+    <div class="bg-white border rounded-xl p-3"><p class="text-xs text-slate-500 font-bold">Ngày có công</p><p class="text-xl font-black">{{ summary.work_days }}</p></div>
+    <div class="bg-white border rounded-xl p-3"><p class="text-xs text-slate-500 font-bold">Đi muộn</p><p class="text-xl font-black text-red-600">{{ summary.late_minutes }}p</p></div>
+    <div class="bg-white border rounded-xl p-3"><p class="text-xs text-slate-500 font-bold">Về sớm</p><p class="text-xl font-black text-orange-600">{{ summary.early_minutes }}p</p></div>
+    <div class="bg-white border rounded-xl p-3"><p class="text-xs text-slate-500 font-bold">Thiếu checkout</p><p class="text-xl font-black text-red-600">{{ summary.missing_checkout }}</p></div>
+    <div class="bg-white border rounded-xl p-3"><p class="text-xs text-slate-500 font-bold">GPS lỗi</p><p class="text-xl font-black text-orange-600">{{ summary.gps_anomalies }}</p></div>
+  </section>
+  <section class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm">
+    <div class="p-4 border-b bg-slate-50 flex justify-between"><h2 class="font-black">{{ selected_nv.ma_nhan_vien }} - {{ selected_nv.ho_ten }}</h2><span class="text-xs text-slate-500">{{ selected_thang }}/{{ selected_nam }}</span></div>
+    <div class="overflow-x-auto"><table class="table w-full"><thead><tr><th>Ngày</th><th>Ca / Mục tiêu</th><th class="text-center">Giờ vào</th><th class="text-center">Giờ ra</th><th class="text-center">Muộn</th><th class="text-center">Sớm</th><th class="text-center">GPS</th><th class="text-right">Giờ</th></tr></thead><tbody>{% for item in report_data %}<tr><td class="font-bold">{{ item.ngay|date:'d/m/Y' }}</td><td><div class="font-bold">{{ item.ca }}</div><div class="text-xs text-slate-500">{{ item.muc_tieu }}</div></td><td class="text-center font-mono">{{ item.vao|date:'H:i'|default:'-' }}</td><td class="text-center font-mono">{{ item.ra|date:'H:i'|default:'-' }}</td><td class="text-center">{% if item.di_muon %}<span class="badge badge-error text-white">{{ item.di_muon }}p</span>{% else %}-{% endif %}</td><td class="text-center">{% if item.ve_som %}<span class="badge badge-warning text-white">{{ item.ve_som }}p</span>{% else %}-{% endif %}</td><td class="text-center">{% if item.gps_ok %}<span class="badge badge-success text-white">Đạt</span>{% else %}<span class="badge badge-error text-white">Lệch</span>{% endif %}</td><td class="text-right font-black text-blue-700">{{ item.gio_lam|floatformat:1 }}</td></tr>{% empty %}<tr><td colspan="8" class="text-center py-10 text-slate-400">Không có dữ liệu chấm công.</td></tr>{% endfor %}</tbody></table></div>
+  </section>
+  {% else %}<div class="alert alert-info"><i class="fas fa-info-circle"></i><span>Nhập bộ lọc rồi chọn nhân viên để xem báo cáo. Không render toàn bộ 1.000+ nhân sự trong một dropdown.</span></div>{% endif %}
+</div>
+{% endblock %}

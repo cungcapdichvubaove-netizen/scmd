@@ -1,0 +1,70 @@
+{# file: operations/templates/operations/mobile/de_xuat_detail.html #}
+{% extends "mobile/base.html" %}
+{% load static humanize %}
+
+{% block title %}Chi tiết đề xuất{% endblock %}
+
+{% block content %}
+<div class="space-y-4 fade-in">
+    <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'operations:mobile_de_xuat_list' %}" class="btn btn-circle btn-ghost btn-sm">
+                <i class="fas fa-arrow-left text-lg"></i>
+            </a>
+            <div>
+                <h1 class="text-lg font-bold text-slate-800 leading-none">Chi Tiết</h1>
+                <span class="text-[10px] text-slate-400 font-bold uppercase">#{{ de_xuat.id }}</span>
+            </div>
+        </div>
+        <div class="w-10 h-10 bg-slate-50 rounded-lg p-1 border border-slate-100 flex items-center justify-center">
+            <img src="{% static 'img/brand/logo-symbol-blue.png' %}" alt="SCMD Pro" class="w-full h-full object-contain">
+        </div>
+    </div>
+
+    <div class="card bg-white shadow-sm p-5 border border-slate-100">
+        <div class="flex justify-between items-start mb-4">
+            <span class="badge font-bold h-8 px-4
+                {% if de_xuat.trang_thai == 'DA_DUYET' %}badge-success text-white
+                {% elif de_xuat.trang_thai == 'TU_CHOI' %}badge-error text-white
+                {% else %}badge-warning text-white{% endif %}">
+                {{ de_xuat.get_trang_thai_display }}
+            </span>
+            <span class="text-xs text-slate-400 font-mono">{{ de_xuat.ngay_gui|date:"d/m/Y H:i" }}</span>
+        </div>
+        
+        <h2 class="text-xl font-black text-slate-800 mb-2">{{ de_xuat.tieu_de }}</h2>
+        <div class="badge badge-outline mb-4 text-xs font-bold text-slate-500">{{ de_xuat.get_loai_de_xuat_display }}</div>
+        
+        <div class="bg-slate-50 p-4 rounded-xl border border-slate-100">
+            <p class="text-slate-700 leading-relaxed whitespace-pre-line">{{ de_xuat.noi_dung }}</p>
+        </div>
+
+        {% if de_xuat.hinh_anh %}
+            <div class="mt-4">
+                <p class="text-xs font-bold text-slate-400 mb-2 uppercase">Ảnh đính kèm:</p>
+                <img src="{{ de_xuat.hinh_anh.url }}" class="rounded-xl w-full object-cover shadow-sm border border-slate-200">
+            </div>
+        {% endif %}
+    </div>
+
+    {% if de_xuat.y_kien_chi_huy %}
+    <div class="card bg-blue-50 border border-blue-100 p-4 shadow-sm">
+        <div class="flex items-center gap-2 mb-2">
+            <div class="w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 text-xs"><i class="fas fa-user-shield"></i></div>
+            <h3 class="font-bold text-blue-800 text-sm">Ý kiến Chỉ huy</h3>
+        </div>
+        <p class="text-sm text-slate-700 pl-8">{{ de_xuat.y_kien_chi_huy }}</p>
+    </div>
+    {% endif %}
+
+    {% if de_xuat.y_kien_nghiep_vu %}
+    <div class="card bg-purple-50 border border-purple-100 p-4 shadow-sm">
+        <div class="flex items-center gap-2 mb-2">
+            <div class="w-6 h-6 rounded-full bg-purple-200 flex items-center justify-center text-purple-700 text-xs"><i class="fas fa-briefcase"></i></div>
+            <h3 class="font-bold text-purple-800 text-sm">Ý kiến Nghiệp vụ</h3>
+        </div>
+        <p class="text-sm text-slate-700 pl-8">{{ de_xuat.y_kien_nghiep_vu }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

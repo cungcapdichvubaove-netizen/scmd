@@ -1,0 +1,751 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Tổng quan vận hành | SCMD Pro{% endblock %}
+{% block header_title %}Tổng quan vận hành{% endblock %}
+
+{% block extra_css %}
+<style>
+    .exec-density {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .exec-density__header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.9rem 1rem;
+        padding: 1rem 1.1rem;
+    }
+
+    .exec-density__title {
+        margin-top: 0.2rem;
+        color: var(--scmd-text);
+        font-size: clamp(1.35rem, 2vw, 1.8rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+    }
+
+    .exec-density__subtitle {
+        margin-top: 0.45rem;
+        color: var(--scmd-text-soft);
+        font-size: 0.82rem;
+        line-height: 1.45;
+    }
+
+    .exec-density__scope {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.45rem;
+        margin-top: 0.65rem;
+    }
+
+    .exec-density__meta {
+        display: grid;
+        gap: 0.75rem;
+        min-width: 16rem;
+    }
+
+    .exec-density__meta-card {
+        border: 1px solid var(--scmd-border);
+        border-radius: 16px;
+        background: var(--scmd-surface-muted);
+        padding: 0.85rem 0.9rem;
+    }
+
+    .exec-density__meta-label {
+        color: var(--scmd-text-muted);
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .exec-density__meta-value {
+        margin-top: 0.35rem;
+        color: var(--scmd-text);
+        font-size: 1rem;
+        font-weight: 800;
+        line-height: 1.3;
+    }
+
+    .exec-kpi-strip {
+        display: grid;
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 0.75rem;
+    }
+
+    .exec-kpi-card {
+        min-height: 6.2rem;
+        padding: 0.9rem 1rem;
+        border-radius: 18px;
+        border: 1px solid var(--scmd-border);
+        background: var(--scmd-surface);
+        box-shadow: var(--scmd-shadow-sm);
+    }
+
+    .exec-kpi-card--danger {
+        background: color-mix(in srgb, var(--scmd-danger-soft) 56%, white);
+        border-color: color-mix(in srgb, var(--scmd-danger) 24%, var(--scmd-border));
+    }
+
+    .exec-kpi-card--warning {
+        background: color-mix(in srgb, var(--scmd-warning-soft) 62%, white);
+        border-color: color-mix(in srgb, var(--scmd-warning) 24%, var(--scmd-border));
+    }
+
+    .exec-kpi-card--success {
+        background: color-mix(in srgb, var(--scmd-success-soft) 58%, white);
+        border-color: color-mix(in srgb, var(--scmd-success) 22%, var(--scmd-border));
+    }
+
+    .exec-kpi-card--info {
+        background: color-mix(in srgb, var(--scmd-info-soft) 58%, white);
+        border-color: color-mix(in srgb, var(--scmd-info) 22%, var(--scmd-border));
+    }
+
+    .exec-kpi-card__top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .exec-kpi-card__label {
+        color: var(--scmd-text-muted);
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        line-height: 1.25;
+        text-transform: uppercase;
+    }
+
+    .exec-kpi-card__value {
+        color: var(--scmd-text);
+        font-size: clamp(1.7rem, 2.2vw, 2.15rem);
+        font-weight: 900;
+        line-height: 1;
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .exec-kpi-card__subvalue,
+    .exec-kpi-card__trend {
+        margin-top: 0.45rem;
+        font-size: 0.76rem;
+        line-height: 1.35;
+    }
+
+    .exec-kpi-card__subvalue {
+        color: var(--scmd-text-soft);
+        font-weight: 700;
+    }
+
+    .exec-kpi-card__trend {
+        color: var(--scmd-text-muted);
+        font-weight: 700;
+    }
+
+    .exec-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        color: var(--scmd-brand-700);
+        font-size: 0.74rem;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        text-decoration: none;
+    }
+
+    .exec-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .exec-column {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .exec-panel {
+        padding: 1rem 1.05rem;
+    }
+
+    .exec-panel__head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+        margin-bottom: 0.9rem;
+    }
+
+    .exec-panel__label {
+        color: var(--scmd-text-muted);
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .exec-panel__title {
+        margin-top: 0.2rem;
+        color: var(--scmd-text);
+        font-size: 1.02rem;
+        font-weight: 900;
+        line-height: 1.25;
+    }
+
+    .exec-action-list,
+    .exec-risk-list,
+    .exec-finance-stack {
+        display: grid;
+        gap: 0.7rem;
+    }
+
+    .exec-action-item,
+    .exec-risk-item,
+    .exec-finance-item {
+        border: 1px solid var(--scmd-border);
+        border-radius: 16px;
+        background: var(--scmd-surface-muted);
+        padding: 0.85rem 0.9rem;
+    }
+
+    .exec-action-item__top,
+    .exec-risk-item__top,
+    .exec-watch-table td {
+        vertical-align: top;
+    }
+
+    .exec-action-item__top,
+    .exec-risk-item__top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.75rem;
+    }
+
+    .exec-action-item__title,
+    .exec-risk-item__title {
+        color: var(--scmd-text);
+        font-size: 0.92rem;
+        font-weight: 800;
+        line-height: 1.3;
+    }
+
+    .exec-action-item__value,
+    .exec-risk-item__metric {
+        color: var(--scmd-text);
+        font-size: 0.95rem;
+        font-weight: 900;
+        white-space: nowrap;
+    }
+
+    .exec-action-item__detail,
+    .exec-risk-item__detail,
+    .exec-incident-item__detail {
+        margin-top: 0.4rem;
+        color: var(--scmd-text-soft);
+        font-size: 0.78rem;
+        line-height: 1.45;
+    }
+
+    .exec-risk-item__meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.55rem;
+        margin-top: 0.55rem;
+    }
+
+    .exec-progress {
+        margin-top: 0.65rem;
+        height: 0.42rem;
+        overflow: hidden;
+        border-radius: 999px;
+        background: var(--scmd-neutral-200);
+    }
+
+    .exec-progress > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--scmd-brand-500);
+    }
+
+    .exec-progress--danger > span {
+        background: var(--scmd-danger);
+    }
+
+    .exec-progress--warning > span {
+        background: var(--scmd-warning);
+    }
+
+    .exec-progress--success > span {
+        background: var(--scmd-success);
+    }
+
+    .exec-progress--info > span {
+        background: var(--scmd-info);
+    }
+
+    .exec-watch-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .exec-watch-table th,
+    .exec-watch-table td {
+        padding: 0.72rem 0.2rem;
+        border-bottom: 1px solid var(--scmd-border);
+        text-align: left;
+    }
+
+    .exec-watch-table th {
+        color: var(--scmd-text-muted);
+        font-size: 0.68rem;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .exec-watch-table td {
+        color: var(--scmd-text);
+        font-size: 0.8rem;
+        line-height: 1.35;
+    }
+
+    .exec-watch-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .exec-incident-list {
+        display: grid;
+        gap: 0.65rem;
+    }
+
+    .exec-incident-item {
+        border: 1px solid var(--scmd-border);
+        border-radius: 16px;
+        background: var(--scmd-surface-muted);
+        padding: 0.8rem 0.9rem;
+    }
+
+    .exec-incident-item__top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.65rem;
+    }
+
+    .exec-incident-item__title {
+        color: var(--scmd-text);
+        font-size: 0.85rem;
+        font-weight: 800;
+        line-height: 1.3;
+    }
+
+    .exec-incident-item__time {
+        color: var(--scmd-text-muted);
+        font-size: 0.72rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .exec-finance-item__value {
+        margin-top: 0.35rem;
+        color: var(--scmd-text);
+        font-size: 1.12rem;
+        font-weight: 900;
+        line-height: 1.2;
+    }
+
+    .exec-empty {
+        border: 1px dashed var(--scmd-border);
+        border-radius: 16px;
+        background: var(--scmd-surface-muted);
+        padding: 0.9rem;
+        color: var(--scmd-text-soft);
+        font-size: 0.8rem;
+        line-height: 1.45;
+    }
+
+    .exec-chart-wrap {
+        position: relative;
+        height: 16rem;
+        margin-top: 0.75rem;
+    }
+
+    @media (min-width: 640px) {
+        .exec-kpi-strip {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .exec-kpi-strip {
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .exec-grid {
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="exec-density">
+    <section class="scmd-surface-card exec-density__header">
+        <div>
+            <p class="exec-panel__label">Dashboard điều hành</p>
+            <h1 class="exec-density__title">Tổng quan vận hành</h1>
+            <p class="exec-density__subtitle">{{ tinh_trang_van_hanh_detail }}</p>
+            <div class="exec-density__scope">
+                <span class="scmd-tone scmd-tone--neutral">{{ dashboard_timeframe_label }}</span>
+                <span class="scmd-tone scmd-tone--neutral">{{ dashboard_scope_label }}</span>
+            </div>
+        </div>
+        <div class="exec-density__meta">
+            <div class="exec-density__meta-card">
+                <p class="exec-density__meta-label">Trạng thái điều hành</p>
+                <div class="exec-density__meta-value">
+                    <span class="scmd-tone {% if tinh_trang_van_hanh_tone == 'success' %}scmd-tone--success{% elif tinh_trang_van_hanh_tone == 'warning' %}scmd-tone--warning{% elif tinh_trang_van_hanh_tone == 'danger' %}scmd-tone--danger{% elif tinh_trang_van_hanh_tone == 'info' %}scmd-tone--info{% else %}scmd-tone--neutral{% endif %}">{{ status_pill_label }}</span>
+                </div>
+            </div>
+            <div class="exec-density__meta-card">
+                <p class="exec-density__meta-label">Độ phủ ca hôm nay</p>
+                <div class="exec-density__meta-value">{{ coverage_rate_display }}</div>
+                <p class="exec-density__subtitle">{{ da_checkin }} / {{ total_shifts_today }} ca đã check-in</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="exec-kpi-strip" aria-label="KPI tổng quan vận hành">
+        {% for item in executive_kpis %}
+        <div class="exec-kpi-card exec-kpi-card--{{ item.tone|default:'neutral' }}">
+            <div class="exec-kpi-card__top">
+                <div class="exec-kpi-card__label">{{ item.label }}</div>
+                <div class="exec-kpi-card__value">{{ item.value }}</div>
+            </div>
+            <div class="exec-kpi-card__subvalue">{{ item.subvalue }}</div>
+            <div class="exec-kpi-card__top">
+                <div class="exec-kpi-card__trend">{{ item.trend }}</div>
+                {% if item.url %}
+                <a href="{{ item.url }}" class="exec-cta">{{ item.cta }}</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </section>
+
+    <section class="exec-grid">
+        <div class="exec-column">
+            <div class="scmd-surface-card exec-panel">
+                <div class="exec-panel__head">
+                    <div>
+                        <p class="exec-panel__label">Ưu tiên trong ngày</p>
+                        <h2 class="exec-panel__title">Việc cần xử lý ngay</h2>
+                    </div>
+                </div>
+                <div class="exec-action-list">
+                    {% for item in immediate_actions %}
+                    <div class="exec-action-item">
+                        <div class="exec-action-item__top">
+                            <div>
+                                <div class="exec-action-item__title">{{ item.title }}</div>
+                                <div class="exec-action-item__detail">{{ item.detail }}</div>
+                            </div>
+                            <div class="exec-action-item__value">{{ item.value }}</div>
+                        </div>
+                        {% if item.url %}
+                        <div class="exec-risk-item__meta">
+                            <a href="{{ item.url }}" class="exec-cta">{{ item.cta }}</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="scmd-surface-card exec-panel">
+                <div class="exec-panel__head">
+                    <div>
+                        <p class="exec-panel__label">Rủi ro điều hành</p>
+                        <h2 class="exec-panel__title">Top rủi ro cần xử lý</h2>
+                    </div>
+                    <span class="scmd-tone {% if top_rui_ro %}scmd-tone--warning{% else %}scmd-tone--success{% endif %}">{{ top_rui_ro|length }} mục</span>
+                </div>
+                <div class="exec-risk-list">
+                    {% for risk in top_rui_ro %}
+                    <div class="exec-risk-item">
+                        <div class="exec-risk-item__top">
+                            <div>
+                                <div class="exec-risk-item__title">{{ risk.title }}</div>
+                                <div class="exec-risk-item__detail">{{ risk.detail }}</div>
+                            </div>
+                            <div class="exec-risk-item__metric">{{ risk.metric }}</div>
+                        </div>
+                        <div class="exec-risk-item__meta">
+                            <span class="scmd-tone {% if risk.tone == 'danger' %}scmd-tone--danger{% elif risk.tone == 'warning' %}scmd-tone--warning{% elif risk.tone == 'info' %}scmd-tone--info{% elif risk.tone == 'success' %}scmd-tone--success{% else %}scmd-tone--neutral{% endif %}">{{ risk.trend.text }}</span>
+                            <span class="exec-kpi-card__trend">{{ risk.progress_label }}</span>
+                            {% if risk.action_url %}
+                            <a href="{{ risk.action_url }}" class="exec-cta">{{ risk.action_label }}</a>
+                            {% endif %}
+                        </div>
+                        <div class="exec-progress exec-progress--{{ risk.tone|default:'neutral' }}">
+                            <span style="width: {{ risk.progress_pct|default:0 }}%;"></span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="exec-empty">Không có rủi ro nổi bật trong phạm vi tổng quan hiện tại.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            {% if has_trend_section %}
+            <div class="scmd-surface-card exec-panel">
+                <div class="exec-panel__head">
+                    <div>
+                        <p class="exec-panel__label">Xu hướng 7 ngày</p>
+                        <h2 class="exec-panel__title">Biến động sự cố và doanh thu dự kiến</h2>
+                    </div>
+                </div>
+                <div class="exec-grid" style="grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 0.85rem;">
+                    {% if has_incident_chart_data %}
+                    <div class="exec-action-item">
+                        <div class="exec-action-item__top">
+                            <div>
+                                <div class="exec-action-item__title">Sự cố phát sinh</div>
+                                <div class="exec-action-item__detail">{{ trend_su_co.text }}</div>
+                            </div>
+                            {% if executive_cta_urls.incidents %}<a href="{{ executive_cta_urls.incidents }}" class="exec-cta">Mở sự cố</a>{% endif %}
+                        </div>
+                        <div class="exec-chart-wrap"><canvas id="incidentChart"></canvas></div>
+                    </div>
+                    {% endif %}
+                    {% if has_revenue_chart_data %}
+                    <div class="exec-action-item">
+                        <div class="exec-action-item__top">
+                            <div>
+                                <div class="exec-action-item__title">Doanh thu dự kiến</div>
+                                <div class="exec-action-item__detail">{{ trend_doanh_thu_7_ngay.text }}</div>
+                            </div>
+                            {% if executive_cta_urls.accounting %}<a href="{{ executive_cta_urls.accounting }}" class="exec-cta">Mở kế toán</a>{% endif %}
+                        </div>
+                        <div class="exec-chart-wrap"><canvas id="revenueChart"></canvas></div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="exec-column">
+            <div class="scmd-surface-card exec-panel">
+                <div class="exec-panel__head">
+                    <div>
+                        <p class="exec-panel__label">Mục tiêu theo dõi</p>
+                        <h2 class="exec-panel__title">Top mục tiêu cần theo dõi</h2>
+                    </div>
+                    {% if executive_cta_urls.operations %}<a href="{{ executive_cta_urls.operations }}" class="exec-cta">Mở vận hành</a>{% endif %}
+                </div>
+                {% if top_risk_targets %}
+                <table class="exec-watch-table" aria-label="Top mục tiêu cần theo dõi">
+                    <thead>
+                        <tr>
+                            <th>Mục tiêu</th>
+                            <th>Sự cố mở</th>
+                            <th>Ca thiếu</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for muc_tieu in top_risk_targets %}
+                        <tr>
+                            <td>
+                                <div class="exec-action-item__title">{{ muc_tieu.ten_muc_tieu }}</div>
+                                <div class="exec-action-item__detail">{{ muc_tieu.dashboard_status_detail }}</div>
+                            </td>
+                            <td>{{ muc_tieu.su_co_mo }}</td>
+                            <td>{{ muc_tieu.ca_thieu }}</td>
+                            <td>
+                                {% if muc_tieu.detail_url %}
+                                <a href="{{ muc_tieu.detail_url }}" class="exec-cta">Chi tiết</a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="exec-empty">Chưa có mục tiêu phát sinh rủi ro hoặc thiếu dữ liệu trong ngày.</div>
+                {% endif %}
+            </div>
+
+            <div class="scmd-surface-card exec-panel">
+                <div class="exec-panel__head">
+                    <div>
+                        <p class="exec-panel__label">Sự cố đang mở</p>
+                        <h2 class="exec-panel__title">Sự cố mới nhất</h2>
+                    </div>
+                    {% if executive_cta_urls.incidents %}<a href="{{ executive_cta_urls.incidents }}" class="exec-cta">Danh sách</a>{% endif %}
+                </div>
+                <div class="exec-incident-list">
+                    {% for sc in recent_open_incidents %}
+                    <div class="exec-incident-item">
+                        <div class="exec-incident-item__top">
+                            <div>
+                                <div class="exec-incident-item__title">{{ sc.tieu_de }}</div>
+                                <div class="exec-incident-item__detail">{{ sc.muc_tieu.ten_muc_tieu|default:"Mục tiêu chưa xác định" }}</div>
+                            </div>
+                            <div class="exec-incident-item__time">{{ sc.created_at|timesince }} trước</div>
+                        </div>
+                        <div class="exec-risk-item__meta">
+                            <span class="scmd-tone {% if sc.muc_do == 'CAO' or sc.muc_do == 'NGUY_HIEM' %}scmd-tone--danger{% elif sc.muc_do == 'TB' %}scmd-tone--warning{% else %}scmd-tone--info{% endif %}">{{ sc.get_muc_do_display }}</span>
+                            <span class="scmd-tone scmd-tone--neutral">{{ sc.get_trang_thai_display }}</span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="exec-empty">Không có sự cố mở trong phạm vi tổng quan hiện tại.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="scmd-surface-card exec-panel">
+                <div class="exec-panel__head">
+                    <div>
+                        <p class="exec-panel__label">Tài chính và kho</p>
+                        <h2 class="exec-panel__title">Đối soát nhanh</h2>
+                    </div>
+                </div>
+                <div class="exec-finance-stack">
+                    <div class="exec-finance-item">
+                        <div class="exec-panel__label">Doanh thu dự kiến tháng này</div>
+                        <div class="exec-finance-item__value">{{ projected_revenue_display }}</div>
+                        {% if executive_cta_urls.accounting %}<div class="exec-risk-item__meta"><a href="{{ executive_cta_urls.accounting }}" class="exec-cta">Mở kế toán</a></div>{% endif %}
+                    </div>
+                    <div class="exec-finance-item">
+                        <div class="exec-panel__label">Lợi nhuận thực thu</div>
+                        <div class="exec-finance-item__value">{{ realized_profit_display }}</div>
+                        <div class="exec-action-item__detail">Kết quả thu chi trong tháng hiện tại.</div>
+                    </div>
+                    <div class="exec-finance-item">
+                        <div class="exec-panel__label">Cảnh báo kho</div>
+                        <div class="exec-finance-item__value">{{ inventory_alerts }}</div>
+                        {% if executive_cta_urls.inventory %}<div class="exec-risk-item__meta"><a href="{{ executive_cta_urls.inventory }}" class="exec-cta">Mở kho</a></div>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const labels = {{ chart_labels|safe|default:"[]" }};
+        const incidentData = {{ data_su_co|safe|default:"[]" }};
+        const revenueData = {{ data_doanh_thu|safe|default:"[]" }};
+
+        function buildChart(canvasId, config) {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) {
+                return;
+            }
+            try {
+                new Chart(canvas.getContext("2d"), config);
+            } catch (error) {
+                console.error("Lỗi khởi tạo biểu đồ SCMD Pro:", error);
+            }
+        }
+
+        buildChart("incidentChart", {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Sự cố",
+                    data: incidentData,
+                    backgroundColor: "rgba(220, 38, 38, 0.86)",
+                    borderRadius: 8,
+                    borderSkipped: false,
+                    barPercentage: 0.58
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, color: "#64748b", font: { size: 10, weight: "600" } },
+                        grid: { color: "#e7eef5", drawBorder: false }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: "#64748b", font: { size: 10, weight: "600" } }
+                    }
+                }
+            }
+        });
+
+        buildChart("revenueChart", {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Doanh thu",
+                    data: revenueData,
+                    borderColor: "#2563eb",
+                    backgroundColor: "rgba(37, 99, 235, 0.10)",
+                    borderWidth: 3,
+                    tension: 0.34,
+                    pointRadius: 3.5,
+                    pointBackgroundColor: "#ffffff",
+                    pointBorderColor: "#2563eb",
+                    pointBorderWidth: 2,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                return context.raw.toLocaleString("vi-VN") + " đ";
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: "#64748b",
+                            font: { size: 10, weight: "600" },
+                            callback: function (value) {
+                                return value.toLocaleString("vi-VN") + " đ";
+                            }
+                        },
+                        grid: { color: "#e7eef5", drawBorder: false }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: "#64748b", font: { size: 10, weight: "600" } }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}

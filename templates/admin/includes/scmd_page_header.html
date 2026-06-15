@@ -1,0 +1,18 @@
+{% if page_header %}
+<section class="scmd-ops-page-header" aria-labelledby="scmd-ops-page-title">
+  <div class="scmd-ops-page-header__copy">
+    {% if page_header.kicker %}<p class="scmd-ops-kicker">{{ page_header.kicker }}</p>{% endif %}
+    <h2 id="scmd-ops-page-title">{{ page_header.title }}</h2>
+    {% if page_header.subtitle %}<p>{{ page_header.subtitle }}</p>{% endif %}
+  </div>
+  {% if page_header.actions %}
+  <div class="scmd-ops-page-header__actions" aria-label="Tác vụ chính">
+    {% for action in page_header.actions %}
+      <a class="scmd-ops-button {% if action.primary %}scmd-ops-button--primary{% endif %}" href="{{ action.url }}">
+        {% if action.icon %}<i class="{{ action.icon }}" aria-hidden="true"></i>{% endif %}<span>{{ action.label }}</span>
+      </a>
+    {% endfor %}
+  </div>
+  {% endif %}
+</section>
+{% endif %}

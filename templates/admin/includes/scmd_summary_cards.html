@@ -1,0 +1,12 @@
+{% if summary_cards %}
+<section class="scmd-ops-summary {% if compact %}scmd-ops-summary--compact{% endif %} {% if strip %}scmd-ops-summary--strip{% endif %}" aria-label="Tổng quan nhanh">
+  {% for card in summary_cards %}
+  <article class="scmd-ops-card scmd-ops-card--{{ card.tone|default:'neutral' }}">
+    <span class="scmd-ops-card__label">{{ card.label }}</span>
+    <strong class="scmd-ops-card__value">{{ card.value|default:0 }}</strong>
+    {% if card.note %}<em class="scmd-ops-card__note">{{ card.note }}</em>{% endif %}
+    {% if card.url and card.url != '#' %}<a class="scmd-ops-card__link" href="{{ card.url }}">Mở</a>{% endif %}
+  </article>
+  {% endfor %}
+</section>
+{% endif %}

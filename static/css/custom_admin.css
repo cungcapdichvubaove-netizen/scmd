@@ -1,0 +1,4 @@
+/* SCMD Pro admin CSS compatibility shim.
+ * Active admin system lives in static/common/css/custom_admin.css.
+ */
+@import url('../common/css/custom_admin.css');

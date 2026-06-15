@@ -1,0 +1,38 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+
+{% block content %}
+<div class="scmd-user-console">
+    <section class="scmd-user-head">
+        <div>
+            <div class="scmd-user-kicker">Quản trị hệ thống</div>
+            <h1 class="scmd-user-title">Quản trị người dùng</h1>
+            <p class="scmd-user-subtitle">
+                Quản lý tài khoản đăng nhập, nhóm quyền, liên kết hồ sơ nhân sự và quyền truy cập `/admin/`. Ưu tiên tìm nhanh, lọc rõ và thao tác an toàn.
+            </p>
+        </div>
+        <div class="scmd-user-actions">
+            <a class="scmd-user-btn primary" href="{{ scmd_user_links.add_user }}"><i class="fas fa-user-plus"></i> Thêm người dùng</a>
+            <a class="scmd-user-btn" href="{{ scmd_user_links.groups }}"><i class="fas fa-users-cog"></i> Nhóm quyền</a>
+            <a class="scmd-user-btn" href="{{ scmd_user_links.employees }}"><i class="fas fa-id-card"></i> Hồ sơ nhân sự</a>
+        </div>
+    </section>
+
+    <section class="scmd-user-metrics" aria-label="Tổng quan tài khoản">
+        <div class="scmd-user-metric"><strong>{{ scmd_user_stats.total }}</strong><span>Tổng tài khoản</span></div>
+        <div class="scmd-user-metric"><strong>{{ scmd_user_stats.active }}</strong><span>Đang hoạt động</span></div>
+        <div class="scmd-user-metric"><strong>{{ scmd_user_stats.inactive }}</strong><span>Đã khóa</span></div>
+        <div class="scmd-user-metric"><strong>{{ scmd_user_stats.staff }}</strong><span>Có quyền nhân viên kỹ thuật</span></div>
+        <div class="scmd-user-metric"><strong>{{ scmd_user_stats.superuser }}</strong><span>Quản trị tối cao</span></div>
+        <div class="scmd-user-metric"><strong>{{ scmd_user_stats.missing_employee }}</strong><span>Chưa gắn hồ sơ</span></div>
+    </section>
+
+    <div class="scmd-user-hint">
+        <span><b>Tìm kiếm:</b> tên đăng nhập, email, mã NV, họ tên, số điện thoại.</span>
+        <span><b>Lọc nhanh:</b> trạng thái, nhân viên kỹ thuật, quản trị tối cao, phòng ban, nhóm quyền, liên kết hồ sơ.</span>
+        <span><b>Nút thao tác:</b> thêm người dùng, nhóm quyền và hồ sơ nhân sự đều trỏ đường dẫn admin thật.</span>
+    </div>
+</div>
+{{ block.super }}
+{% endblock %}

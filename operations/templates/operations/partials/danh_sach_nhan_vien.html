@@ -1,0 +1,5 @@
+{% for nv in nhan_vien_list %}
+    <p>{{ nv.ho_ten }} ({{ nv.ma_nhan_vien }})</p>
+{% empty %}
+    <p>Không tìm thấy nhân viên nào.</p>
+{% endfor %}

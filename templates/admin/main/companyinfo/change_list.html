@@ -1,0 +1,62 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div class="scmd-company-page scmd-compact-list-page" aria-label="Thông tin công ty">
+  <section class="scmd-company-header" aria-label="Tổng quan thông tin công ty">
+    <div class="scmd-company-header__main">
+      <div class="scmd-admin-eyebrow">Cấu hình chung</div>
+      <h1>Thông tin công ty</h1>
+      <p>Hồ sơ pháp lý dùng thống nhất cho bảng lương, hồ sơ nhân viên, phiếu kho, hợp đồng và các mẫu in/xuất dữ liệu.</p>
+    </div>
+    {% if scmd_company_primary_url %}
+    <div class="scmd-company-header__actions">
+      <a class="scmd-btn scmd-btn-primary" href="{{ scmd_company_primary_url }}">{{ scmd_company_primary_label }}</a>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="scmd-company-strip" aria-label="Tình trạng cấu hình thông tin công ty">
+    <div class="scmd-company-kpi">
+      <span>Mức hoàn thiện</span>
+      <strong>{{ scmd_company_completion|default:0 }}%</strong>
+      <small>{% if scmd_company_missing_count %}Còn {{ scmd_company_missing_count }} mục cần bổ sung{% else %}Đã đủ thông tin cốt lõi{% endif %}</small>
+    </div>
+    <div class="scmd-company-kpi">
+      <span>Mã số thuế</span>
+      <strong>{% if scmd_company_profile.ma_so_thue %}Đã có{% else %}Thiếu{% endif %}</strong>
+      <small>{{ scmd_company_profile.ma_so_thue|default:"Cần bổ sung trước khi in mẫu biểu" }}</small>
+    </div>
+    <div class="scmd-company-kpi">
+      <span>Liên hệ</span>
+      <strong>{% if scmd_company_profile.contact_phone %}Đã có{% else %}Thiếu{% endif %}</strong>
+      <small>{{ scmd_company_profile.contact_phone|default:"Chưa cấu hình số điện thoại" }}</small>
+    </div>
+    <div class="scmd-company-kpi">
+      <span>Email giao dịch</span>
+      <strong>{% if scmd_company_profile.email %}Đã có{% else %}Thiếu{% endif %}</strong>
+      <small>{{ scmd_company_profile.email|default:"Chưa cấu hình email" }}</small>
+    </div>
+  </section>
+
+  {% if scmd_company_missing_count %}
+  <details class="scmd-company-notice">
+    <summary>Thông tin cần bổ sung trước khi dùng trên mẫu biểu</summary>
+    <div>
+      {% for field_name in scmd_company_missing_fields %}
+        <span>{{ field_name }}</span>
+      {% endfor %}
+      {% if scmd_company_missing_extra_count %}
+        <span>+{{ scmd_company_missing_extra_count }} mục khác</span>
+      {% endif %}
+    </div>
+  </details>
+  {% endif %}
+
+  <section class="scmd-company-list" aria-label="Bảng thông tin công ty">
+    {{ block.super }}
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/admin_operations_compact.css' %}">
+{% endblock %}
+
+{% block object-tools %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-header" aria-label="Tổng quan sự cố">
+    <div>
+      <div class="scmd-op-kicker">Sự cố / Rủi ro</div>
+      <h1 class="scmd-op-title">Danh sách sự cố</h1>
+      <p class="scmd-op-subtitle">Trạng thái xử lý, bằng chứng, người thụ lý và khoản đền bù/khấu trừ.</p>
+    </div>
+    <div class="scmd-op-actions">
+      <a href="{{ scmd_incident_links.add }}" class="scmd-op-btn primary"><i class="fas fa-plus-circle" aria-hidden="true"></i> Thêm sự cố</a>
+      <a href="{{ scmd_incident_links.reports }}" class="scmd-op-btn"><i class="fas fa-file-lines" aria-hidden="true"></i> Báo cáo</a>
+      <a href="{{ scmd_incident_links.assignments }}" class="scmd-op-btn"><i class="fas fa-user-shield" aria-hidden="true"></i> Ca trực</a>
+      <a href="{{ scmd_incident_links.attendance }}" class="scmd-op-btn"><i class="fas fa-clock" aria-hidden="true"></i> Chấm công</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block result_list %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-metrics" aria-label="Chỉ số sự cố">
+    <div class="scmd-op-metric"><span>Tổng hồ sơ</span><strong>{{ scmd_incident_stats.total }}</strong></div>
+    <div class="scmd-op-metric warning"><span>Đang mở</span><strong>{{ scmd_incident_stats.open }}</strong></div>
+    <div class="scmd-op-metric danger"><span>Cao/nguy hiểm</span><strong>{{ scmd_incident_stats.high_risk }}</strong></div>
+    <div class="scmd-op-metric warning"><span>Thiếu thụ lý</span><strong>{{ scmd_incident_stats.missing_handler }}</strong></div>
+  </section>
+  {% if scmd_incident_stats.open or scmd_incident_stats.high_risk or scmd_incident_stats.missing_handler or scmd_incident_stats.missing_evidence %}
+  <details class="scmd-op-note">
+    <summary>Việc cần rà soát: {{ scmd_incident_stats.open }} đang mở · {{ scmd_incident_stats.missing_handler }} thiếu người thụ lý · {{ scmd_incident_stats.missing_evidence }} thiếu bằng chứng</summary>
+    <p>Sự cố liên quan đền bù/khấu trừ cần đủ bằng chứng và người xử lý trước khi đối soát.</p>
+  </details>
+  {% endif %}
+</div>
+{{ block.super }}
+{% endblock %}

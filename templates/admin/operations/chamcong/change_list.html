@@ -1,0 +1,45 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/admin_operations_compact.css' %}">
+{% endblock %}
+
+{% block object-tools %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-header" aria-label="Tổng quan chấm công">
+    <div>
+      <div class="scmd-op-kicker">Vận hành / Chấm công</div>
+      <h1 class="scmd-op-title">Danh sách chấm công</h1>
+      <p class="scmd-op-subtitle">Đối soát check-in, check-out, GPS, ảnh xác thực và giờ công trước khi tính lương.</p>
+    </div>
+    <div class="scmd-op-actions">
+      <a href="{{ scmd_attendance_links.add }}" class="scmd-op-btn primary"><i class="fas fa-plus-circle" aria-hidden="true"></i> Thêm chấm công</a>
+      <a href="{{ scmd_attendance_links.assignments }}" class="scmd-op-btn"><i class="fas fa-user-shield" aria-hidden="true"></i> Phân công</a>
+      <a href="{{ scmd_attendance_links.adjustments }}" class="scmd-op-btn"><i class="fas fa-history" aria-hidden="true"></i> Điều chỉnh</a>
+      <a href="{{ scmd_attendance_links.reports }}" class="scmd-op-btn"><i class="fas fa-chart-column" aria-hidden="true"></i> Báo cáo</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block result_list %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-metrics" aria-label="Chỉ số chấm công">
+    <div class="scmd-op-metric"><span>Tổng bản ghi</span><strong>{{ scmd_attendance_stats.total }}</strong></div>
+    <div class="scmd-op-metric info"><span>Hôm nay</span><strong>{{ scmd_attendance_stats.today }}</strong></div>
+    <div class="scmd-op-metric warning"><span>Thiếu check-out</span><strong>{{ scmd_attendance_stats.missing_checkout }}</strong></div>
+    <div class="scmd-op-metric danger"><span>Sai GPS</span><strong>{{ scmd_attendance_stats.invalid_gps }}</strong></div>
+  </section>
+  {% if scmd_attendance_stats.invalid_gps or scmd_attendance_stats.missing_checkout or scmd_attendance_stats.no_photo %}
+  <details class="scmd-op-note">
+    <summary>Việc cần rà soát: {{ scmd_attendance_stats.missing_checkout }} thiếu check-out · {{ scmd_attendance_stats.invalid_gps }} sai GPS · {{ scmd_attendance_stats.no_photo }} thiếu ảnh</summary>
+    <p>Bản ghi thuộc kỳ lương đã khóa không sửa trực tiếp; dùng nhật ký điều chỉnh để kiểm toán thay đổi.</p>
+  </details>
+  {% endif %}
+</div>
+{{ block.super }}
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "admin/change_list.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{# Trang này có header nghiệp vụ riêng; ẩn tiêu đề mặc định của Django Admin để tránh lặp tên model. #}
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="scmd-contract-console">
+  <section class="scmd-contract-head">
+    <div>
+      <div class="scmd-contract-kicker">CRM / Hợp đồng dịch vụ</div>
+      <h1 class="scmd-contract-title">Quản trị hợp đồng</h1>
+      <p class="scmd-contract-subtitle">Theo dõi hợp đồng đã ký, thời hạn hiệu lực, file hồ sơ và mục tiêu triển khai. Đây là cầu nối từ kinh doanh sang vận hành, ca trực, kho và đối soát lương.</p>
+    </div>
+    <div class="scmd-contract-actions">
+      <a class="scmd-contract-btn primary" href="{{ scmd_contract_links.add_contract }}"><i class="fas fa-plus-circle"></i> Thêm hợp đồng</a>
+      <a class="scmd-contract-btn" href="{{ scmd_contract_links.opportunity_list }}"><i class="fas fa-stream"></i> Cơ hội</a>
+      <a class="scmd-contract-btn" href="{{ scmd_contract_links.lead_list }}"><i class="fas fa-address-book"></i> Khách hàng</a>
+      <a class="scmd-contract-btn" href="{{ scmd_contract_links.target_list }}"><i class="fas fa-map-marker-alt"></i> Mục tiêu</a>
+      <a class="scmd-contract-btn" href="{{ scmd_contract_links.crm_dashboard }}"><i class="fas fa-chart-line"></i> CRM dashboard</a>
+    </div>
+  </section>
+
+  <section class="scmd-contract-metrics" aria-label="Chỉ số hợp đồng">
+    <div class="scmd-contract-metric"><strong>{{ scmd_contract_stats.total }}</strong><span>Tổng hợp đồng</span></div>
+    <div class="scmd-contract-metric"><strong>{{ scmd_contract_stats.active }}</strong><span>Đang hiệu lực</span></div>
+    <div class="scmd-contract-metric"><strong>{{ scmd_contract_stats.expiring_30 }}</strong><span>Sắp hết hạn 30 ngày</span></div>
+    <div class="scmd-contract-metric"><strong>{{ scmd_contract_stats.expired_by_date }}</strong><span>Quá hạn theo ngày</span></div>
+    <div class="scmd-contract-metric"><strong>{{ scmd_contract_stats.no_targets }}</strong><span>Chưa có mục tiêu</span></div>
+    <div class="scmd-contract-metric"><strong>{{ scmd_contract_stats.monthly_value|floatformat:0|intcomma }}</strong><span>Doanh thu tháng hiệu lực</span></div>
+  </section>
+  <p class="scmd-contract-hint">Bộ lọc “Chất lượng hợp đồng” giúp rà soát nhanh hồ sơ thiếu file, thiếu khách hàng, chưa tạo mục tiêu hoặc cần gia hạn.</p>
+</div>
+{{ block.super }}
+{% endblock %}

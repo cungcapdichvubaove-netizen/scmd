@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Biên bản sự cố</title>
+    <style>
+        @page { size: A4; margin: 2cm; }
+        body {
+            font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #111827;
+        }
+        .report-logo { max-height: 52px; max-width: 190px; object-fit: contain; margin-bottom: 8px; }
+        .watermark { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: -1; }
+        .watermark img { width: 72%; opacity: 0.055; transform: rotate(-35deg); }
+        .header strong { font-size: 15px; }
+        .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+        .title { text-align: center; font-size: 18px; font-weight: bold; margin: 20px 0; text-transform: uppercase; }
+        .section { margin-bottom: 15px; }
+        .label { font-weight: bold; width: 150px; display: inline-block; }
+        .images { margin-top: 20px; text-align: center; }
+        .images img { max-width: 45%; margin: 5px; border: 1px solid #ddd; }
+        .footer { margin-top: 50px; display: flex; justify-content: space-between; }
+        .sign-box { width: 45%; text-align: center; float: left; }
+    </style>
+</head>
+<body>
+    <div class="watermark"><img src="{% static 'img/brand/report-watermark-symbol.png' %}" alt="" aria-hidden="true"></div>
+    <div class="header">
+        {% if company_info.logo_path %}
+            <img src="{{ company_info.logo_path }}" class="report-logo" alt="{{ company_info.name }}"><br>
+        {% elif company_info.logo_url %}
+            <img src="{{ company_info.logo_url }}" class="report-logo" alt="{{ company_info.name }}"><br>
+        {% else %}
+            <img src="{% static 'img/brand/report-header-logo.png' %}" class="report-logo" alt="SCMD Pro"><br>
+        {% endif %}
+        <strong>{{ company_info.name }}</strong><br>
+        Địa chỉ: {{ company_info.address }}<br>
+        Hotline: {{ company_info.hotline }}
+    </div>
+
+    <div class="title">BIÊN BẢN BÁO CÁO SỰ CỐ AN NINH</div>
+
+    <div class="section">
+        <span class="label">Mã sự cố:</span> {{ incident.ma_su_co }}<br>
+        <span class="label">Thời gian:</span> {{ incident.thoi_gian_phat_hien|date:"H:i d/m/Y" }}<br>
+        <span class="label">Mục tiêu:</span> {{ incident.muc_tieu.ten_muc_tieu }}<br>
+        <span class="label">Người báo cáo:</span> {{ incident.nhan_vien_bao_cao.ho_ten }}
+    </div>
+
+    <div class="section">
+        <span class="label">Tiêu đề:</span> <strong>{{ incident.tieu_de }}</strong><br>
+        <span class="label">Mức độ:</span> {{ incident.get_muc_do_display }}
+    </div>
+
+    <div class="section">
+        <strong>NỘI DUNG CHI TIẾT:</strong><br>
+        <p style="text-align: justify;">{{ incident.mo_ta_chi_tiet|linebreaksbr }}</p>
+    </div>
+
+    <div class="section">
+        <span class="label">Thiệt hại ước tính:</span> {{ incident.tong_thiet_hai }} VNĐ<br>
+        <span class="label">Trạng thái:</span> {{ incident.get_trang_thai_display }}
+    </div>
+
+    <div class="images">
+        {% if incident.hinh_anh_1 %}
+            <img src="{{ incident.hinh_anh_1.path }}"> 
+        {% endif %}
+        {% if incident.hinh_anh_2 %}
+            <img src="{{ incident.hinh_anh_2.path }}">
+        {% endif %}
+    </div>
+
+    <div class="footer">
+        <div class="sign-box">
+            <strong>Người báo cáo</strong><br>
+            <i>(Ký, ghi rõ họ tên)</i>
+            <br><br><br><br>
+            {{ incident.nhan_vien_bao_cao.ho_ten }}
+        </div>
+        <div class="sign-box">
+            <strong>Chỉ huy Mục tiêu</strong><br>
+            <i>(Xác nhận)</i>
+        </div>
+    </div>
+</body>
+</html>

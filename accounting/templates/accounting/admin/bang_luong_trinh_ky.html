@@ -1,0 +1,115 @@
+{% load static humanize %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Hồ sơ Lương {{ bl.thang }}/{{ bl.nam }}</title>
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+    <link rel="stylesheet" href="{% static 'common/css/custom_admin.css' %}">
+    <link rel="stylesheet" href="{% static 'common/css/payroll_report.css' %}">
+
+</head>
+<body>
+
+    <div class="scmd-payroll-toolbar no-print">
+        <button onclick="window.print()" class="scmd-payroll-btn scmd-payroll-btn--primary">In Báo Cáo</button>
+        <button onclick="window.close()" class="scmd-payroll-btn scmd-payroll-btn--secondary">Đóng</button>
+    </div>
+
+    <div class="sheet">
+        <div class="report-header scmd-payroll-report-header">
+            <div>
+                {% if COMPANY.logo %}<img src="{{ COMPANY.logo.url }}" class="brand-logo--report" alt="{{ COMPANY.display_name }}">{% else %}<img src="{% static 'img/brand/report-header-logo.png' %}" class="brand-logo--report" alt="SCMD Pro">{% endif %}
+                <div class="company-name">{{ COMPANY.display_name|default:"CÔNG TY DỊCH VỤ BẢO VỆ SCMD" }}</div>
+                <div class="report-title">HỒ SƠ THẨM ĐỊNH LƯƠNG</div>
+                <div class="scmd-payroll-muted">Kỳ lương: Tháng {{ bl.thang }}/{{ bl.nam }}</div>
+            </div>
+            <div class="scmd-payroll-text-end">
+                <div class="scmd-payroll-badge scmd-payroll-badge--{{ bl.trang_thai|yesno:'success,warning' }}">
+                    {{ bl.get_trang_thai_display }}
+                </div>
+                <div class="scmd-payroll-small scmd-payroll-mt-1">Ngày lập: {{ today|date:"d/m/Y" }}</div>
+            </div>
+        </div>
+
+        <div class="scmd-payroll-grid scmd-payroll-mb-4">
+            <div class="scmd-payroll-col">
+                <div class="kpi-card primary">
+                    <div class="kpi-label">Tổng Nhân Sự</div>
+                    <div class="kpi-value">{{ tong_nv }} <small class="scmd-payroll-small scmd-payroll-muted">người</small></div>
+                </div>
+            </div>
+            <div class="scmd-payroll-col">
+                <div class="kpi-card danger">
+                    <div class="kpi-label">Tổng Thực Chi</div>
+                    <div class="kpi-value">{{ tong_tien|intcomma }} đ</div>
+                </div>
+            </div>
+            <div class="scmd-payroll-col">
+                <div class="kpi-card {{ phan_tram|yesno:'danger,success' }}">
+                    <div class="kpi-label">So với tháng trước</div>
+                    <div class="kpi-value scmd-payroll-inline">
+                        {% if chenh_lech > 0 %}
+                            <span class="scmd-payroll-text-danger">Tăng +{{ phan_tram }}%</span>
+                        {% elif chenh_lech < 0 %}
+                            <span class="scmd-payroll-text-success">Giảm {{ phan_tram }}%</span>
+                        {% else %}
+                            <span class="scmd-payroll-muted">-</span>
+                        {% endif %}
+                    </div>
+                    <div class="scmd-payroll-small scmd-payroll-muted scmd-payroll-mt-1">
+                        ({{ chenh_lech|intcomma }} đ)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% for nhom in data_groups %}
+        <div class="scmd-payroll-card scmd-payroll-mb-4">
+            <div class="scmd-payroll-card-header">
+                <div class="scmd-payroll-between">
+                    <h5 class="scmd-payroll-group-title">{{ nhom.ten_nhom }}</h5>
+                    <div class="scmd-payroll-strong">{{ nhom.tong_tien|intcomma }} đ</div>
+                </div>
+            </div>
+            <div class="scmd-payroll-card-body">
+                <table class="scmd-payroll-table">
+                    <thead class="scmd-payroll-thead">
+                        <tr>
+                            <th>Nhân viên</th>
+                            <th class="scmd-payroll-text-center">Công</th>
+                            <th class="scmd-payroll-text-end">Lương Chính</th>
+                            <th class="scmd-payroll-text-end">Phụ Cấp</th>
+                            <th class="scmd-payroll-text-end scmd-payroll-text-danger">Khấu Trừ</th>
+                            <th class="scmd-payroll-text-end scmd-payroll-strong">Thực Lĩnh</th>
+                        </tr>
+                    </thead>
+                    <tbody class="scmd-payroll-align-middle">
+                        {% for luong in nhom.ds_nv %}
+                        <tr>
+                            <td>
+                                <div class="scmd-payroll-strong">{{ luong.nhan_vien.ho_ten }}</div>
+                                <div class="scmd-payroll-small scmd-payroll-muted">{{ luong.nhan_vien.ma_nhan_vien }}</div>
+                            </td>
+                            <td class="scmd-payroll-text-center">{{ luong.tong_gio_lam }}h</td>
+                            <td class="scmd-payroll-text-end">{{ luong.luong_chinh|intcomma }}</td>
+                            
+                            <td class="scmd-payroll-text-end scmd-payroll-text-success">+{{ luong.tong_phu_cap|intcomma }}</td>
+                            <td class="scmd-payroll-text-end scmd-payroll-text-danger">-{{ luong.tong_khau_tru|intcomma }}</td>
+                            <td class="scmd-payroll-text-end scmd-payroll-strong">{{ luong.thuc_lanh|intcomma }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="scmd-payroll-signature-grid no-print-break">
+            <div class="scmd-payroll-col"><p class="scmd-payroll-strong">LẬP BIỂU</p><br><br><i>(Ký tên)</i></div>
+            <div class="scmd-payroll-col"><p class="scmd-payroll-strong">KẾ TOÁN TRƯỞNG</p><br><br><i>(Ký tên)</i></div>
+            <div class="scmd-payroll-col"><p class="scmd-payroll-strong">GIÁM ĐỐC DUYỆT</p><br><br><i>(Ký đóng dấu)</i></div>
+        </div>
+    </div>
+</body>
+</html>

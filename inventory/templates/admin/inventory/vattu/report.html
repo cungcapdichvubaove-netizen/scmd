@@ -1,0 +1,43 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+
+<div id="print-section">
+    <div class="scmd-inventory-report-header">
+        <h2>{{ COMPANY.display_name|default:"CÔNG TY DỊCH VỤ BẢO VỆ SCMD" }}</h2>
+        <p>Địa chỉ: {{ COMPANY.dia_chi|default:"Chưa cấu hình địa chỉ công ty" }}</p>
+        <p>Email: {{ COMPANY.email|default:"Chưa cấu hình email" }} | SĐT: {{ COMPANY.contact_phone|default:"Chưa cấu hình số điện thoại" }}</p>
+        <hr>
+        <h1>BÁO CÁO TỒN KHO VẬT TƯ</h1>
+        <p><em>Ngày xuất báo cáo: {% now "H:i, d/m/Y" %}</em></p>
+    </div>
+    
+    <table id="result_list" class="scmd-inventory-report-table">
+        <thead>
+            <tr>
+                <th class="scmd-col-10">STT</th>
+                <th class="scmd-col-50">Tên Vật tư</th>
+                <th class="scmd-col-20">Đơn vị tính</th>
+                <th class="scmd-col-20">Số lượng Tồn kho</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in vat_tu_list %}
+            <tr class="{% cycle 'row1' 'row2' %}">
+                <td class="scmd-text-center">{{ forloop.counter }}</td>
+                <td>{{ item.ten_vat_tu }}</td>
+                <td class="scmd-text-center">{{ item.don_vi_tinh }}</td>
+                <td class="scmd-text-center">{{ item.so_luong_ton_kho }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="scmd-text-center">Không có dữ liệu.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<p class="no-print scmd-mt-lg">
+    <button onclick="window.print();">In Báo cáo</button>
+</p>
+{% endblock %}

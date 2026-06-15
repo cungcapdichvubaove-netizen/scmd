@@ -1,0 +1,47 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-shift-console">
+    <div class="scmd-shift-head">
+        <div>
+            <div class="scmd-shift-eyebrow">Thanh tra & đối soát</div>
+            <h1 class="scmd-shift-title">Biên bản thanh tra</h1>
+            <p class="scmd-shift-subtitle">
+                Biên bản thanh tra là hồ sơ đối soát kết quả kiểm tra mục tiêu, checklist, kết luận và rủi ro vận hành. Ưu tiên đủ mục tiêu, thanh tra viên, điểm đánh giá và chi tiết hạng mục để dữ liệu có thể dùng cho báo cáo, xử lý vi phạm và cải tiến vận hành.
+            </p>
+        </div>
+        <div class="scmd-shift-actions">
+            <a class="scmd-shift-btn" href="{{ scmd_inspection_report_links.add }}">+ Thêm biên bản</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_report_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_report_links.inspection_runs }}">Đợt thanh tra</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_report_links.violations }}">Vi phạm</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_report_links.categories }}">Hạng mục</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_report_links.targets }}">Mục tiêu</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_report_links.dashboard }}">Bảng điều hành</a>
+        </div>
+    </div>
+
+    <div class="scmd-shift-grid">
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.list }}"><span>Tổng biên bản</span><strong>{{ scmd_inspection_report_stats.total }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.today }}"><span>Hôm nay</span><strong>{{ scmd_inspection_report_stats.today }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.month }}"><span>Tháng này</span><strong>{{ scmd_inspection_report_stats.month }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.good_score }}"><span>Điểm tốt</span><strong>{{ scmd_inspection_report_stats.good_score }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.low_score }}"><span>Điểm thấp</span><strong>{{ scmd_inspection_report_stats.low_score }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.failed_items }}"><span>Hạng mục không đạt</span><strong>{{ scmd_inspection_report_stats.failed_items }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.missing_target }}"><span>Thiếu mục tiêu</span><strong>{{ scmd_inspection_report_stats.missing_target }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.missing_inspector }}"><span>Thiếu thanh tra viên</span><strong>{{ scmd_inspection_report_stats.missing_inspector }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.missing_conclusion }}"><span>Thiếu kết luận</span><strong>{{ scmd_inspection_report_stats.missing_conclusion }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_report_links.no_details }}"><span>Chưa có chi tiết</span><strong>{{ scmd_inspection_report_stats.no_details }}</strong></a>
+    </div>
+
+    <div class="scmd-shift-note">
+        Gợi ý kiểm soát: biên bản điểm thấp, có hạng mục không đạt hoặc thiếu kết luận cần được rà soát trước khi dùng làm căn cứ xử lý vi phạm, đánh giá chất lượng mục tiêu hoặc báo cáo khách hàng.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

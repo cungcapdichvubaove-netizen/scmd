@@ -1,0 +1,45 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/admin_operations_compact.css' %}">
+{% endblock %}
+
+{% block object-tools %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-header" aria-label="Tổng quan đề xuất hiện trường">
+    <div>
+      <div class="scmd-op-kicker">Hiện trường / Đề xuất</div>
+      <h1 class="scmd-op-title">Danh sách đề xuất nghiệp vụ</h1>
+      <p class="scmd-op-subtitle">Tiếp nhận, thụ lý và chuyển Văn phòng điện tử khi đề xuất vượt thẩm quyền.</p>
+    </div>
+    <div class="scmd-op-actions">
+      <a href="{{ scmd_field_proposal_links.add }}" class="scmd-op-btn primary"><i class="fas fa-plus-circle" aria-hidden="true"></i> Thêm đề xuất</a>
+      <a href="{{ scmd_field_proposal_links.workflow_create }}" class="scmd-op-btn"><i class="fas fa-file-signature" aria-hidden="true"></i> Tạo tờ trình</a>
+      <a href="{{ scmd_field_proposal_links.workflow_list }}" class="scmd-op-btn"><i class="fas fa-folder-open" aria-hidden="true"></i> Văn phòng điện tử</a>
+      <a href="{{ scmd_field_proposal_links.incidents }}" class="scmd-op-btn"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> Sự cố</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block result_list %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-metrics" aria-label="Chỉ số đề xuất">
+    <div class="scmd-op-metric"><span>Tổng đề xuất</span><strong>{{ scmd_field_proposal_stats.total }}</strong></div>
+    <div class="scmd-op-metric warning"><span>Chờ chỉ huy</span><strong>{{ scmd_field_proposal_stats.waiting_commander }}</strong></div>
+    <div class="scmd-op-metric warning"><span>Chờ nghiệp vụ</span><strong>{{ scmd_field_proposal_stats.waiting_ops }}</strong></div>
+    <div class="scmd-op-metric info"><span>Cần văn phòng</span><strong>{{ scmd_field_proposal_stats.need_office }}</strong></div>
+  </section>
+  {% if scmd_field_proposal_stats.waiting_commander or scmd_field_proposal_stats.waiting_ops or scmd_field_proposal_stats.need_office or scmd_field_proposal_stats.missing_evidence %}
+  <details class="scmd-op-note">
+    <summary>Việc cần rà soát: {{ scmd_field_proposal_stats.waiting_commander }} chờ chỉ huy · {{ scmd_field_proposal_stats.waiting_ops }} chờ nghiệp vụ · {{ scmd_field_proposal_stats.missing_evidence }} thiếu đính kèm</summary>
+    <p>Đề xuất vượt thẩm quyền cần lập tờ trình để phòng ban liên quan phê duyệt và thực hiện.</p>
+  </details>
+  {% endif %}
+</div>
+{{ block.super }}
+{% endblock %}

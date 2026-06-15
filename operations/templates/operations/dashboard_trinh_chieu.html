@@ -1,0 +1,897 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trung tâm điều hành hiện trường | SCMD Pro</title>
+    <link rel="stylesheet" href="{% static 'vendor/fonts/be-vietnam-pro.css' %}">
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}?v=20260612b">
+    <style>
+        :root {
+            --wall-bg: #06111d;
+            --wall-panel: rgba(7, 14, 26, 0.48);
+            --wall-panel-strong: rgba(6, 12, 22, 0.58);
+            --wall-border: rgba(203, 213, 225, 0.14);
+            --wall-text: #e2e8f0;
+            --wall-muted: #9bb0c9;
+            --wall-soft: rgba(255, 255, 255, 0.05);
+            --wall-shadow: 0 18px 40px rgba(2, 6, 23, 0.24);
+            --wall-highlight: rgba(255, 255, 255, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Be Vietnam Pro", sans-serif;
+            color: var(--wall-text);
+            background:
+                radial-gradient(circle at top left, rgba(37, 99, 235, 0.14), transparent 24%),
+                radial-gradient(circle at right top, rgba(56, 189, 248, 0.1), transparent 24%),
+                linear-gradient(180deg, #05101b 0%, #081421 46%, #0a1728 100%);
+        }
+
+        .wall-shell {
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .wall-stage {
+            position: relative;
+            min-height: calc(100vh - 20px);
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 28px;
+            box-shadow: 0 30px 72px rgba(2, 6, 23, 0.34);
+            background: #09111f;
+        }
+
+        .wall-map {
+            position: absolute;
+            inset: 0;
+        }
+
+        .wall-map .leaflet-tile,
+        .wall-map .leaflet-container img.leaflet-tile {
+            mix-blend-mode: normal !important;
+        }
+
+        .wall-map .leaflet-container {
+            background: #09111f;
+        }
+
+        .wall-map::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 401;
+            pointer-events: none;
+            background:
+                linear-gradient(180deg, rgba(3, 7, 18, 0.08) 0%, rgba(3, 7, 18, 0.18) 100%),
+                linear-gradient(90deg, rgba(4, 11, 20, 0.16) 0%, rgba(4, 11, 20, 0) 26%, rgba(4, 11, 20, 0) 74%, rgba(4, 11, 20, 0.16) 100%);
+        }
+
+        .leaflet-tile {
+            filter: grayscale(0.08) brightness(0.83) contrast(1.04) saturate(0.9);
+        }
+
+        .leaflet-popup-content-wrapper,
+        .leaflet-popup-tip {
+            background: rgba(7, 14, 26, 0.9);
+            color: #e2e8f0;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .wall-widget {
+            position: absolute;
+            z-index: 520;
+            min-width: 260px;
+            max-width: min(92vw, 460px);
+            transform: translate3d(0, 0, 0);
+            will-change: transform;
+        }
+
+        .wall-widget.is-hidden {
+            display: none;
+        }
+
+        .wall-widget[data-widget-collapsed="true"] .wall-panel-content {
+            display: none;
+        }
+
+        .wall-widget[data-widget-dragging="true"] {
+            z-index: 800;
+        }
+
+        .wall-widget-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 12px 0;
+        }
+
+        .wall-drag-handle {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 28px;
+            padding: 0 10px;
+            border-radius: 999px;
+            border: 1px solid rgba(203, 213, 225, 0.12);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--wall-muted);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: none;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .wall-widget[data-widget-dragging="true"] .wall-drag-handle {
+            cursor: grabbing;
+            background: rgba(59, 130, 246, 0.16);
+            color: #dbeafe;
+        }
+
+        .wall-widget-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .wall-widget-btn {
+            width: 28px;
+            height: 28px;
+            border: 1px solid rgba(203, 213, 225, 0.12);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.05);
+            color: #dbeafe;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 900;
+            cursor: pointer;
+            transition: 160ms ease;
+        }
+
+        .wall-widget-btn:hover {
+            background: rgba(59, 130, 246, 0.18);
+            border-color: rgba(96, 165, 250, 0.34);
+        }
+
+        .wall-panel {
+            position: relative;
+            margin-top: 8px;
+            border: 1px solid var(--wall-border);
+            border-radius: 22px;
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
+                var(--wall-panel);
+            box-shadow: var(--wall-shadow);
+            backdrop-filter: blur(22px) saturate(1.15);
+            -webkit-backdrop-filter: blur(22px) saturate(1.15);
+        }
+
+        .wall-panel::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0));
+            opacity: 0.42;
+        }
+
+        .wall-panel-body {
+            position: relative;
+            padding: 14px 16px 16px;
+        }
+
+        .wall-widget--header {
+            top: 12px;
+            left: 12px;
+            right: 180px;
+            max-width: none;
+        }
+
+        .wall-widget--filters {
+            top: 104px;
+            left: 12px;
+            width: 320px;
+        }
+
+        .wall-widget--focus {
+            top: 246px;
+            left: 12px;
+            width: 360px;
+        }
+
+        .wall-widget--overview {
+            top: 104px;
+            right: 12px;
+            width: 420px;
+        }
+
+        .wall-widget--lists {
+            top: 332px;
+            right: 12px;
+            width: 420px;
+        }
+
+        .wall-widget--ticker {
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            max-width: none;
+        }
+
+        .wall-layout-dock {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 700;
+            width: 160px;
+        }
+
+        .wall-layout-dock .wall-panel-body {
+            padding: 12px;
+        }
+
+        .wall-eyebrow,
+        .wall-panel-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            text-transform: none;
+            color: var(--wall-muted);
+        }
+
+        .wall-title {
+            margin: 6px 0 0;
+            font-size: clamp(20px, 1.8vw, 30px);
+            line-height: 1.06;
+            font-weight: 900;
+            color: #f8fafc;
+        }
+
+        .wall-copy {
+            margin: 8px 0 0;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #d4deeb;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .wall-heading-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .wall-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .wall-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 0 18px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.88), rgba(29, 78, 216, 0.88));
+            color: white;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: none;
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.16);
+        }
+
+        .wall-filter-grid {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .wall-filter {
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #dbeafe;
+            min-height: 38px;
+            padding: 0 14px;
+            font: inherit;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: none;
+            cursor: pointer;
+            transition: 160ms ease;
+        }
+
+        .wall-filter.is-active {
+            background: rgba(37, 99, 235, 0.2);
+            border-color: rgba(96, 165, 250, 0.42);
+            color: white;
+        }
+
+        .wall-filter[data-filter-kind="critical"].is-active {
+            background: rgba(220, 38, 38, 0.18);
+            border-color: rgba(248, 113, 113, 0.34);
+        }
+
+        .wall-focus-title {
+            margin: 6px 0 0;
+            font-size: 18px;
+            font-weight: 900;
+            color: #f8fafc;
+        }
+
+        .wall-focus-copy {
+            margin: 8px 0 0;
+            font-size: 13px;
+            line-height: 1.55;
+            color: #d3dbe6;
+        }
+
+        .wall-detail-grid {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .wall-detail {
+            padding: 10px 12px;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(148, 163, 184, 0.09);
+        }
+
+        .wall-detail__label {
+            display: block;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: none;
+            color: var(--wall-muted);
+        }
+
+        .wall-detail__value {
+            display: block;
+            margin-top: 5px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #f8fafc;
+            word-break: break-word;
+        }
+
+        .wall-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .wall-kpi {
+            padding: 12px 12px 10px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.045);
+            border: 1px solid rgba(148, 163, 184, 0.1);
+        }
+
+        .wall-kpi__value {
+            margin-top: 8px;
+            font-size: 28px;
+            line-height: 1;
+            font-weight: 900;
+            color: #f8fafc;
+        }
+
+        .wall-kpi__meta {
+            margin-top: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #9eb0c7;
+            line-height: 1.35;
+        }
+
+        .wall-list-panel {
+            display: grid;
+            gap: 12px;
+        }
+
+        .wall-list-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .wall-list-title {
+            margin: 6px 0 0;
+            font-size: 17px;
+            font-weight: 900;
+            color: #f8fafc;
+        }
+
+        .wall-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .wall-scroll {
+            overflow: auto;
+            max-height: 220px;
+            padding-right: 4px;
+        }
+
+        .wall-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .wall-scroll::-webkit-scrollbar-thumb {
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.35);
+        }
+
+        .wall-item {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            color: inherit;
+            text-align: left;
+            cursor: pointer;
+            transition: 160ms ease;
+        }
+
+        .wall-item:hover,
+        .wall-item.is-active {
+            border-color: rgba(96, 165, 250, 0.36);
+            background: rgba(30, 41, 59, 0.7);
+            transform: translateY(-1px);
+        }
+
+        .wall-item__title {
+            margin-top: 7px;
+            font-size: 14px;
+            font-weight: 800;
+            color: #f8fafc;
+        }
+
+        .wall-item__meta,
+        .wall-item__sub {
+            margin-top: 5px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #c7d2e1;
+        }
+
+        .wall-ribbon {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-height: 54px;
+        }
+
+        .wall-ribbon__text {
+            min-width: 0;
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .wall-dock-grid {
+            margin-top: 10px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .wall-dock-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 10px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(148, 163, 184, 0.08);
+        }
+
+        .wall-dock-label {
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            text-transform: none;
+            color: #d7e3f0;
+        }
+
+        .wall-toggle {
+            width: 46px;
+            height: 26px;
+            border: 1px solid rgba(148, 163, 184, 0.16);
+            border-radius: 999px;
+            background: rgba(15, 23, 42, 0.72);
+            position: relative;
+            cursor: pointer;
+            transition: 160ms ease;
+        }
+
+        .wall-toggle::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 18px;
+            height: 18px;
+            border-radius: 999px;
+            background: #dbeafe;
+            transition: 160ms ease;
+        }
+
+        .wall-toggle.is-on {
+            background: rgba(37, 99, 235, 0.34);
+            border-color: rgba(96, 165, 250, 0.3);
+        }
+
+        .wall-toggle.is-on::after {
+            left: 23px;
+            background: white;
+        }
+
+        .wall-event-flash {
+            position: absolute;
+            inset: 0;
+            z-index: 450;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 260ms ease;
+            background: radial-gradient(circle at center, rgba(96, 165, 250, 0.18), transparent 42%);
+        }
+
+        .wall-event-flash.is-visible {
+            opacity: 1;
+        }
+
+        .ops-marker {
+            width: 46px;
+            height: 46px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.88);
+            overflow: hidden;
+            box-shadow: 0 16px 30px rgba(2, 6, 23, 0.32);
+            position: relative;
+        }
+
+        .ops-marker::after {
+            content: "";
+            position: absolute;
+            inset: -8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 197, 255, 0.24);
+        }
+
+        .ops-marker img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .ops-marker--guard {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.94), rgba(30, 58, 138, 0.94));
+            color: white;
+            font-weight: 900;
+        }
+
+        .ops-marker--incident {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.94), rgba(153, 27, 27, 0.94));
+            color: white;
+        }
+
+        .ops-marker--incident.ops-marker--critical {
+            animation: ops-pulse 1.8s infinite;
+        }
+
+        .ops-marker-ripple {
+            width: 84px;
+            height: 84px;
+            border-radius: 999px;
+            border: 2px solid rgba(96, 165, 250, 0.48);
+            background: rgba(96, 165, 250, 0.08);
+            animation: ops-ripple 1.6s ease-out forwards;
+        }
+
+        .ops-marker-ripple--incident {
+            border-color: rgba(248, 113, 113, 0.52);
+            background: rgba(248, 113, 113, 0.1);
+        }
+
+        @keyframes ops-pulse {
+            0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.42); }
+            70% { transform: scale(1); box-shadow: 0 0 0 22px rgba(248, 113, 113, 0); }
+            100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
+        }
+
+        @keyframes ops-ripple {
+            0% { transform: scale(0.3); opacity: 0.95; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
+        @media (max-width: 1320px) {
+            .wall-shell {
+                padding: 8px;
+            }
+
+            .wall-stage {
+                min-height: auto;
+                display: grid;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .wall-map {
+                position: relative;
+                min-height: 560px;
+                border-radius: 20px;
+                overflow: hidden;
+            }
+
+            .wall-widget,
+            .wall-layout-dock {
+                position: static !important;
+                width: 100% !important;
+                max-width: none !important;
+                transform: none !important;
+            }
+
+            .wall-widget-header {
+                padding: 0 0 6px;
+            }
+
+            .wall-panel {
+                margin-top: 0;
+            }
+
+            .wall-heading-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wall-shell" data-ops-dashboard data-variant="display" data-api-url="{{ dashboard_api_url }}" data-tile-url="{{ map_tile_url }}" data-tile-attribution="{{ map_attribution }}">
+        <section class="wall-stage">
+            <div id="ops-map" class="wall-map" data-ops-map></div>
+            <div id="ops-event-flash" class="wall-event-flash"></div>
+
+            <aside class="wall-layout-dock" data-layout-dock>
+                <div class="wall-panel">
+                    <div class="wall-panel-body">
+                        <div class="wall-panel-label">Bố cục hiển thị</div>
+                        <div class="wall-dock-grid">
+                            <div class="wall-dock-item"><span class="wall-dock-label">Header</span><button type="button" class="wall-toggle is-on" data-widget-toggle="header" aria-label="Bật tắt header"></button></div>
+                            <div class="wall-dock-item"><span class="wall-dock-label">Bộ lọc</span><button type="button" class="wall-toggle is-on" data-widget-toggle="filters" aria-label="Bật tắt bộ lọc"></button></div>
+                            <div class="wall-dock-item"><span class="wall-dock-label">Điểm chọn</span><button type="button" class="wall-toggle is-on" data-widget-toggle="focus" aria-label="Bật tắt điểm chọn"></button></div>
+                            <div class="wall-dock-item"><span class="wall-dock-label">KPI</span><button type="button" class="wall-toggle is-on" data-widget-toggle="overview" aria-label="Bật tắt KPI"></button></div>
+                            <div class="wall-dock-item"><span class="wall-dock-label">Danh sách</span><button type="button" class="wall-toggle is-on" data-widget-toggle="lists" aria-label="Bật tắt danh sách"></button></div>
+                            <div class="wall-dock-item"><span class="wall-dock-label">Ticker</span><button type="button" class="wall-toggle is-on" data-widget-toggle="ticker" aria-label="Bật tắt ticker"></button></div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <section class="wall-widget wall-widget--header" data-widget="header">
+                <div class="wall-widget-header">
+                    <div class="wall-drag-handle" data-widget-handle>Kéo widget</div>
+                    <div class="wall-widget-actions">
+                        <button type="button" class="wall-widget-btn" data-widget-hide="header" aria-label="Ẩn header">×</button>
+                        <button type="button" class="wall-widget-btn" data-widget-collapse="header" aria-label="Thu gọn header">−</button>
+                    </div>
+                </div>
+                <div class="wall-panel">
+                    <div class="wall-panel-body wall-panel-content">
+                        <div class="wall-heading-row">
+                            <div>
+                                <div class="wall-eyebrow">Trung tâm điều hành SCMD Pro</div>
+                                <h1 class="wall-title">Màn hình trình chiếu vận hành toàn công ty</h1>
+                                <span style="display:none;">Màn hình trình chiếu SCMD Pro</span>
+                                <p id="ops-status-copy" class="wall-copy">Đang đồng bộ dữ liệu quân số, check-in và sự cố từ hiện trường.</p>
+                            </div>
+                            <div class="wall-actions">
+                                <span id="ops-status-tone" class="scmd-tone scmd-tone--neutral">Đang tải</span>
+                                <span id="ops-clock" class="scmd-tone scmd-tone--info">--:--</span>
+                                <a href="{{ operations_dashboard_url }}" class="wall-link">Về bảng điều hành</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="wall-widget wall-widget--filters" data-widget="filters">
+                <div class="wall-widget-header">
+                    <div class="wall-drag-handle" data-widget-handle>Kéo widget</div>
+                    <div class="wall-widget-actions">
+                        <button type="button" class="wall-widget-btn" data-widget-hide="filters" aria-label="Ẩn bộ lọc">×</button>
+                        <button type="button" class="wall-widget-btn" data-widget-collapse="filters" aria-label="Thu gọn bộ lọc">−</button>
+                    </div>
+                </div>
+                <div class="wall-panel">
+                    <div class="wall-panel-body wall-panel-content">
+                        <div class="wall-panel-label">Bộ lọc bản đồ</div>
+                        <div class="wall-filter-grid">
+                            <button type="button" class="wall-filter is-active" data-filter-kind="guards">Nhân viên online</button>
+                            <button type="button" class="wall-filter is-active" data-filter-kind="incidents">Sự cố mở</button>
+                            <button type="button" class="wall-filter" data-filter-kind="critical">Sự cố nghiêm trọng</button>
+                        </div>
+                        <div style="margin-top:12px;">
+                            <div class="wall-panel-label">Sự kiện nổi bật</div>
+                            <div id="last-activity" class="wall-focus-title">Chưa có cập nhật</div>
+                            <div id="ops-event-summary" class="wall-focus-copy">Hệ thống sẽ ưu tiên tiêu điểm vào sự cố hoặc check-in mới nhất.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="wall-widget wall-widget--focus" data-widget="focus">
+                <div class="wall-widget-header">
+                    <div class="wall-drag-handle" data-widget-handle>Kéo widget</div>
+                    <div class="wall-widget-actions">
+                        <button type="button" class="wall-widget-btn" data-widget-hide="focus" aria-label="Ẩn điểm đang chọn">×</button>
+                        <button type="button" class="wall-widget-btn" data-widget-collapse="focus" aria-label="Thu gọn điểm đang chọn">−</button>
+                    </div>
+                </div>
+                <div class="wall-panel">
+                    <div class="wall-panel-body wall-panel-content">
+                        <div class="wall-panel-label">Điểm đang chọn</div>
+                        <div id="selected-title" class="wall-focus-title">Bản đồ toàn cục</div>
+                        <div id="selected-copy" class="wall-focus-copy">Chọn nhân viên online hoặc sự cố trong danh sách để xem chi tiết và zoom nhanh trên bản đồ.</div>
+                        <div id="selected-detail-grid" class="wall-detail-grid">
+                            <div class="wall-detail">
+                                <span class="wall-detail__label">Loại điểm</span>
+                                <span id="selected-kind" class="wall-detail__value">Tổng quan</span>
+                            </div>
+                            <div class="wall-detail">
+                                <span class="wall-detail__label">Trạng thái</span>
+                                <span id="selected-status" class="wall-detail__value">Đang theo dõi</span>
+                            </div>
+                            <div class="wall-detail">
+                                <span class="wall-detail__label">Mục tiêu</span>
+                                <span id="selected-target" class="wall-detail__value">Toàn hệ thống</span>
+                            </div>
+                            <div class="wall-detail">
+                                <span class="wall-detail__label">Liên hệ</span>
+                                <span id="selected-contact" class="wall-detail__value">Chưa có dữ liệu</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="wall-widget wall-widget--overview" data-widget="overview">
+                <div class="wall-widget-header">
+                    <div class="wall-drag-handle" data-widget-handle>Kéo widget</div>
+                    <div class="wall-widget-actions">
+                        <button type="button" class="wall-widget-btn" data-widget-hide="overview" aria-label="Ẩn KPI">×</button>
+                        <button type="button" class="wall-widget-btn" data-widget-collapse="overview" aria-label="Thu gọn KPI">−</button>
+                    </div>
+                </div>
+                <div class="wall-panel">
+                    <div class="wall-panel-body wall-panel-content">
+                        <div class="wall-panel-label">Tổng quan thời gian thực</div>
+                        <div class="wall-kpi-grid">
+                            <div class="wall-kpi">
+                                <div class="wall-panel-label">Tổng ca</div>
+                                <div id="stat-total" class="wall-kpi__value">0</div>
+                                <div class="wall-kpi__meta">Ca trong ngày</div>
+                            </div>
+                            <div class="wall-kpi">
+                                <div class="wall-panel-label">Đã check-in</div>
+                                <div id="stat-online" class="wall-kpi__value" style="color:#4ade80;">0</div>
+                                <div class="wall-kpi__meta">Quân số trực</div>
+                            </div>
+                            <div class="wall-kpi">
+                                <div class="wall-panel-label">Chưa có mặt</div>
+                                <div id="stat-missing" class="wall-kpi__value" style="color:#fbbf24;">0</div>
+                                <div class="wall-kpi__meta">Ca chưa vào vị trí</div>
+                            </div>
+                            <div class="wall-kpi">
+                                <div class="wall-panel-label">Phủ ca</div>
+                                <div id="stat-rate" class="wall-kpi__value">0%</div>
+                                <div class="wall-kpi__meta">Tỷ lệ phủ hiện tại</div>
+                            </div>
+                            <div class="wall-kpi">
+                                <div class="wall-panel-label">Sự cố mở</div>
+                                <div id="stat-incident" class="wall-kpi__value" style="color:#fecaca;">0</div>
+                                <div class="wall-kpi__meta">Hồ sơ đang xử lý</div>
+                            </div>
+                            <div class="wall-kpi">
+                                <div class="wall-panel-label">Nghiêm trọng</div>
+                                <div id="stat-severe" class="wall-kpi__value" style="color:#f87171;">0</div>
+                                <div class="wall-kpi__meta">Cần ưu tiên</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="wall-widget wall-widget--lists" data-widget="lists">
+                <div class="wall-widget-header">
+                    <div class="wall-drag-handle" data-widget-handle>Kéo widget</div>
+                    <div class="wall-widget-actions">
+                        <button type="button" class="wall-widget-btn" data-widget-hide="lists" aria-label="Ẩn danh sách">×</button>
+                        <button type="button" class="wall-widget-btn" data-widget-collapse="lists" aria-label="Thu gọn danh sách">−</button>
+                    </div>
+                </div>
+                <div class="wall-panel">
+                    <div class="wall-panel-body wall-panel-content wall-list-panel">
+                        <div>
+                            <div class="wall-list-head">
+                                <div>
+                                    <div class="wall-panel-label">Danh sách sự cố</div>
+                                    <div class="wall-list-title">Điểm cần xử lý</div>
+                                </div>
+                                <span id="incident-count" class="scmd-tone scmd-tone--danger">0 hồ sơ</span>
+                            </div>
+                            <div id="incident-list" class="wall-list wall-scroll" style="margin-top:10px;"></div>
+                        </div>
+
+                        <div>
+                            <div class="wall-list-head" style="margin-top:8px;">
+                                <div>
+                                    <div class="wall-panel-label">Nhân viên đang online</div>
+                                    <div class="wall-list-title">Danh sách tại hiện trường</div>
+                                </div>
+                                <span id="guard-count" class="scmd-tone scmd-tone--info">0 người</span>
+                            </div>
+                            <div id="guard-list" class="wall-list wall-scroll" style="margin-top:10px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="wall-widget wall-widget--ticker" data-widget="ticker">
+                <div class="wall-widget-header">
+                    <div class="wall-drag-handle" data-widget-handle>Kéo widget</div>
+                    <div class="wall-widget-actions">
+                        <button type="button" class="wall-widget-btn" data-widget-hide="ticker" aria-label="Ẩn ticker">×</button>
+                        <button type="button" class="wall-widget-btn" data-widget-collapse="ticker" aria-label="Thu gọn ticker">−</button>
+                    </div>
+                </div>
+                <div class="wall-panel">
+                    <div class="wall-panel-body wall-panel-content wall-ribbon">
+                        <span class="scmd-tone scmd-tone--warning">Cảnh báo tức thời</span>
+                        <div id="incident-ticker" class="wall-ribbon__text">Chưa có cảnh báo mới.</div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </div>
+
+    <script src="{% static 'vendor/leaflet/leaflet.js' %}?v=20260612b"></script>
+    <script src="{% static 'js/operations_dashboard_live.js' %}?v=20260612b"></script>
+</body>
+</html>

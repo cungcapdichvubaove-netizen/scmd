@@ -1,0 +1,45 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/admin_operations_compact.css' %}">
+{% endblock %}
+
+{% block object-tools %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-header" aria-label="Tổng quan kiểm tra quân số">
+    <div>
+      <div class="scmd-op-kicker">Hiện trường / Quân số</div>
+      <h1 class="scmd-op-title">Danh sách kiểm tra quân số</h1>
+      <p class="scmd-op-subtitle">Theo dõi lệnh kiểm tra đột xuất, ảnh xác thực, GPS, thiết bị và phản hồi của nhân viên bảo vệ.</p>
+    </div>
+    <div class="scmd-op-actions">
+      <a class="scmd-op-btn primary" href="{{ scmd_alive_links.add }}"><i class="fas fa-plus-circle" aria-hidden="true"></i> Thêm kiểm tra</a>
+      <a class="scmd-op-btn" href="{{ scmd_alive_links.assignments }}"><i class="fas fa-user-shield" aria-hidden="true"></i> Phân công</a>
+      <a class="scmd-op-btn" href="{{ scmd_alive_links.attendance }}"><i class="fas fa-clock" aria-hidden="true"></i> Chấm công</a>
+      <a class="scmd-op-btn" href="{{ scmd_alive_links.dashboard }}"><i class="fas fa-gauge-high" aria-hidden="true"></i> Vận hành</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block result_list %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-metrics" aria-label="Chỉ số kiểm tra quân số">
+    <div class="scmd-op-metric"><span>Tổng lệnh</span><strong>{{ scmd_alive_stats.total }}</strong></div>
+    <div class="scmd-op-metric warning"><span>Đang chờ</span><strong>{{ scmd_alive_stats.pending }}</strong></div>
+    <div class="scmd-op-metric danger"><span>Quá hạn</span><strong>{{ scmd_alive_stats.overdue }}</strong></div>
+    <div class="scmd-op-metric danger"><span>Bỏ lỡ/sai vị trí</span><strong>{{ scmd_alive_stats.missed }}</strong></div>
+  </section>
+  {% if scmd_alive_stats.pending or scmd_alive_stats.overdue or scmd_alive_stats.missed or scmd_alive_stats.no_evidence %}
+  <details class="scmd-op-note">
+    <summary>Việc cần rà soát: {{ scmd_alive_stats.pending }} đang chờ · {{ scmd_alive_stats.overdue }} quá hạn · {{ scmd_alive_stats.no_evidence }} thiếu bằng chứng</summary>
+    <p>Ưu tiên xử lý lệnh quá hạn hoặc thiếu ảnh/GPS để bảo toàn dữ liệu kiểm toán hiện trường.</p>
+  </details>
+  {% endif %}
+</div>
+{{ block.super }}
+{% endblock %}

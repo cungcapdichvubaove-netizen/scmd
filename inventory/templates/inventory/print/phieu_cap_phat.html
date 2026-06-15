@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phiếu Cấp Phát {{ phieu.so_phieu }}</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; margin: 40px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .info { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .signatures { margin-top: 50px; display: flex; justify-content: space-around; }
+        .signature-box { text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PHIẾU CẤP PHÁT VẬT TƯ</h1>
+        <p>Số: {{ phieu.so_phieu }}</p>
+    </div>
+    <div class="info">
+        <p><strong>Ngày cấp phát:</strong> {{ phieu.ngay_cap_phat|date:"d/m/Y H:i" }}</p>
+        <p><strong>Nhân viên nhận:</strong> {{ phieu.nguoi_nhan.ho_ten }} (MSNV: {{ phieu.nguoi_nhan.ma_nhan_vien }})</p>
+        <p><strong>Ghi chú:</strong> {{ phieu.ghi_chu|default_if_none:"" }}</p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên vật tư</th>
+                <th>ĐVT</th>
+                <th>Số lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in phieu.chi_tiet.all %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.vat_tu.ten_vat_tu }}</td>
+                <td>{{ item.vat_tu.don_vi_tinh }}</td>
+                <td>{{ item.so_luong }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="signatures">
+        <div class="signature-box">
+            <p><strong>Người cấp phát</strong></p>
+            <p>(Ký, ghi rõ họ tên)</p>
+            <br><br><br>
+            <p>{{ phieu.nguoi_cap_phat.username }}</p>
+        </div>
+        <div class="signature-box">
+            <p><strong>Người nhận</strong></p>
+            <p>(Ký, ghi rõ họ tên)</p>
+            <br><br><br>
+            <p>{{ phieu.nguoi_nhan.ho_ten }}</p>
+        </div>
+    </div>
+</body>
+</html>

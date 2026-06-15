@@ -1,0 +1,22 @@
+{% extends "admin/base.html" %}
+{% load admin_console static %}
+
+{% block title %}Quản trị kỹ thuật SCMD{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% admin_sidebar_runtime request.user as sidebar_runtime %}
+<script>
+window.SCMDAdminSidebarData = {
+    periodicEnabled: {{ sidebar_runtime.periodic_enabled|default:0 }},
+    taskAlerts: {{ sidebar_runtime.task_alerts|default:0 }}
+};
+window.SCMDAdminShell = window.SCMDAdminShell || {};
+window.SCMDAdminShell.globalSearchUrl = "{% url 'admin_global_search' %}";
+window.SCMDAdminShell.adminIndexUrl = "{% url 'admin:index' %}";
+window.SCMDAdminShell.passwordChangeUrl = "{% url 'admin:password_change' %}";
+window.SCMDAdminShell.logoutUrl = "{% url 'admin_logout_fix' %}";
+</script>
+<script src="{% static 'common/js/admin_localization.js' %}" defer></script>
+
+{% endblock %}

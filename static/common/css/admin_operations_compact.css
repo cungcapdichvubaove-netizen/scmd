@@ -1,0 +1,258 @@
+/* SCMD Pro compact operations changelists.
+   Scope-safe UI-only layer for selected operations admin pages.
+   No gradients, no decorative shadows, no hard-coded brand colors. */
+
+:root {
+    --scmd-op-topbar-offset: var(--scmd-admin-topbar-height, 56px);
+}
+
+.scmd-op-list,
+.scmd-op-list * {
+    box-sizing: border-box;
+}
+
+.scmd-op-list {
+    color: var(--scmd-text);
+    margin: 0 0 .65rem;
+}
+
+.scmd-op-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: .75rem;
+    min-height: 3.75rem;
+    padding: .65rem .9rem;
+    border: 1px solid var(--scmd-border);
+    border-radius: var(--scmd-radius-lg);
+    background: var(--scmd-surface);
+    margin: 0 0 .55rem;
+}
+
+.scmd-op-kicker {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.15rem;
+    padding: .08rem .42rem;
+    border-radius: 999px;
+    background: var(--scmd-surface-muted);
+    color: var(--scmd-text-soft);
+    font-size: .64rem;
+    font-weight: 700;
+    letter-spacing: var(--scmd-eyebrow-l2-tracking, .08em);
+    text-transform: uppercase;
+    margin: 0 0 .22rem;
+}
+
+.scmd-op-title {
+    margin: 0;
+    color: var(--scmd-text);
+    font-size: clamp(1.08rem, .98rem + .34vw, 1.28rem);
+    line-height: 1.14;
+    font-weight: 800;
+    letter-spacing: -.02em;
+}
+
+.scmd-op-subtitle {
+    margin: .2rem 0 0;
+    color: var(--scmd-text-soft);
+    font-size: .78rem;
+    line-height: 1.35;
+    max-width: 58rem;
+}
+
+.scmd-op-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: .38rem;
+}
+
+.scmd-op-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .32rem;
+    min-height: 2rem;
+    padding: .38rem .58rem;
+    border: 1px solid var(--scmd-border);
+    border-radius: var(--scmd-radius-md);
+    background: var(--scmd-surface);
+    color: var(--scmd-brand);
+    font-size: .72rem;
+    font-weight: 700;
+    line-height: 1.15;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.scmd-op-btn:hover,
+.scmd-op-btn:focus-visible {
+    border-color: var(--scmd-brand);
+    color: var(--scmd-brand);
+    text-decoration: none;
+}
+
+.scmd-op-btn.primary {
+    background: var(--scmd-brand);
+    border-color: var(--scmd-brand);
+    color: var(--scmd-surface);
+}
+
+.scmd-op-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(8rem, 1fr));
+    gap: .42rem;
+    margin: 0 0 .48rem;
+}
+
+.scmd-op-metric {
+    display: grid;
+    align-content: center;
+    min-height: 3.65rem;
+    padding: .52rem .65rem;
+    border: 1px solid var(--scmd-border);
+    border-radius: var(--scmd-radius-md);
+    background: var(--scmd-surface);
+}
+
+.scmd-op-metric span {
+    color: var(--scmd-text-soft);
+    font-size: .63rem;
+    font-weight: 700;
+    letter-spacing: var(--scmd-eyebrow-l2-tracking, .08em);
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.scmd-op-metric strong {
+    margin-top: .24rem;
+    color: var(--scmd-text);
+    font-size: clamp(1.1rem, .98rem + .32vw, 1.42rem);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: -.025em;
+}
+
+.scmd-op-metric.warning strong { color: var(--scmd-warning); }
+.scmd-op-metric.danger strong { color: var(--scmd-danger); }
+.scmd-op-metric.success strong { color: var(--scmd-success); }
+.scmd-op-metric.info strong { color: var(--scmd-info); }
+
+.scmd-op-note {
+    margin: 0 0 .48rem;
+    color: var(--scmd-text-soft);
+    font-size: .76rem;
+    line-height: 1.35;
+}
+
+.scmd-op-note summary {
+    cursor: pointer;
+    color: var(--scmd-text);
+    font-weight: 700;
+    list-style-position: inside;
+}
+
+.scmd-op-note p {
+    margin: .25rem 0 0 1.1rem;
+}
+
+.scmd-op-table-first .object-tools,
+.scmd-op-table-first .object-tools + .module {
+    margin-top: 0;
+}
+
+body.change-list.model-phancongcatruc .actions,
+body.change-list.model-chamcong .actions,
+body.change-list.model-chamcongadjustment .actions,
+body.change-list.model-baocaosuco .actions,
+body.change-list.model-baocaodexuat .actions,
+body.change-list.model-kiemtraquanso .actions {
+    min-height: 2.2rem;
+    padding: .45rem .6rem;
+    border-radius: var(--scmd-radius-md);
+}
+
+body.change-list.model-phancongcatruc #changelist-search,
+body.change-list.model-chamcong #changelist-search,
+body.change-list.model-chamcongadjustment #changelist-search,
+body.change-list.model-baocaosuco #changelist-search,
+body.change-list.model-baocaodexuat #changelist-search,
+body.change-list.model-kiemtraquanso #changelist-search {
+    margin: .35rem 0 .55rem;
+}
+
+body.change-list.model-phancongcatruc #changelist-search input[type="text"],
+body.change-list.model-chamcong #changelist-search input[type="text"],
+body.change-list.model-chamcongadjustment #changelist-search input[type="text"],
+body.change-list.model-baocaosuco #changelist-search input[type="text"],
+body.change-list.model-baocaodexuat #changelist-search input[type="text"],
+body.change-list.model-kiemtraquanso #changelist-search input[type="text"],
+body.change-list.model-phancongcatruc #changelist-search select,
+body.change-list.model-chamcong #changelist-search select,
+body.change-list.model-chamcongadjustment #changelist-search select,
+body.change-list.model-baocaosuco #changelist-search select,
+body.change-list.model-baocaodexuat #changelist-search select,
+body.change-list.model-kiemtraquanso #changelist-search select {
+    min-height: 2.45rem;
+}
+
+body.change-list.model-phancongcatruc #result_list,
+body.change-list.model-chamcong #result_list,
+body.change-list.model-chamcongadjustment #result_list,
+body.change-list.model-baocaosuco #result_list,
+body.change-list.model-baocaodexuat #result_list,
+body.change-list.model-kiemtraquanso #result_list {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+body.change-list.model-phancongcatruc #result_list thead th,
+body.change-list.model-chamcong #result_list thead th,
+body.change-list.model-chamcongadjustment #result_list thead th,
+body.change-list.model-baocaosuco #result_list thead th,
+body.change-list.model-baocaodexuat #result_list thead th,
+body.change-list.model-kiemtraquanso #result_list thead th {
+    position: static;
+    top: auto;
+    z-index: auto;
+    background: var(--scmd-surface);
+}
+
+body.change-list.model-phancongcatruc #result_list tbody td,
+body.change-list.model-chamcong #result_list tbody td,
+body.change-list.model-chamcongadjustment #result_list tbody td,
+body.change-list.model-baocaosuco #result_list tbody td,
+body.change-list.model-baocaodexuat #result_list tbody td,
+body.change-list.model-kiemtraquanso #result_list tbody td {
+    min-height: 3.25rem;
+    vertical-align: middle;
+}
+
+@media (max-width: 1023px) {
+    .scmd-op-header {
+        grid-template-columns: 1fr;
+        align-items: start;
+    }
+    .scmd-op-actions {
+        justify-content: flex-start;
+    }
+    .scmd-op-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 639px) {
+    .scmd-op-header {
+        padding: .6rem .7rem;
+    }
+    .scmd-op-metrics {
+        grid-template-columns: 1fr 1fr;
+    }
+    .scmd-op-btn {
+        min-height: 2.15rem;
+    }
+}

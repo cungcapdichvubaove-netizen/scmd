@@ -1,0 +1,45 @@
+/* V14 payroll print styles: no Bootstrap dependency, brand-token based. */
+body { background: var(--scmd-surface-muted); color: var(--scmd-text); font-family: Arial, sans-serif; margin: 0; }
+.sheet { background: var(--scmd-surface); max-width: 250mm; margin: 0 auto; padding: 15mm; min-height: 297mm; border: 1px solid var(--scmd-border); }
+.scmd-payroll-toolbar { display: flex; justify-content: center; gap: 8px; margin: 16px 0; text-align: center; }
+.scmd-payroll-btn { border: 1px solid var(--scmd-border-strong); border-radius: 8px; padding: 10px 16px; background: var(--scmd-surface); color: var(--scmd-text); font-weight: 700; cursor: pointer; }
+.scmd-payroll-btn--primary { background: var(--scmd-brand-900); color: var(--scmd-on-brand); border-color: var(--scmd-brand-900); }
+.scmd-payroll-btn--secondary { background: var(--scmd-surface); color: var(--scmd-text-soft); }
+.scmd-payroll-report-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; border-bottom: 2px solid var(--scmd-brand-900); padding-bottom: 14px; margin-bottom: 18px; }
+.company-name { font-weight: 800; color: var(--scmd-brand-900); margin-top: 8px; }
+.report-title { font-size: 24px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; margin-top: 10px; }
+.scmd-payroll-text-end { text-align: right; }
+.scmd-payroll-text-center { text-align: center; }
+.scmd-payroll-small { font-size: 12px; }
+.scmd-payroll-muted { color: var(--scmd-text-muted); }
+.scmd-payroll-mt-1 { margin-top: 4px; }
+.scmd-payroll-mb-4 { margin-bottom: 16px; }
+.scmd-payroll-m0 { margin: 0; }
+.scmd-payroll-strong { font-weight: 800; }
+.scmd-payroll-text-danger { color: var(--scmd-danger); }
+.scmd-payroll-text-success { color: var(--scmd-success); }
+.scmd-payroll-inline { display: flex; align-items: center; gap: 6px; }
+.scmd-payroll-between { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.scmd-payroll-grid, .scmd-payroll-signature-grid { display: flex; gap: 12px; }
+.scmd-payroll-col { flex: 1 1 0; min-width: 0; }
+.scmd-payroll-badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 6px 10px; font-weight: 800; font-size: 13px; }
+.scmd-payroll-badge--success { background: var(--scmd-success-soft); color: var(--scmd-success); }
+.scmd-payroll-badge--warning { background: var(--scmd-warning-soft); color: var(--scmd-warning); }
+.kpi-card { border: 1px solid var(--scmd-border); border-radius: 12px; padding: 14px; background: var(--scmd-surface-strong); min-height: 88px; }
+.kpi-card.primary { border-left: 4px solid var(--scmd-info); }
+.kpi-card.danger { border-left: 4px solid var(--scmd-danger); }
+.kpi-card.success { border-left: 4px solid var(--scmd-success); }
+.kpi-label { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--scmd-text-muted); }
+.kpi-value { margin-top: 8px; font-size: 20px; font-weight: 800; color: var(--scmd-text); }
+.scmd-payroll-card { border: 1px solid var(--scmd-border); border-radius: 12px; overflow: hidden; background: var(--scmd-surface); }
+.scmd-payroll-card-header { background: var(--scmd-surface-strong); padding: 12px 14px; border-bottom: 1px solid var(--scmd-border); }
+.scmd-payroll-group-title { margin: 0; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--scmd-info); }
+.scmd-payroll-card-body { padding: 0; }
+.scmd-payroll-table { width: 100%; border-collapse: collapse; margin: 0; }
+.scmd-payroll-table th, .scmd-payroll-table td { padding: 9px 10px; border-bottom: 1px solid var(--scmd-border); }
+.scmd-payroll-table th { background: var(--scmd-surface-muted); color: var(--scmd-text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+.scmd-payroll-table tbody tr:hover { background: var(--scmd-surface-strong); }
+.scmd-payroll-align-middle td { vertical-align: middle; }
+.no-print-break { break-inside: avoid; page-break-inside: avoid; }
+@media (max-width: 760px) { .scmd-payroll-grid, .scmd-payroll-signature-grid, .scmd-payroll-report-header { flex-direction: column; } .scmd-payroll-text-end { text-align: left; } }
+@media print { .no-print { display: none !important; } body { background: var(--scmd-surface); } .sheet { border: 0; padding: 0; } }

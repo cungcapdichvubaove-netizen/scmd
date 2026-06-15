@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    # Gắn code từ máy host vào container để sửa là nhận ngay
+    volumes:
+      - .:/app
+    # Mở cổng để truy cập trực tiếp
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - PYTHONUNBUFFERED=1
+    # Dùng runserver để có tính năng StatReloader (Tự reload khi sửa code)
+    command: python manage.py runserver 0.0.0.0:8000

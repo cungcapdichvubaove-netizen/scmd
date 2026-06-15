@@ -1,0 +1,80 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{# Compact table-first changelist for /admin/operations/vitrichot/.
+   - No duplicate Add action (object-tools block overridden to empty).
+   - Compact KPI strip instead of hero/card stack.
+   - Collapsible notice only when there is work to review.
+   - {{ block.super }} preserves Django Admin search/filter/action/pagination. #}
+{% block content_title %}{% endblock %}
+{% block object-tools %}{% endblock %}
+
+{% block extrahead %}{{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="scmd-post-console scmd-post-console--compact scmd-compact-list-page">
+
+  <div class="scmd-post-head scmd-post-head--compact">
+    <div>
+      <p class="scmd-post-kicker">Vận hành / Chốt trực</p>
+      <h2 class="scmd-post-title">Danh sách vị trí chốt</h2>
+      <p class="scmd-post-subtitle">Điểm làm việc cụ thể tại mục tiêu, phục vụ xếp ca, chấm công GPS/ảnh và kiểm tra hiện trường.</p>
+    </div>
+    <nav class="scmd-post-actions" aria-label="Thao tác nhanh">
+      {% if scmd_post_links.add_post != '#' %}
+        <a class="scmd-post-btn primary" href="{{ scmd_post_links.add_post }}">
+          <i class="fas fa-plus-circle" aria-hidden="true"></i> Thêm chốt
+        </a>
+      {% endif %}
+      {% if scmd_post_links.target_list != '#' %}
+        <a class="scmd-post-btn" href="{{ scmd_post_links.target_list }}">
+          <i class="fas fa-building" aria-hidden="true"></i> Mục tiêu
+        </a>
+      {% endif %}
+      {% if scmd_post_links.shift_list != '#' %}
+        <a class="scmd-post-btn" href="{{ scmd_post_links.shift_list }}">
+          <i class="fas fa-calendar-check" aria-hidden="true"></i> Phân công ca
+        </a>
+      {% endif %}
+      {% if scmd_post_links.schedule != '#' %}
+        <a class="scmd-post-btn" href="{{ scmd_post_links.schedule }}">
+          <i class="fas fa-calendar-alt" aria-hidden="true"></i> Xếp lịch
+        </a>
+      {% endif %}
+    </nav>
+  </div>
+
+  <div class="scmd-post-metrics scmd-post-metrics--compact" role="region" aria-label="Chỉ số chốt trực">
+    <div class="scmd-post-metric">
+      <span>Tổng chốt</span>
+      <strong>{{ scmd_post_stats.total|default:"0" }}</strong>
+    </div>
+    <div class="scmd-post-metric">
+      <span>Có ca hôm nay</span>
+      <strong>{{ scmd_post_stats.today_scheduled|default:"0" }}</strong>
+    </div>
+    <div class="scmd-post-metric">
+      <span>Chưa có ca hôm nay</span>
+      <strong>{{ scmd_post_stats.no_today_schedule|default:"0" }}</strong>
+    </div>
+    <div class="scmd-post-metric">
+      <span>Thiếu GPS</span>
+      <strong>{{ scmd_post_stats.missing_gps|default:"0" }}</strong>
+    </div>
+  </div>
+
+  {% if scmd_post_stats.no_today_schedule or scmd_post_stats.no_assignments or scmd_post_stats.missing_gps %}
+    <details class="scmd-post-note scmd-post-note--compact">
+      <summary>
+        ▶ Việc cần rà soát:
+        {{ scmd_post_stats.no_today_schedule|default:"0" }} chốt chưa có ca hôm nay
+        · {{ scmd_post_stats.no_assignments|default:"0" }} chốt chưa từng phân công
+        · {{ scmd_post_stats.missing_gps|default:"0" }} mục tiêu thiếu GPS
+      </summary>
+      <span>Dùng bộ lọc "Chất lượng chốt trực" để xử lý đúng nhóm dữ liệu trước khi xếp ca/chấm công.</span>
+    </details>
+  {% endif %}
+
+</div>
+{{ block.super }}
+{% endblock %}

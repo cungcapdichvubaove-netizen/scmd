@@ -1,0 +1,42 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{# Compact table-first changelist for /admin/operations/calamviec/.
+   - No duplicate Add action: object-tools block intentionally empty.
+   - No hero/card/banner stack: title, KPI chips and actions stay in a small shell.
+   - {{ block.super }} preserves Django Admin search/filter/action/pagination. #}
+{% block content_title %}{% endblock %}
+{% block object-tools %}{% endblock %}
+
+{% block content %}
+<div class="scmd-shift-page scmd-shift-page--repair scmd-compact-list-page scmd-shift-console--compact" aria-label="Ca làm việc">
+  <section class="scmd-shift-toolbar" aria-label="Tổng quan ca làm việc">
+    <div class="scmd-shift-toolbar__title">
+      <p class="scmd-shift-eyebrow">Vận hành / Ca làm việc</p>
+      <h2>Danh sách ca làm việc</h2>
+      <p class="scmd-shift-subtitle">Khung giờ ca dùng cho phân công, check-in/check-out và đối soát công.</p>
+    </div>
+
+    <nav class="scmd-shift-toolbar__actions" aria-label="Thao tác nhanh">
+      {% if scmd_shift_links.add != '#' %}<a class="scmd-shift-action scmd-shift-action--primary" href="{{ scmd_shift_links.add }}">+ Thêm ca</a>{% endif %}
+      {% if scmd_shift_links.assignments != '#' %}<a class="scmd-shift-action" href="{{ scmd_shift_links.assignments }}">Phân công ca</a>{% endif %}
+      {% if scmd_shift_links.schedule != '#' %}<a class="scmd-shift-action" href="{{ scmd_shift_links.schedule }}">Xếp lịch</a>{% endif %}
+    </nav>
+  </section>
+
+  <section class="scmd-shift-kpis scmd-shift-grid--compact" aria-label="Chỉ số nhanh">
+    <span class="scmd-shift-stat"><span>Tổng ca</span><strong>{{ scmd_shift_stats.total|default:"0" }}</strong></span>
+    <span class="scmd-shift-stat"><span>Ca đêm</span><strong>{{ scmd_shift_stats.night_count|default:"0" }}</strong></span>
+    <span class="scmd-shift-stat"><span>Có ca hôm nay</span><strong>{{ scmd_shift_stats.assigned_today|default:"0" }}</strong></span>
+    <span class="scmd-shift-stat"><span>Chưa từng dùng</span><strong>{{ scmd_shift_stats.never_assigned|default:"0" }}</strong></span>
+    {% if scmd_shift_stats.never_assigned %}
+      <details class="scmd-shift-note-compact">
+        <summary>{{ scmd_shift_stats.never_assigned }} ca cần rà soát</summary>
+        <span>Rà soát trước khi sửa/xóa; ca đêm cần kiểm kỹ logic qua ngày để không sai công và lương.</span>
+      </details>
+    {% endif %}
+  </section>
+</div>
+
+{{ block.super }}
+{% endblock %}

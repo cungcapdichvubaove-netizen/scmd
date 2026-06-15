@@ -1,0 +1,34 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls %}
+
+{% block content %}
+
+<div class="scmd-position-console">
+  <section class="scmd-position-head">
+    <div>
+      <h1 class="scmd-position-title">Quản trị chức danh</h1>
+      <p class="scmd-position-subtitle">Thiết lập chức danh, mô tả vai trò và nhóm quyền mặc định để hệ thống điều hướng đúng không gian làm việc sau đăng nhập.</p>
+    </div>
+    <div class="scmd-position-actions">
+      <a class="scmd-position-button scmd-position-button-primary" href="{{ scmd_position_links.add_position }}"><i class="fas fa-plus"></i> Thêm chức danh</a>
+      <a class="scmd-position-button" href="{{ scmd_position_links.employee_list }}"><i class="fas fa-users"></i> Nhân sự</a>
+      <a class="scmd-position-button" href="{{ scmd_position_links.group_list }}"><i class="fas fa-user-shield"></i> Nhóm quyền</a>
+      <a class="scmd-position-button" href="{{ scmd_position_links.department_list }}"><i class="fas fa-building"></i> Phòng ban</a>
+    </div>
+  </section>
+
+  <section class="scmd-position-metrics" aria-label="Chỉ số chức danh">
+    <div class="scmd-position-metric"><span>Tổng chức danh</span><strong>{{ scmd_position_stats.total_positions }}</strong></div>
+    <div class="scmd-position-metric"><span>Đang có nhân sự</span><strong>{{ scmd_position_stats.active_positions }}</strong></div>
+    <div class="scmd-position-metric"><span>Chưa gắn nhóm quyền</span><strong>{{ scmd_position_stats.positions_without_group }}</strong></div>
+    <div class="scmd-position-metric"><span>Chưa có nhân sự</span><strong>{{ scmd_position_stats.empty_positions }}</strong></div>
+  </section>
+
+  <section class="scmd-position-help">
+    <div class="scmd-position-note"><strong>Nguyên tắc vận hành:</strong> chức danh quyết định vai trò nghiệp vụ, nhóm quyền quyết định phạm vi thao tác. Khi nhân sự đăng nhập, router có thể dùng phòng ban + chức danh + nhóm quyền để đưa đúng màn hình làm việc.</div>
+    <div class="scmd-position-note"><strong>Cần rà soát:</strong> chức danh chưa gắn nhóm quyền, chức danh trùng nghĩa hoặc chức danh không còn nhân sự sử dụng.</div>
+  </section>
+</div>
+
+{{ block.super }}
+{% endblock %}

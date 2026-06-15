@@ -1,0 +1,38 @@
+{% extends "admin/change_list.html" %}
+{% load i18n humanize %}
+
+{% block content_title %}
+<div class="scmd-admin-hero inventory">
+    <div>
+        <p class="scmd-admin-eyebrow">Kho vật tư</p>
+        <h1>Công cụ hỗ trợ tại mục tiêu</h1>
+        <p class="scmd-admin-note">Theo dõi CCHT đang bàn giao thực tế cho từng mục tiêu bảo vệ: số lượng đang giữ, tồn kho tổng liên quan, cảnh báo tồn và điểm cần đối soát.</p>
+    </div>
+    <div class="scmd-admin-actions">
+        <a href="{{ target_tool_links.add }}" class="scmd-admin-btn primary">Thêm bản ghi</a>
+        <a href="{{ target_tool_export_url }}" class="scmd-admin-btn secondary">Xuất CSV</a>
+        <a href="{{ target_tool_links.materials }}" class="scmd-admin-btn ghost">Vật tư</a>
+        <a href="{{ target_tool_links.targets }}" class="scmd-admin-btn ghost">Mục tiêu</a>
+        <a href="{{ target_tool_links.dashboard }}" class="scmd-admin-btn ghost">Dashboard kho</a>
+    </div>
+</div>
+{% if target_tool_summary %}
+<div class="scmd-admin-kpis inventory">
+    <a class="scmd-admin-kpi" href="."><span>Tổng bản ghi</span><strong>{{ target_tool_summary.total_rows|default:0 }}</strong><small>{{ target_tool_summary.total_quantity|default:0|intcomma }} công cụ đang giữ</small></a>
+    <a class="scmd-admin-kpi" href="."><span>Mục tiêu có CCHT</span><strong class="success">{{ target_tool_summary.active_targets|default:0 }}</strong><small>{{ target_tool_summary.active_materials|default:0 }} loại vật tư/CCHT</small></a>
+    <a class="scmd-admin-kpi" href="?target_tool_issue=zero_quantity"><span>Số lượng bằng 0</span><strong class="danger">{{ target_tool_summary.zero_quantity|default:0 }}</strong><small>Cần thu hồi hoặc xóa sau đối soát</small></a>
+    <a class="scmd-admin-kpi" href="?target_tool_issue=today_update"><span>Cập nhật hôm nay</span><strong>{{ target_tool_summary.today_update|default:0 }}</strong><small>{{ target_tool_summary.month_update|default:0 }} cập nhật trong tháng</small></a>
+    <a class="scmd-admin-kpi" href="?target_tool_issue=material_low_stock"><span>Vật tư cảnh báo</span><strong class="warning">{{ target_tool_summary.material_low_stock|default:0 }}</strong><small>{{ target_tool_summary.material_out_stock|default:0 }} đã hết tồn tổng</small></a>
+    <a class="scmd-admin-kpi" href="?target_tool_issue=no_material_category"><span>Thiếu phân loại</span><strong>{{ target_tool_summary.no_material_category|default:0 }}</strong><small>Ảnh hưởng báo cáo kho</small></a>
+</div>
+{% endif %}
+<div class="scmd-admin-note-card inventory">
+    <strong>Nguyên tắc thủ kho:</strong> CCHT tại mục tiêu phải đối soát được với phiếu xuất, biên bản bàn giao/thu hồi và tồn kho tổng. Không dùng màn này để chỉnh tay thay cho quy trình cấp phát nếu đã phát sinh chứng từ.
+    <span>
+        <a href="{{ target_tool_links.issues }}">Phiếu xuất</a>
+        <a href="{{ target_tool_links.receipts }}">Phiếu nhập/thu hồi</a>
+        <a href="{{ target_tool_links.stock_report }}">Báo cáo tồn</a>
+        <a href="{{ target_tool_links.categories }}">Loại vật tư</a>
+    </span>
+</div>
+{% endblock %}

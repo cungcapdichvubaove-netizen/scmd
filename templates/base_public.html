@@ -1,0 +1,122 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+
+    <title>{% block title %}SCMD Pro{% endblock %}</title>
+
+    <link rel="icon" href="{% static 'img/brand/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/favicon-16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'img/brand/favicon-48x48.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/brand/apple-touch-icon.png' %}">
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="SCMD Pro">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+    {% block extra_css %}{% endblock %}
+
+    <style>
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.9);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: translateY(10px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes pulseLoader {
+            0%, 100% { transform: scale(1); opacity: 0.92; }
+            50% { transform: scale(1.06); opacity: 1; }
+        }
+
+        .animate-enter {
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .loader-mark {
+            width: 4rem;
+            height: 4rem;
+            margin-bottom: 1rem;
+            color: #60a5fa;
+            animation: pulseLoader 1.2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="{% block body_class %}scmd-public-shell p-4 md:p-6{% endblock %}">
+    <div id="global-loader" class="loader-overlay">
+        <div class="flex flex-col items-center">
+            <img src="{% static 'img/brand/loading-symbol.svg' %}" alt="SCMD Pro" class="loader-mark">
+            <p class="text-white text-sm font-bold tracking-[0.2em]">Hệ thống đang xử lý</p>
+        </div>
+    </div>
+
+    <div class="{% block public_shell_class %}w-full max-w-md animate-enter{% endblock %}">
+        {% block public_header %}
+        <header class="mb-8 text-center">
+            <div class="relative inline-block">
+                <img src="{% static 'img/brand/logo-symbol-white.png' %}" alt="SCMD Pro" class="brand-logo brand-logo--public mx-auto mb-4 h-16 w-16 object-contain drop-shadow-2xl">
+                <div class="absolute inset-0 -z-10 rounded-full bg-blue-400/15 blur-2xl"></div>
+            </div>
+            <h1 class="text-3xl font-black tracking-tight text-white">SCMD Pro</h1>
+            <p class="scmd-public-kicker mt-1 text-xs uppercase tracking-[0.3em]">Phần mềm chỉ huy và quản trị vận hành</p>
+        </header>
+        {% endblock %}
+
+        <main class="{% block public_main_class %}scmd-public-card rounded-[2.5rem] p-8 md:p-10{% endblock %}">
+            {% block content %}{% endblock %}
+        </main>
+
+        {% block public_footer %}
+        <footer class="mt-12 text-center">
+            <p class="scmd-public-footer text-[10px] font-bold uppercase tracking-widest">
+                &copy; 2026 SCMD
+            </p>
+        </footer>
+        {% endblock %}
+    </div>
+
+    <script>
+        document.querySelectorAll("form").forEach((form) => {
+            form.addEventListener("submit", function () {
+                document.getElementById("global-loader").style.display = "flex";
+            });
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const currentPath = window.location.pathname;
+            if (currentPath.includes("logout")) {
+                window.sessionStorage.clear();
+                window.localStorage.clear();
+                setTimeout(() => {
+                    window.location.href = "{% url 'main:login' %}";
+                }, 1000);
+            }
+        });
+    </script>
+    <script defer src="{% static 'pwa/pwa-register.js' %}"></script>
+</body>
+</html>

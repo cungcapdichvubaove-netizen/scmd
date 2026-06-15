@@ -1,0 +1,48 @@
+{% if bulk_bar %}
+<section class="scmd-ops-bulkbar {% if compact %}scmd-ops-bulkbar--compact{% endif %} is-idle" data-scmd-bulkbar{% if bulk_bar.print_selected_url %} data-scmd-print-selected-url="{{ bulk_bar.print_selected_url }}"{% endif %} aria-label="Thao tác hàng loạt an toàn">
+  <div class="scmd-ops-bulkbar__copy">
+    <strong data-scmd-bulk-idle>Chọn dòng để thao tác hàng loạt</strong>
+    <strong data-scmd-bulk-active hidden>{{ bulk_bar.title|default:"Thao tác với dòng đã chọn" }}</strong>
+    <p data-scmd-bulk-idle-note>{{ bulk_bar.idle_note|default:"Chọn một hoặc nhiều dòng trong bảng để mở thao tác hàng loạt an toàn." }}</p>
+    <p data-scmd-bulk-active-note hidden>{{ bulk_bar.note|default:"Dùng Action mặc định của Django Admin. Thanh này không tự ghi dữ liệu." }}</p>
+  </div>
+
+  <div class="scmd-ops-bulkbar__status" aria-live="polite" data-scmd-bulk-status>
+    Đã chọn <strong data-scmd-bulk-count>0</strong> dòng
+  </div>
+
+  {% if bulk_bar.idle_links %}
+  <div class="scmd-ops-bulkbar__idle-links" data-scmd-bulk-idle>
+    {% for link in bulk_bar.idle_links %}
+      {% if forloop.first %}<a class="scmd-ops-mini-link" href="{{ link.url }}">{{ link.label }}</a>{% endif %}
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="scmd-ops-bulkbar__expanded" data-scmd-bulk-expanded hidden>
+    <div class="scmd-ops-bulkbar__actions">
+      <button type="button" class="scmd-ops-mini-button" data-scmd-bulk-action="select-visible">Chọn trang hiện tại</button>
+      <button type="button" class="scmd-ops-mini-button" data-scmd-bulk-action="clear">Bỏ chọn</button>
+      <button type="button" class="scmd-ops-mini-button" data-scmd-bulk-action="copy-filter">Sao chép URL lọc</button>
+      {% if bulk_bar.print_selected_url %}<button type="button" class="scmd-ops-mini-button scmd-ops-mini-button--primary" data-scmd-bulk-action="print-selected">In hồ sơ đã chọn</button>{% endif %}
+      <button type="button" class="scmd-ops-mini-button" data-scmd-bulk-action="open-action">Mở Action</button>
+    </div>
+
+    {% if bulk_bar.safe_actions %}
+    <div class="scmd-ops-bulkbar__safe-actions" aria-label="Action nên dùng">
+      {% for action in bulk_bar.safe_actions %}
+        <span>{{ action }}</span>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if bulk_bar.links %}
+    <div class="scmd-ops-bulkbar__links">
+      {% for link in bulk_bar.links %}
+        <a class="scmd-ops-mini-link" href="{{ link.url }}">{{ link.label }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endif %}

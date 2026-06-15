@@ -1,0 +1,61 @@
+﻿{% extends "base.html" %}
+{% load humanize %}
+{% block title %}Bảng công tổng hợp | SCMD Pro{% endblock %}
+{% block header_title %}Trung tâm báo cáo{% endblock %}
+{% block extra_css %}
+<style>
+.report-shell{--b:#e2e8f0;--n:#0f172a;--m:#64748b;--blue:#1d4ed8}.report-card{background:#fff;border:1px solid var(--b);border-radius:16px;box-shadow:0 12px 28px rgba(15,23,42,.06)}.report-filter{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}.report-filter label{font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:800;color:#64748b}.matrix-container{max-width:100%;overflow:auto;max-height:72vh;border:1px solid #e2e8f0;border-radius:14px;background:#fff}.table-matrix{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}.table-matrix th{position:sticky;top:0;background:#f8fafc;z-index:20;border-bottom:2px solid #e2e8f0;color:#64748b;font-size:11px;text-transform:uppercase;padding:10px 8px}.table-matrix td{border-bottom:1px solid #f1f5f9;border-right:1px solid #f1f5f9;padding:8px;font-size:12px;text-align:center}.table-matrix td:nth-child(1),.table-matrix th:nth-child(1){position:sticky;left:0;z-index:15;background:#fff;border-right:1px solid #e2e8f0}.table-matrix td:nth-child(2),.table-matrix th:nth-child(2){position:sticky;left:86px;z-index:15;background:#fff;border-right:2px solid #e2e8f0}.table-matrix thead th:nth-child(1),.table-matrix thead th:nth-child(2){z-index:30;background:#f8fafc}.bg-success-subtle{background:#dcfce7!important;color:#166534!important;font-weight:800}.bg-warning-subtle{background:#fef3c7!important;color:#92400e!important;font-weight:800}.text-danger{color:#dc2626!important;font-weight:800}@media(max-width:1100px){.report-filter{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:640px){.report-filter{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="report-shell space-y-4">
+  <section class="report-card p-4">
+    <div class="flex flex-col xl:flex-row xl:items-start xl:justify-between gap-4">
+      <div>
+        
+        <h1 class="text-2xl font-black text-slate-900 mt-1">Bảng công tổng hợp</h1>
+        <p class="text-sm text-slate-500 mt-1">{{ summary.rendered_count }} / {{ summary.employee_count }}</p>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a class="btn btn-sm btn-outline" href="{{ urls.dashboard }}"><i class="fas fa-layer-group"></i> Trung tâm</a>
+        <a class="btn btn-sm btn-outline" href="{{ urls.ca_nhan }}"><i class="fas fa-user-clock"></i> Cá nhân</a>
+        <a class="btn btn-sm btn-outline" href="{{ urls.muc_tieu }}"><i class="fas fa-building"></i> Mục tiêu</a>
+        <a class="btn btn-sm bg-emerald-600 text-white border-none" href="{{ urls.export_attendance }}?month={{ selected_thang }}&year={{ selected_nam }}&muc_tieu={{ filters.muc_tieu_id|default:'all' }}"><i class="fas fa-file-excel"></i> Xuất Excel</a>
+      </div>
+    </div>
+    <form method="get" class="report-filter mt-4 bg-slate-50 border border-slate-100 rounded-xl p-3">
+      <div class="col-span-2"><label>Tìm nhân viên</label><input class="input input-sm input-bordered w-full bg-white" name="q" value="{{ filters.q }}" placeholder="Mã, họ tên, SĐT..."></div>
+      <div><label>Phòng ban</label><select class="select select-sm select-bordered w-full bg-white" name="phong_ban_id"><option value="">Tất cả</option>{% for item in phong_ban_list %}<option value="{{ item.id }}" {% if filters.phong_ban_id|stringformat:'s' == item.id|stringformat:'s' %}selected{% endif %}>{{ item.ten_phong_ban }}</option>{% endfor %}</select></div>
+      <div><label>Chức danh</label><select class="select select-sm select-bordered w-full bg-white" name="chuc_danh_id"><option value="">Tất cả</option>{% for item in chuc_danh_list %}<option value="{{ item.id }}" {% if filters.chuc_danh_id|stringformat:'s' == item.id|stringformat:'s' %}selected{% endif %}>{{ item.ten_chuc_danh }}</option>{% endfor %}</select></div>
+      <div><label>Mục tiêu</label><select class="select select-sm select-bordered w-full bg-white" name="muc_tieu_id"><option value="">Tất cả</option>{% for mt in muc_tieu_list %}<option value="{{ mt.id }}" {% if filters.muc_tieu_id|stringformat:'s' == mt.id|stringformat:'s' %}selected{% endif %}>{{ mt.ten_muc_tieu }}</option>{% endfor %}</select></div>
+      <div><label>Trạng thái</label><select class="select select-sm select-bordered w-full bg-white" name="trang_thai"><option value="">Đang làm</option>{% for value,label in trang_thai_choices %}<option value="{{ value }}" {% if filters.trang_thai == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+      <div><label>Tháng</label><select name="thang" class="select select-sm select-bordered w-full bg-white">{% for m in thang_range %}<option value="{{ m }}" {% if m == selected_thang %}selected{% endif %}>Tháng {{ m }}</option>{% endfor %}</select></div>
+      <div><label>Năm</label><select name="nam" class="select select-sm select-bordered w-full bg-white">{% for y in nam_range %}<option value="{{ y }}" {% if y == selected_nam %}selected{% endif %}>{{ y }}</option>{% endfor %}</select></div>
+      <div><label>Số dòng/trang</label><select name="page_size" class="select select-sm select-bordered w-full bg-white"><option value="50" {% if filters.page_size == '50' %}selected{% endif %}>50</option><option value="100" {% if filters.page_size == '100' %}selected{% endif %}>100</option><option value="200" {% if filters.page_size == '200' %}selected{% endif %}>200</option></select></div>
+      <div class="flex gap-2 items-end"><button class="btn btn-sm bg-blue-700 text-white border-none flex-1" type="submit"><i class="fas fa-filter"></i> Lọc</button><a class="btn btn-sm btn-ghost" href="{{ urls.tong_hop }}">Xóa</a></div>
+    </form>
+    {% if matrix_performance_notice %}
+    <div class="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800" data-testid="matrix-performance-notice">
+      <i class="fas fa-triangle-exclamation"></i> {{ matrix_performance_notice }}
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="report-card p-4"><p class="text-xs font-bold text-slate-500">Nhân sự phù hợp</p><p class="text-2xl font-black">{{ summary.employee_count|intcomma }}</p></div>
+    <div class="report-card p-4"><p class="text-xs font-bold text-slate-500">Tổng giờ trang này</p><p class="text-2xl font-black">{{ summary.total_hours|floatformat:1 }}</p></div>
+    <div class="report-card p-4"><p class="text-xs font-bold text-slate-500">Thiếu checkout</p><p class="text-2xl font-black text-red-600">{{ summary.missing_checkout }}</p></div>
+    <div class="report-card p-4"><p class="text-xs font-bold text-slate-500">GPS bất thường</p><p class="text-2xl font-black text-orange-600">{{ summary.gps_anomalies }}</p></div>
+  </section>
+
+  <div class="matrix-container">
+    <table class="table-matrix">
+      <thead><tr><th style="min-width:86px">Mã NV</th><th style="min-width:220px">Họ tên</th>{% for d in days_in_month %}<th style="min-width:38px">{{ d }}</th>{% endfor %}<th style="min-width:80px">T.Giờ</th><th style="min-width:80px">Muộn</th></tr></thead>
+      <tbody>{% for row in matrix_data %}<tr><td class="font-mono text-blue-700 font-bold">{{ row.nhan_vien.ma_nhan_vien }}</td><td class="text-left"><div class="font-bold text-slate-800 truncate w-52">{{ row.nhan_vien.ho_ten }}</div><div class="text-xs text-slate-400">{{ row.nhan_vien.phong_ban|default:'Chưa phòng ban' }} · {{ row.nhan_vien.chuc_danh|default:'Chưa chức danh' }}</div></td>{% for cell in row.days %}<td class="{{ cell.class }}" title="{{ cell.title }}">{{ cell.val }}</td>{% endfor %}<td class="font-black bg-slate-50">{{ row.tong_gio|floatformat:1 }}</td><td class="bg-slate-50 {% if row.tong_muon > 0 %}text-danger{% endif %}">{{ row.tong_muon }}</td></tr>{% empty %}<tr><td colspan="40" class="py-12 text-center text-slate-400">Không có dữ liệu phù hợp với bộ lọc.</td></tr>{% endfor %}</tbody>
+    </table>
+  </div>
+  {% if page_obj.has_other_pages %}<div class="flex justify-between items-center report-card p-3 text-sm"><span>Trang {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span><div class="join">{% if page_obj.has_previous %}<a class="btn btn-sm join-item" href="?{{ page_querystring }}&page={{ page_obj.previous_page_number }}">Trước</a>{% endif %}{% if page_obj.has_next %}<a class="btn btn-sm join-item" href="?{{ page_querystring }}&page={{ page_obj.next_page_number }}">Sau</a>{% endif %}</div></div>{% endif %}
+</div>
+{% endblock %}
+
+

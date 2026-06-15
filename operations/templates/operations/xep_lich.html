@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}Xếp lịch trực | SCMD Pro{% endblock %}
+{% block header_title %}Xếp lịch trực{% endblock %}
+
+{% block content %}
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+
+<div class="space-y-5">
+    <section class="scmd-surface-card p-5 md:p-6">
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div class="max-w-4xl">
+                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Phòng nghiệp vụ</p>
+                <h1 class="mt-2 text-2xl font-black tracking-tight text-slate-900 md:text-3xl">Xếp lịch ca trực theo mục tiêu và vị trí chốt</h1>
+                <p class="mt-2 text-sm leading-relaxed text-slate-600">
+                    Bề mặt này thuộc cụm điều hành vận hành, dùng để điều phối nhân sự theo tuần, theo mục tiêu bảo vệ và theo từng chốt trực.
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="{{ operations_dashboard_url }}" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-xs font-black uppercase tracking-[0.12em] text-slate-700 transition hover:border-blue-500 hover:text-blue-700">
+                    Về bảng điều hành
+                </a>
+                <a href="{{ presentation_url }}" class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs font-black uppercase tracking-[0.12em] text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700">
+                    Mở trình chiếu
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="scmd-surface-card p-5">
+        <div class="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
+            <form method="get" class="flex flex-wrap items-end gap-4">
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Mục tiêu vận hành</label>
+                    <select name="muc_tieu" class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-500 md:w-80" onchange="this.form.submit()">
+                        <option value="">Tất cả mục tiêu</option>
+                        {% for mt in muc_tieus %}
+                            <option value="{{ mt.id }}" {% if current_muc_tieu and mt.id == current_muc_tieu.id %}selected{% endif %}>{{ mt.ten_muc_tieu }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Tuần bắt đầu</label>
+                    <input type="date" name="date" value="{{ days_of_week.0|date:'Y-m-d' }}" class="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-500" onchange="this.form.submit()">
+                </div>
+
+                <div class="flex gap-2">
+                    <a href="?date={{ prev_week }}{% if current_muc_tieu %}&muc_tieu={{ current_muc_tieu.id }}{% endif %}" class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700" title="Tuần trước">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                    <a href="?date={{ next_week }}{% if current_muc_tieu %}&muc_tieu={{ current_muc_tieu.id }}{% endif %}" class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700" title="Tuần sau">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+            </form>
+
+            <div class="flex items-center gap-3">
+                <span class="text-xs font-semibold text-slate-400">Cập nhật: {% now "H:i" %}</span>
+                <button type="button" onclick="window.location.reload()" class="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-500 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700">
+                    <i class="fas fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section class="scmd-surface-card overflow-hidden">
+        <div class="overflow-auto custom-scrollbar">
+            <table class="min-w-full border-separate border-spacing-0 text-sm">
+                <thead>
+                    <tr class="sticky top-0 z-30">
+                        <th class="sticky left-0 z-40 min-w-[240px] border-b border-r border-slate-200 bg-slate-50 p-4 text-left shadow-[2px_0_8px_-4px_rgba(15,23,42,0.12)]">
+                            <span class="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">Vị trí / chốt trực</span>
+                        </th>
+                        {% for day in days_of_week %}
+                        <th class="min-w-[170px] border-b border-r border-slate-200 p-3 text-center {% if day == today %}bg-blue-600 text-white{% else %}bg-slate-50 text-slate-600{% endif %}">
+                            <div class="text-[10px] font-black uppercase tracking-[0.14em] opacity-80">{{ day|date:"l" }}</div>
+                            <div class="mt-1 text-lg font-black tracking-tight">{{ day|date:"d/m" }}</div>
+                        </th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for vi_tri in vi_tris %}
+                    <tr class="transition hover:bg-slate-50/70">
+                        <td class="sticky left-0 z-20 border-r border-slate-200 bg-white p-4 align-top shadow-[2px_0_8px_-4px_rgba(15,23,42,0.12)]">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-sm font-black text-blue-700">{{ vi_tri.ten_vi_tri }}</span>
+                                <span class="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-400">
+                                    <i class="fas fa-location-dot mr-1"></i>{{ vi_tri.muc_tieu.ten_muc_tieu }}
+                                </span>
+                            </div>
+                        </td>
+
+                        {% for day in days_of_week %}
+                        <td class="group relative min-h-[120px] border-r border-slate-100 p-2 align-top transition hover:bg-blue-50/30">
+                            <div id="cell-{{ vi_tri.id }}-{{ day|date:'Ymd' }}" class="flex h-full flex-col gap-2">
+                                {% with schedule_list=schedule_map|get_item:vi_tri|get_item:day %}
+                                    {% for ca in ca_lam_viecs %}
+                                        <div class="transition active:scale-[0.99]">
+                                            {% include "operations/partials/ca_truc_cell.html" with vi_tri=vi_tri ca=ca day=day phan_congs=schedule_list %}
+                                        </div>
+                                    {% endfor %}
+                                {% endwith %}
+                            </div>
+                            <div class="pointer-events-none absolute inset-0 rounded-sm border-2 border-transparent transition group-hover:border-blue-200"></div>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{{ days_of_week|length|add:1 }}" class="bg-slate-50 py-20 text-center">
+                            <div class="mx-auto flex max-w-sm flex-col items-center gap-3">
+                                <div class="flex h-16 w-16 items-center justify-center rounded-full bg-slate-200 text-slate-400 shadow-inner">
+                                    <i class="fas fa-calendar-xmark text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-slate-700">Chưa có dữ liệu lịch trực</h3>
+                                    <p class="mt-2 text-sm text-slate-400">Chọn mục tiêu vận hành ở phía trên để bắt đầu sắp xếp lịch theo tuần.</p>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+
+<dialog id="htmx-modal" class="modal modal-bottom sm:modal-middle transition-all">
+    <div class="modal-box overflow-hidden border border-slate-200 p-0 shadow-2xl">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 z-50 text-slate-400">x</button>
+        </form>
+
+        <div id="modal-content" class="min-h-[200px]">
+            <div class="htmx-indicator flex items-center justify-center p-10">
+                <span class="loading loading-ring loading-lg text-blue-600"></span>
+            </div>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop bg-slate-900/40 backdrop-blur-sm">
+        <button>close</button>
+    </form>
+</dialog>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #f1f5f9;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+    }
+</style>
+
+<script>
+    document.body.addEventListener('htmx:afterOnLoad', function (evt) {
+        if (evt.detail.target.id === "modal-content") {
+            return;
+        }
+    });
+</script>
+{% endblock %}

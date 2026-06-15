@@ -1,0 +1,25 @@
+{% extends "admin/change_list.html" %}
+{% load i18n humanize %}
+
+{% block content_title %}
+<div class="scmd-admin-hero">
+    <div>
+        <p class="scmd-admin-eyebrow">Kế toán & Sổ quỹ</p>
+        <h1>Sổ quỹ thu chi</h1>
+        <p class="scmd-admin-note">Theo dõi chứng từ thu/chi, trạng thái duyệt và dòng tiền đã được ghi nhận.</p>
+    </div>
+    <div class="scmd-admin-actions">
+        <a href="add/" class="scmd-admin-btn primary">Lập phiếu</a>
+        <a href="{% url 'accounting:dashboard' %}" class="scmd-admin-btn ghost">Dashboard kế toán</a>
+    </div>
+</div>
+{% if cashbook_summary %}
+<div class="scmd-admin-kpis">
+    <div class="scmd-admin-kpi"><span>Phiếu chờ duyệt</span><strong>{{ cashbook_summary.pending_count|default:0 }}</strong><small>{{ cashbook_summary.pending_amount|default:0|floatformat:0|intcomma }} ₫ đang treo</small></div>
+    <div class="scmd-admin-kpi"><span>Thu đã duyệt</span><strong class="success">{{ cashbook_summary.thu|default:0|floatformat:0|intcomma }} ₫</strong><small>Nguồn thu đã được xác nhận</small></div>
+    <div class="scmd-admin-kpi"><span>Chi đã duyệt</span><strong class="danger">{{ cashbook_summary.chi|default:0|floatformat:0|intcomma }} ₫</strong><small>Chi phí đã được xác nhận</small></div>
+    <div class="scmd-admin-kpi"><span>Số dư tạm tính</span><strong>{{ cashbook_summary.balance|default:0|floatformat:0|intcomma }} ₫</strong><small>Thu đã duyệt - chi đã duyệt</small></div>
+    <div class="scmd-admin-kpi"><span>Nháp / từ chối</span><strong>{{ cashbook_summary.draft_count|default:0 }} / {{ cashbook_summary.rejected_count|default:0 }}</strong><small>Cần bổ sung hoặc kiểm tra lại</small></div>
+</div>
+{% endif %}
+{% endblock %}

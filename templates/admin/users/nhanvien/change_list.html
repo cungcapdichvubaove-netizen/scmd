@@ -1,0 +1,31 @@
+{% extends "admin/change_list.html" %}
+{% load i18n admin_urls admin_console %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+<div class="scmd-ops-page scmd-employee-page scmd-employee-page--compact scmd-compact-list-page">
+  {% include "admin/includes/scmd_page_header.html" with page_header=page_header compact=True only %}
+
+  {% if summary_cards or work_queue_items %}
+  <section class="scmd-ops-decision-strip scmd-ops-decision-strip--compact" aria-label="Tóm tắt xử lý nhanh nhân sự">
+    {% include "admin/includes/scmd_summary_cards.html" with summary_cards=summary_cards compact=True strip=True only %}
+    {% if work_queue_items %}
+      {% include "admin/includes/scmd_work_queue_panel.html" with work_queue_items=work_queue_items work_queue_title=work_queue_title work_queue_subtitle=work_queue_subtitle compact=True minimal=True micro=True only %}
+    {% endif %}
+  </section>
+  {% endif %}
+
+  <div class="scmd-ops-table-tools scmd-ops-table-tools--compact" aria-label="Bộ lọc và thao tác bảng">
+    {% include "admin/includes/scmd_smart_filter_bar.html" with smart_filters=smart_filters compact=True only %}
+    {% include "admin/includes/scmd_bulk_action_bar.html" with bulk_bar=bulk_bar compact=True only %}
+  </div>
+
+  {{ block.super }}
+
+  {% admin_result_range cl as scmd_result_range %}
+  {% if scmd_result_range %}
+    <div class="scmd-ops-pagination-note scmd-ops-pagination-note--compact">Đang hiển thị {{ scmd_result_range }}</div>
+  {% endif %}
+</div>
+{% endblock %}

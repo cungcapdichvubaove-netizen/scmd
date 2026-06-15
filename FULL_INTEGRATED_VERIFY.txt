@@ -1,0 +1,22 @@
+SCMD Pro Full Integrated Source V15 verification
+
+Static checks run:
+- python3 -m py_compile users/test_operations_ux_foundation.py: PASS
+- python3 -m compileall -q .: PASS
+- node --check static/common/js/mobile_shell.js: PASS
+- node --check static/common/js/admin_localization.js: PASS
+- node --check static/common/js/operations_ux.js: PASS
+
+Static scans:
+- mobile/templates/base.html has no Django Tailwind demo strings: PASS
+- inventory dashboard has no page-level <style> block: PASS
+- dashboard_modules.css has no hardcoded hex color tokens: PASS
+- dashboard_modules.css has no linear/radial gradient: PASS
+- shared skeleton/state classes present: PASS
+- no bad release artifacts in packaged ZIP: PASS
+
+Not verified in sandbox:
+- docker compose run --rm web python manage.py check
+- docker compose run --rm web python manage.py makemigrations --check --dry-run
+- Django test suite
+- Browser/mobile responsive QA

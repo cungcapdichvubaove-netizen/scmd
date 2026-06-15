@@ -1,0 +1,137 @@
+{% load navigation_access %}
+{% with current_app=request.resolver_match.app_name current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name %}
+{% shell_route_allowed user 'dashboard:main' as can_access_overview %}
+{% shell_route_allowed user 'operations:dashboard_vanhanh' as can_access_operations %}
+{% shell_route_allowed user 'operations:mobile_tuan_tra_list' as can_access_patrol %}
+{% shell_route_allowed user 'inspection:dashboard' as can_access_inspection %}
+{% shell_route_allowed user 'clients:dashboard_crm' as can_access_clients %}
+{% shell_route_allowed user 'users:dashboard' as can_access_users %}
+{% shell_route_allowed user 'workflow:dashboard' as can_access_workflow %}
+{% shell_route_allowed user 'accounting:dashboard' as can_access_accounting %}
+{% shell_route_allowed user 'inventory:dashboard' as can_access_inventory %}
+{% shell_route_allowed user 'reports:report_dashboard' as can_access_reports %}
+<div class="mb-3.5">
+    <p class="scmd-sidebar-section sidebar-text mb-2 px-3 text-[9px] font-extrabold uppercase opacity-80">
+        Điều hành chung
+    </p>
+
+    <a href="{% url 'dashboard:main' %}" title="{% if can_access_overview %}Bảng điều hành tổng quan vận hành{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_overview %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'dashboard' %}scmd-nav-link-active{% endif %} {% if not can_access_overview %}scmd-nav-link-disabled{% endif %} group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-th-large text-sm"></i>
+        </div>
+        <span class="sidebar-text">Tổng quan vận hành</span>
+        {% if not can_access_overview %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+</div>
+
+<div class="mb-3.5">
+    <p class="scmd-sidebar-section sidebar-text mb-2 px-3 text-[9px] font-extrabold uppercase opacity-80">
+        Vận hành
+    </p>
+
+    <a href="{% url 'operations:dashboard_vanhanh' %}" title="{% if can_access_operations %}Bảng điều hành vận hành{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_operations %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'operations' and current_url_name == 'dashboard_vanhanh' or current_app == 'operations' and current_url_name == 'dashboard_trinh_chieu' %}scmd-nav-link-active{% endif %} {% if not can_access_operations %}scmd-nav-link-disabled{% endif %} group mb-0.5 flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-map-marked-alt text-sm"></i>
+        </div>
+        <span class="sidebar-text">Bảng điều hành</span>
+        {% if not can_access_operations %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+
+    <a href="{% url 'operations:mobile_tuan_tra_list' %}" title="{% if can_access_patrol %}Tuần tra mục tiêu thuộc vận hành{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_patrol %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'operations' and current_url_name == 'mobile_tuan_tra_list' %}scmd-nav-link-active{% endif %} {% if not can_access_patrol %}scmd-nav-link-disabled{% endif %} group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-person-walking text-sm"></i>
+        </div>
+        <span class="sidebar-text">Tuần tra mục tiêu</span>
+        {% if not can_access_patrol %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+</div>
+
+<div class="mb-3.5">
+    <p class="scmd-sidebar-section sidebar-text mb-2 px-3 text-[9px] font-extrabold uppercase opacity-80">
+        Thanh tra
+    </p>
+
+    <a href="{% url 'inspection:dashboard' %}" title="{% if can_access_inspection %}Kiểm tra mục tiêu và biên bản thanh tra{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_inspection %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'inspection' %}scmd-nav-link-active{% endif %} {% if not can_access_inspection %}scmd-nav-link-disabled{% endif %} group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-clipboard-check text-sm"></i>
+        </div>
+        <span class="sidebar-text">Kiểm tra mục tiêu</span>
+        {% if not can_access_inspection %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+</div>
+
+<div class="mb-3.5">
+    <p class="scmd-sidebar-section sidebar-text mb-2 px-3 text-[9px] font-extrabold uppercase opacity-80">
+        Kinh doanh
+    </p>
+    <a href="{% url 'clients:dashboard_crm' %}" title="{% if can_access_clients %}CRM và hợp đồng{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_clients %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'clients' %}scmd-nav-link-active{% endif %} {% if not can_access_clients %}scmd-nav-link-disabled{% endif %} group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-chart-pie text-sm"></i>
+        </div>
+        <span class="sidebar-text">CRM & hợp đồng</span>
+        {% if not can_access_clients %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+</div>
+
+<div class="mb-3.5">
+    <p class="scmd-sidebar-section sidebar-text mb-2 px-3 text-[9px] font-extrabold uppercase opacity-80">
+        Nhân sự
+    </p>
+    <a href="{% url 'users:dashboard' %}" title="{% if can_access_users %}Hành chính nhân sự{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_users %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'users' and current_url_name != 'profile' and current_url_name != 'mobile_profile' %}scmd-nav-link-active{% endif %} {% if not can_access_users %}scmd-nav-link-disabled{% endif %} group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-users text-sm"></i>
+        </div>
+        <span class="sidebar-text">Hành chính nhân sự</span>
+        {% if not can_access_users %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+</div>
+
+<div class="mb-3.5">
+    <p class="scmd-sidebar-section sidebar-text mb-2 px-3 text-[9px] font-extrabold uppercase opacity-80">
+        Văn phòng số
+    </p>
+    <a href="{% url 'workflow:dashboard' %}" title="{% if can_access_workflow %}Công việc và đề xuất{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_workflow %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'workflow' %}scmd-nav-link-active{% endif %} {% if not can_access_workflow %}scmd-nav-link-disabled{% endif %} group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-tasks text-sm"></i>
+        </div>
+        <span class="sidebar-text">Công việc & đề xuất</span>
+        {% if not can_access_workflow %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+</div>
+
+<div class="mb-3.5">
+    <p class="scmd-sidebar-section sidebar-text mb-2 px-3 text-[9px] font-extrabold uppercase opacity-80">
+        Tài chính & Kho
+    </p>
+
+    <a href="{% url 'accounting:dashboard' %}" title="{% if can_access_accounting %}Kế toán và lương{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_accounting %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'accounting' %}scmd-nav-link-active{% endif %} {% if not can_access_accounting %}scmd-nav-link-disabled{% endif %} group mb-0.5 flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-file-invoice-dollar text-sm"></i>
+        </div>
+        <span class="sidebar-text">Kế toán & lương</span>
+        {% if not can_access_accounting %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+
+    <a href="{% url 'inventory:dashboard' %}" title="{% if can_access_inventory %}Kho và vật tư{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_inventory %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'inventory' %}scmd-nav-link-active{% endif %} {% if not can_access_inventory %}scmd-nav-link-disabled{% endif %} group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-boxes text-sm"></i>
+        </div>
+        <span class="sidebar-text">Kho & vật tư</span>
+        {% if not can_access_inventory %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+</div>
+
+<div class="mb-3.5">
+    <p class="scmd-sidebar-section sidebar-text mb-2 px-3 text-[9px] font-extrabold uppercase opacity-80">
+        Báo cáo
+    </p>
+    <a href="{% url 'reports:report_dashboard' %}" title="{% if can_access_reports %}Trung tâm báo cáo{% else %}Bạn không có quyền truy cập khu vực này. Vui lòng liên hệ với Admin.{% endif %}" aria-disabled="{% if can_access_reports %}false{% else %}true{% endif %}" class="scmd-nav-link {% if current_app == 'reports' %}scmd-nav-link-active{% endif %} {% if not can_access_reports %}scmd-nav-link-disabled{% endif %} group flex items-center gap-2.5 rounded-xl px-2.5 py-2 text-[13px] font-semibold transition-all duration-300">
+        <div class="scmd-nav-icon flex h-7 w-7 items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-chart-line text-sm"></i>
+        </div>
+        <span class="sidebar-text">Trung tâm báo cáo</span>
+        {% if not can_access_reports %}<i class="fas fa-lock ml-auto text-[10px] opacity-70"></i>{% endif %}
+    </a>
+</div>
+
+{% endwith %}

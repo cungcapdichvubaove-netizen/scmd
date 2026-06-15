@@ -1,0 +1,208 @@
+{# file: accounting/templates/accounting/dashboard.html #}
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Kế toán và lương | SCMD Pro{% endblock %}
+{% block header_title %}Kế toán và lương{% endblock %}
+
+{% block extra_css %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/dashboard_modules.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="acct-dashboard acct-workbench">
+    <section class="acct-topbar" aria-label="Kế toán và lương">
+        <div class="acct-topbar-main">
+            <div>
+                <div class="acct-period-row">
+                    <span class="acct-chip"><i class="fas fa-calendar-alt"></i>{{ period_label }}</span>
+                    <span class="acct-chip"><i class="fas fa-scale-balanced"></i>{{ period_balance|floatformat:0|intcomma }} đ</span>
+                </div>
+            </div>
+            <div class="acct-actions" aria-label="Thao tác nhanh kế toán">
+                {% if can_run_payroll and urls.calculate_payroll %}
+                <button type="button" onclick="document.getElementById('modal-tinh-luong').showModal()" class="acct-btn acct-btn-primary"><i class="fas fa-calculator"></i>Tính lương</button>
+                {% endif %}
+                {% if urls.add_voucher %}<a href="{{ urls.add_voucher }}" class="acct-btn acct-btn-primary"><i class="fas fa-plus"></i>Lập phiếu</a>{% endif %}
+                {% if urls.vouchers %}<a href="{{ urls.vouchers }}" class="acct-btn acct-btn-ghost"><i class="fas fa-receipt"></i>Sổ quỹ</a>{% endif %}
+                {% if urls.payrolls %}<a href="{{ urls.payrolls }}" class="acct-btn acct-btn-ghost"><i class="fas fa-money-check-alt"></i>Kỳ lương</a>{% endif %}
+            </div>
+        </div>
+        <div class="acct-toolbar" aria-label="Kỳ xem">
+            <div class="acct-filter">
+                <a href="?period=today" class="{% if period == 'today' %}is-active{% endif %}">Hôm nay</a>
+                <a href="?period=7d" class="{% if period == '7d' %}is-active{% endif %}">7 ngày</a>
+                <a href="?period=month" class="{% if period == 'month' %}is-active{% endif %}">Tháng này</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="acct-kpi-strip" aria-label="Chỉ số kế toán chính">
+        {% for card in metric_cards %}
+        {% if card.url %}<a href="{{ card.url }}" class="acct-kpi acct-tone-{{ card.tone }}">{% else %}<div class="acct-kpi acct-tone-{{ card.tone }}">{% endif %}
+            <span class="acct-kpi-label">{{ card.label }}</span>
+            <strong class="acct-kpi-value acct-money">{% if card.money %}{{ card.value|floatformat:0|intcomma }} đ{% else %}{{ card.value }}{% endif %}</strong>
+            <span class="acct-kpi-foot"><span>{{ card.status }}</span><b>{{ card.cta }}</b></span>
+        {% if card.url %}</a>{% else %}</div>{% endif %}
+        {% endfor %}
+    </section>
+
+    <section class="acct-workspace{% if not utility_cards %} acct-workspace--single{% endif %}">
+        <div class="acct-panel acct-workqueue-panel">
+            <div class="acct-panel-header acct-panel-header--compact">
+                <h2 class="acct-panel-title"><i class="fas fa-list-check"></i>Việc cần xử lý</h2>
+                {% if urls.vouchers %}<a href="{{ urls.vouchers }}" class="acct-panel-link">Sổ quỹ</a>{% endif %}
+            </div>
+            <div class="acct-table-wrap">
+                <table class="acct-table acct-workqueue-table">
+                    <thead>
+                        <tr>
+                            <th>Mức</th>
+                            <th>Nghiệp vụ</th>
+                            <th>Hồ sơ</th>
+                            <th>Giá trị</th>
+                            <th>Trạng thái</th>
+                            <th>Hạn</th>
+                            <th>CTA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in action_items %}
+                        <tr>
+                            <td><span class="acct-badge {% if item.tone == 'danger' %}acct-badge-danger{% elif item.tone == 'warning' %}acct-badge-warning{% else %}acct-badge-info{% endif %}">{{ item.priority }}</span></td>
+                            <td><div class="acct-row-title">{{ item.type }}</div><div class="acct-row-sub">{{ item.subject|default:"—" }}</div></td>
+                            <td><div class="acct-row-title">{{ item.title }}</div></td>
+                            <td class="acct-money font-semibold">{{ item.amount|floatformat:0|intcomma }} đ</td>
+                            <td><span class="acct-status-text">{{ item.status }}</span></td>
+                            <td>{{ item.due_label|default:"—" }}</td>
+                            <td>{% if item.url %}<a href="{{ item.url }}" class="acct-mini-cta">{{ item.cta }}</a>{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7"><div class="acct-empty scmd-state scmd-state--empty"><i class="fas fa-check-circle"></i>Không có việc mở</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if utility_cards %}
+        <aside class="acct-utility-stack" aria-label="Tiện ích kế toán">
+            {% if cashflow_has_activity %}
+            <div class="acct-panel acct-utility-card">
+                <div class="acct-panel-header acct-panel-header--compact">
+                    <h2 class="acct-panel-title"><i class="fas fa-chart-column"></i>Dòng tiền 6 tháng</h2>
+                </div>
+                <div class="acct-mini-cashflow">
+                    {% for point in cashflow_points %}
+                    <div class="acct-mini-cash-col" title="{{ point.label }}: {{ point.balance|floatformat:0|intcomma }} đ">
+                        <span style="height: {{ point.thu_percent }}%;"></span>
+                        <b style="height: {{ point.chi_percent }}%;"></b>
+                        <small>{{ point.label }}</small>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </aside>
+        {% endif %}
+    </section>
+
+    <section class="acct-reference-grid" aria-label="Bảng tham khảo kế toán">
+        <div class="acct-panel">
+            <div class="acct-panel-header acct-panel-header--compact">
+                <h2 class="acct-panel-title"><i class="fas fa-money-check-alt"></i>Kỳ lương gần nhất</h2>
+                {% if urls.payrolls %}<a href="{{ urls.payrolls }}" class="acct-panel-link">Quản lý</a>{% endif %}
+            </div>
+            <div class="acct-table-wrap">
+                <table class="acct-table acct-reference-table">
+                    <thead><tr><th>Kỳ</th><th>Giá trị</th><th>Trạng thái</th></tr></thead>
+                    <tbody>
+                        {% for bl in recent_payroll_rows %}
+                        <tr>
+                            <td>{% if bl.detail_url %}<a href="{{ bl.detail_url }}" class="acct-row-title">T{{ bl.thang }}/{{ bl.nam }}</a>{% else %}<span class="acct-row-title">T{{ bl.thang }}/{{ bl.nam }}</span>{% endif %}</td>
+                            <td class="acct-money">{{ bl.tong_chi_tra|floatformat:0|intcomma }} đ</td>
+                            <td>{{ bl.get_trang_thai_display }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3"><div class="acct-empty">Không có việc mở</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="acct-panel">
+            <div class="acct-panel-header acct-panel-header--compact">
+                <h2 class="acct-panel-title"><i class="fas fa-receipt"></i>Chứng từ gần đây</h2>
+                {% if urls.vouchers %}<a href="{{ urls.vouchers }}" class="acct-panel-link">Xem tất cả</a>{% endif %}
+            </div>
+            <div class="acct-table-wrap">
+                <table class="acct-table acct-reference-table">
+                    <thead><tr><th>Phiếu</th><th>Giá trị</th><th>Trạng thái</th></tr></thead>
+                    <tbody>
+                        {% for item in recent_voucher_rows %}
+                        <tr>
+                            <td><span class="acct-row-title">{{ item.ma_phieu }}</span><div class="acct-row-sub">{{ item.ngay_lap|date:"d/m" }}</div></td>
+                            <td class="acct-money">{{ item.so_tien|floatformat:0|intcomma }} đ</td>
+                            <td>{{ item.get_trang_thai_display }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="3"><div class="acct-empty">Không có chứng từ</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="acct-panel">
+            <div class="acct-panel-header acct-panel-header--compact">
+                <h2 class="acct-panel-title"><i class="fas fa-layer-group"></i>Cơ cấu thu/chi</h2>
+                {% if urls.add_voucher %}<a href="{{ urls.add_voucher }}" class="acct-panel-link">Lập phiếu</a>{% endif %}
+            </div>
+            <div class="acct-bars acct-bars--compact">
+                {% for row in category_rows %}
+                <div class="acct-bar-row">
+                    <div>
+                        <div class="acct-bar-label">{{ row.label }}</div>
+                        <div class="acct-bar-track"><div class="acct-bar-fill" style="width: {{ row.percent }}%;"></div></div>
+                    </div>
+                    <div class="acct-money text-right text-xs font-bold text-slate-700">{{ row.total|floatformat:0|intcomma }}</div>
+                </div>
+                {% empty %}
+                <div class="acct-empty">Không có phát sinh</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+{% if can_run_payroll and urls.calculate_payroll %}
+<dialog id="modal-tinh-luong" class="modal">
+    <div class="modal-box bg-white rounded-xl shadow-2xl acct-modal">
+        <h3 class="font-bold text-lg text-slate-800 mb-2">Tính lương tháng mới</h3>
+        <form method="post" action="{{ urls.calculate_payroll }}">
+            {% csrf_token %}
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div class="form-control">
+                    <label class="label text-xs font-bold text-slate-500">Tháng</label>
+                    <input type="number" name="thang" value="{{ today.month }}" class="input input-bordered input-sm w-full" min="1" max="12" required>
+                </div>
+                <div class="form-control">
+                    <label class="label text-xs font-bold text-slate-500">Năm</label>
+                    <input type="number" name="nam" value="{{ today.year }}" class="input input-bordered input-sm w-full" required>
+                </div>
+            </div>
+            <div class="rounded-xl border border-amber-200 bg-amber-50 text-amber-800 text-xs p-3 mb-4">
+                <i class="fas fa-triangle-exclamation mr-1"></i> Không tính lại kỳ đã khóa/đã thanh toán.
+            </div>
+            <div class="modal-action">
+                <button type="button" class="btn btn-sm btn-ghost" onclick="document.getElementById('modal-tinh-luong').close()">Hủy</button>
+                <button type="submit" class="btn btn-sm bg-slate-800 text-white border-none">Thực hiện</button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop"><button>close</button></form>
+</dialog>
+{% endif %}
+{% endblock %}

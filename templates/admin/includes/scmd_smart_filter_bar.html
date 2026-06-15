@@ -1,0 +1,37 @@
+{% if smart_filters %}
+<section class="scmd-ops-smart-filters {% if compact %}scmd-ops-smart-filters--compact{% endif %}" aria-label="Bộ lọc nhanh theo tình huống">
+  {% if not compact %}
+  <div class="scmd-ops-section-head scmd-ops-section-head--inline">
+    <div>
+      <h3>Lọc nhanh</h3>
+      <p>Thu hẹp ngay trên phạm vi dữ liệu hiện tại.</p>
+    </div>
+  </div>
+  {% endif %}
+  <div class="scmd-ops-smart-filters__items">
+    {% for item in smart_filters %}
+      {% if forloop.counter <= 5 %}
+      <a class="scmd-ops-filter {% if item.active %}is-active{% endif %}" href="{{ item.url }}">
+        <span>{{ item.label }}</span>
+        <strong>{{ item.count|default:0 }}</strong>
+      </a>
+      {% endif %}
+    {% endfor %}
+    {% if smart_filters|length > 5 %}
+    <details class="scmd-ops-more-filters">
+      <summary>Bộ lọc thêm</summary>
+      <div class="scmd-ops-more-filters__menu">
+        {% for item in smart_filters %}
+          {% if forloop.counter > 5 %}
+          <a class="scmd-ops-filter {% if item.active %}is-active{% endif %}" href="{{ item.url }}">
+            <span>{{ item.label }}</span>
+            <strong>{{ item.count|default:0 }}</strong>
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </details>
+    {% endif %}
+  </div>
+</section>
+{% endif %}

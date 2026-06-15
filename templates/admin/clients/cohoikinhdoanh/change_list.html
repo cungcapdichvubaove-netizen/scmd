@@ -1,0 +1,38 @@
+﻿{% extends "admin/change_list.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{# Trang này đã có header nghiệp vụ riêng; ẩn tiêu đề mặc định của Django Admin để tránh lặp "0 2. Pipeline (Cơ hội)". #}
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="scmd-opp-console">
+  <section class="scmd-opp-head">
+    <div>
+      <div class="scmd-opp-kicker">CRM / Pipeline kinh doanh</div>
+      <h1 class="scmd-opp-title">Quản trị cơ hội kinh doanh</h1>
+    </div>
+    <div class="scmd-opp-actions">
+      <a class="scmd-opp-btn primary" href="{{ scmd_opportunity_links.add_opportunity }}"><i class="fas fa-plus-circle"></i> Thêm cơ hội</a>
+      <a class="scmd-opp-btn" href="{{ scmd_opportunity_links.lead_list }}"><i class="fas fa-address-book"></i> Lead</a>
+      <a class="scmd-opp-btn" href="{{ scmd_opportunity_links.contract_list }}"><i class="fas fa-file-contract"></i> Hợp đồng</a>
+      <a class="scmd-opp-btn" href="{{ scmd_opportunity_links.pipeline }}"><i class="fas fa-stream"></i> Pipeline</a>
+      <a class="scmd-opp-btn" href="{{ scmd_opportunity_links.crm_dashboard }}"><i class="fas fa-chart-line"></i> CRM dashboard</a>
+    </div>
+  </section>
+
+  <section class="scmd-opp-metrics" aria-label="Chỉ số cơ hội kinh doanh">
+    <div class="scmd-opp-metric"><strong>{{ scmd_opportunity_stats.total }}</strong><span>Tổng cơ hội</span></div>
+    <div class="scmd-opp-metric"><strong>{{ scmd_opportunity_stats.open }}</strong><span>Đang mở</span></div>
+    <div class="scmd-opp-metric"><strong>{{ scmd_opportunity_stats.pipeline_value|floatformat:0|intcomma }}</strong><span>Giá trị pipeline</span></div>
+    <div class="scmd-opp-metric"><strong>{{ scmd_opportunity_stats.negotiating }}</strong><span>Thương thảo</span></div>
+    <div class="scmd-opp-metric"><strong>{{ scmd_opportunity_stats.won_no_contract }}</strong><span>Thắng chưa HĐ</span></div>
+    <div class="scmd-opp-metric"><strong>{{ scmd_opportunity_stats.missing_owner }}</strong><span>Thiếu phụ trách</span></div>
+  </section>
+</div>
+{{ block.super }}
+{% endblock %}

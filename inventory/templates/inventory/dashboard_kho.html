@@ -1,0 +1,218 @@
+{% extends "base.html" %}
+{% load humanize static %}
+
+{% block title %}Kho & Vật tư | SCMD Pro{% endblock %}
+{% block header_title %}Kho & Vật tư{% endblock %}
+
+{% block extra_css %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/dashboard_modules.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="inv-dashboard inv-workbench scmd-dashboard scmd-dashboard--inventory">
+    <section class="inv-topbar" aria-label="Kho và vật tư">
+        <div class="inv-topbar-main">
+            <div class="inv-topbar-meta">
+                <span class="inv-chip"><i class="fas fa-calendar-alt"></i>{{ period_label }}</span>
+                <span class="inv-chip"><i class="fas fa-cubes"></i>{{ total_stock_quantity|intcomma }} đơn vị</span>
+                <span class="inv-chip"><i class="fas fa-arrow-down"></i>{{ incoming_qty|intcomma }} nhập</span>
+                <span class="inv-chip"><i class="fas fa-arrow-up"></i>{{ outgoing_qty|intcomma }} xuất</span>
+            </div>
+            <div class="inv-actions" aria-label="Thao tác kho">
+                {% if urls.add_receipt %}<a href="{{ urls.add_receipt }}" class="inv-btn inv-btn-primary"><i class="fas fa-arrow-down"></i>Nhập kho</a>{% endif %}
+                {% if urls.add_issue %}<a href="{{ urls.add_issue }}" class="inv-btn inv-btn-primary"><i class="fas fa-arrow-up"></i>Xuất kho</a>{% endif %}
+                {% if urls.stock_report %}<a href="{{ urls.stock_report }}" class="inv-btn inv-btn-ghost"><i class="fas fa-clipboard-list"></i>Tồn kho</a>{% endif %}
+                {% if urls.target_tools %}<a href="{{ urls.target_tools }}" class="inv-btn inv-btn-ghost"><i class="fas fa-building-shield"></i>CCHT mục tiêu</a>{% endif %}
+            </div>
+        </div>
+        <div class="inv-toolbar" aria-label="Kỳ xem">
+            <div class="inv-filter">
+                <a href="?period=today" class="{% if period == 'today' %}is-active{% endif %}">Hôm nay</a>
+                <a href="?period=7d" class="{% if period == '7d' %}is-active{% endif %}">7 ngày</a>
+                <a href="?period=month" class="{% if period == 'month' %}is-active{% endif %}">Tháng này</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="inv-kpi-strip" aria-label="Chỉ số kho">
+        {% for card in metric_cards %}
+        {% if card.url %}<a href="{{ card.url }}" class="inv-kpi">{% else %}<div class="inv-kpi">{% endif %}
+            <span class="inv-kpi-label">{{ card.label }}</span>
+            <strong class="inv-kpi-value">{{ card.value|intcomma }}</strong>
+            <span class="inv-kpi-foot"><span>{{ card.status }}</span><b>{{ card.cta }}</b></span>
+        {% if card.url %}</a>{% else %}</div>{% endif %}
+        {% endfor %}
+    </section>
+
+    <section class="inv-workspace{% if not utility_cards %} inv-workspace--single{% endif %}">
+        <div class="inv-panel inv-workqueue-panel">
+            <div class="inv-panel-header inv-panel-header--compact">
+                <h2 class="inv-panel-title"><i class="fas fa-list-check"></i>Việc cần xử lý</h2>
+                <div class="inv-queue-filters" aria-label="Lọc nhanh việc kho">
+                    <button type="button" class="inv-queue-filter is-active" data-filter="all">Tất cả</button>
+                    <button type="button" class="inv-queue-filter" data-filter="nhap">Nhập</button>
+                    <button type="button" class="inv-queue-filter" data-filter="xuat">Xuất</button>
+                    <button type="button" class="inv-queue-filter" data-filter="ton">Tồn</button>
+                    <button type="button" class="inv-queue-filter" data-filter="ccht">CCHT</button>
+                    <button type="button" class="inv-queue-filter" data-filter="khau-tru">Khấu trừ</button>
+                </div>
+            </div>
+            <div class="inv-table-wrap">
+                <table class="inv-table inv-workqueue-table">
+                    <thead>
+                        <tr>
+                            <th>Mức</th>
+                            <th>Nghiệp vụ</th>
+                            <th>Hồ sơ</th>
+                            <th>Đối tượng</th>
+                            <th>Trạng thái</th>
+                            <th>Hạn</th>
+                            <th>CTA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in action_items %}
+                        <tr data-work-kind="{{ item.business }}">
+                            <td><span class="inv-badge {% if item.tone == 'danger' %}badge-red{% elif item.tone == 'warning' %}badge-amber{% else %}badge-blue{% endif %}">{{ item.priority }}</span></td>
+                            <td><div class="inv-row-title">{{ item.type }}</div></td>
+                            <td><div class="inv-row-title">{{ item.title }}</div></td>
+                            <td><div class="inv-row-sub">{{ item.target }}</div></td>
+                            <td><span class="inv-status-text">{{ item.status }}</span></td>
+                            <td>{{ item.due_label }}</td>
+                            <td>{% if item.url %}<a href="{{ item.url }}" class="inv-mini-cta">{{ item.cta }}</a>{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7"><div class="inv-empty scmd-state scmd-state--empty">Không có việc mở</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {% if utility_cards %}
+        <aside class="inv-utility-stack" aria-label="Tiện ích kho">
+            {% for card in utility_cards %}
+            <div class="inv-panel inv-utility-card">
+                <div class="inv-panel-header inv-panel-header--compact">
+                    <h2 class="inv-panel-title">{{ card.title }}</h2>
+                    {% if card.url %}<a href="{{ card.url }}" class="inv-panel-link">{{ card.cta }}</a>{% endif %}
+                </div>
+                <div class="inv-utility-body">
+                    <strong>{{ card.count|intcomma }}</strong>
+                    <span>{{ card.status }}</span>
+                </div>
+                {% if card.items %}
+                <div class="inv-side-list inv-side-list--compact">
+                    {% for item in card.items %}
+                    <div class="inv-side-item">
+                        <div class="inv-side-title">{{ item.title }}</div>
+                        <div class="inv-side-meta">{{ item.meta }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </aside>
+        {% endif %}
+    </section>
+
+    <section class="inv-reference-grid" aria-label="Bảng tham khảo kho">
+        <div class="inv-panel">
+            <div class="inv-panel-header inv-panel-header--compact">
+                <h2 class="inv-panel-title"><i class="fas fa-file-invoice"></i>Chứng từ gần đây</h2>
+                {% if urls.issues %}<a href="{{ urls.issues }}" class="inv-panel-link">Mở phiếu</a>{% endif %}
+            </div>
+            <div class="inv-table-wrap">
+                <table class="inv-table inv-reference-table">
+                    <thead>
+                        <tr>
+                            <th>Phiếu</th>
+                            <th>Nghiệp vụ</th>
+                            <th>Đối tượng</th>
+                            <th>Trạng thái</th>
+                            <th>CTA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for doc in recent_documents %}
+                        <tr>
+                            <td><div class="inv-row-title">{{ doc.code }}</div><div class="inv-row-sub">{{ doc.time|date:"d/m H:i" }}</div></td>
+                            <td>{{ doc.kind }}</td>
+                            <td>{{ doc.subject }}</td>
+                            <td>{{ doc.status_label }}</td>
+                            <td>
+                                {% if doc.admin_url %}<a href="{{ doc.admin_url }}" class="inv-mini-cta">Mở</a>{% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5"><div class="inv-empty">Không có chứng từ</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="inv-panel">
+            <div class="inv-panel-header inv-panel-header--compact">
+                <h2 class="inv-panel-title"><i class="fas fa-chart-simple"></i>Cơ cấu tồn kho</h2>
+                {% if urls.stock_report %}<a href="{{ urls.stock_report }}" class="inv-panel-link">Báo cáo</a>{% endif %}
+            </div>
+            <div class="inv-bars inv-bars--compact">
+                {% for row in category_stock %}
+                <div class="inv-bar-row">
+                    <div>
+                        <div class="inv-bar-label">{{ row.label }}</div>
+                        <div class="inv-bar-track"><div class="inv-bar-fill" style="width: {{ row.percent }}%;"></div></div>
+                    </div>
+                    <strong>{{ row.total_stock|intcomma }}</strong>
+                </div>
+                {% empty %}
+                <div class="inv-empty">Không có tồn kho</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="inv-panel">
+            <div class="inv-panel-header inv-panel-header--compact">
+                <h2 class="inv-panel-title"><i class="fas fa-right-left"></i>Ledger gần đây</h2>
+                {% if urls.ledger %}<a href="{{ urls.ledger }}" class="inv-panel-link">Mở ledger</a>{% endif %}
+            </div>
+            <div class="inv-ledger-list">
+                {% for entry in recent_ledger|slice:":6" %}
+                <div class="inv-ledger-item">
+                    <span class="inv-ledger-icon {% if entry.direction == 'IN' %}in{% else %}out{% endif %}"><i class="fas {% if entry.direction == 'IN' %}fa-plus{% else %}fa-minus{% endif %}"></i></span>
+                    <div>
+                        <div class="inv-row-title">{{ entry.vat_tu.ten_vat_tu }}</div>
+                        <div class="inv-row-sub">{{ entry.created_at|date:"d/m H:i" }} · {{ entry.stock_before }} → {{ entry.stock_after }}</div>
+                    </div>
+                    <strong>{% if entry.quantity_delta > 0 %}+{% endif %}{{ entry.quantity_delta }}</strong>
+                </div>
+                {% empty %}
+                <div class="inv-empty">Không có ledger</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const filters = document.querySelectorAll(".inv-queue-filter");
+    const rows = document.querySelectorAll(".inv-workqueue-table tbody tr[data-work-kind]");
+    if (!filters.length || !rows.length) {
+        return;
+    }
+    filters.forEach((button) => {
+        button.addEventListener("click", function () {
+            const selected = button.dataset.filter || "all";
+            filters.forEach((item) => item.classList.toggle("is-active", item === button));
+            rows.forEach((row) => {
+                const visible = selected === "all" || row.dataset.workKind === selected;
+                row.hidden = !visible;
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

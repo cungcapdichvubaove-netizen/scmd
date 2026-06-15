@@ -1,0 +1,41 @@
+{% extends "mobile/base.html" %}
+{% load static %}
+
+{% block title %}Đề xuất & Kiến nghị{% endblock %}
+
+{% block content %}
+<div class="flex items-center gap-3 mb-6">
+    <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-circle btn-ghost btn-sm">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    <h1 class="text-xl font-bold">Đề xuất / Cấp phát</h1>
+</div>
+
+<div class="card bg-base-100 shadow-xl border border-base-200">
+    <div class="card-body">
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-bold">Tiêu đề đề xuất</span>
+                </label>
+                {{ form.tieu_de }}
+            </div>
+            
+            <div class="form-control w-full">
+                <label class="label">
+                    <span class="label-text font-bold">Nội dung chi tiết</span>
+                </label>
+                {{ form.noi_dung }}
+            </div>
+
+            <div class="card-actions mt-6">
+                <button type="submit" class="btn btn-info w-full text-white shadow-lg shadow-info/20">
+                    <i class="fas fa-paper-plane mr-2"></i> Gửi Đề Xuất
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

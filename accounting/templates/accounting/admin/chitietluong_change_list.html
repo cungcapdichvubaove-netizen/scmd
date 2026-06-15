@@ -1,0 +1,32 @@
+{% extends "admin/change_list.html" %}
+{% load i18n humanize %}
+
+{% block content_title %}
+<div class="scmd-admin-hero payroll">
+    <div>
+        <p class="scmd-admin-eyebrow">Kế toán & Lương</p>
+        <h1>Phiếu lương cá nhân</h1>
+        <p class="scmd-admin-note">Theo dõi từng phiếu lương, khoản khấu trừ, dữ liệu đối soát và trạng thái khóa kỳ trước khi phát hành.</p>
+    </div>
+    <div class="scmd-admin-actions">
+        <a href="add/" class="scmd-admin-btn primary">Thêm phiếu lương</a>
+        <a href="{{ export_csv_url }}" class="scmd-admin-btn ghost">Xuất CSV</a>
+        <a href="../bangluongthang/" class="scmd-admin-btn ghost">Kỳ lương</a>
+        <a href="../cauhinhluong/" class="scmd-admin-btn ghost">Cấu hình lương</a>
+        <a href="{% url 'accounting:dashboard' %}" class="scmd-admin-btn ghost">Dashboard kế toán</a>
+    </div>
+</div>
+{% if payroll_detail_summary %}
+<div class="scmd-admin-kpis">
+    <a class="scmd-admin-kpi" href="."><span>Tổng phiếu</span><strong>{{ payroll_detail_summary.total_payslips|default:0 }}</strong><small>{{ payroll_detail_summary.total_hours|default:0|floatformat:1|intcomma }} giờ công</small></a>
+    <a class="scmd-admin-kpi" href="."><span>Tổng thực lĩnh</span><strong class="success">{{ payroll_detail_summary.total_net|default:0|floatformat:0|intcomma }} ₫</strong><small>{{ payroll_detail_summary.total_gross|default:0|floatformat:0|intcomma }} ₫ tổng thu nhập</small></a>
+    <a class="scmd-admin-kpi" href="?payroll_detail_issue=locked_batch"><span>Đã khóa / đã trả</span><strong>{{ payroll_detail_summary.locked_count|default:0 }}</strong><small>Không sửa trực tiếp trên admin</small></a>
+    <a class="scmd-admin-kpi" href="?payroll_detail_issue=has_violation"><span>Phạt vi phạm</span><strong class="danger">{{ payroll_detail_summary.has_violation_count|default:0 }}</strong><small>{{ payroll_detail_summary.total_violations|default:0|floatformat:0|intcomma }} ₫ cần trace nguồn</small></a>
+    <a class="scmd-admin-kpi" href="?payroll_detail_issue=has_advance"><span>Tạm ứng</span><strong class="warning">{{ payroll_detail_summary.has_advance_count|default:0 }}</strong><small>{{ payroll_detail_summary.total_advances|default:0|floatformat:0|intcomma }} ₫ đã khấu trừ</small></a>
+    <a class="scmd-admin-kpi" href="?payroll_detail_issue=missing_snapshot"><span>Thiếu snapshot</span><strong class="danger">{{ payroll_detail_summary.missing_snapshot_count|default:0 }}</strong><small>Cần bổ sung dữ liệu nguồn đối soát</small></a>
+</div>
+{% endif %}
+<div class="scmd-admin-guidance">
+    <strong>Nguyên tắc vận hành:</strong> Phiếu lương cá nhân là dữ liệu kiểm toán. Kỳ lương đã LOCKED/PAID không sửa trực tiếp; mọi thay đổi ảnh hưởng thực lĩnh phải có ghi chú đối soát hoặc adjustment theo quy trình lương.
+</div>
+{% endblock %}

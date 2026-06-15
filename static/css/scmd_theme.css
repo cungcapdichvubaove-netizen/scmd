@@ -1,0 +1,48 @@
+/* file: static/css/scmd_theme.css */
+
+:root {
+    /* BẢNG MÀU SCMD COMMANDER */
+    --scmd-bg: #0A192F;        /* Nền chính (Deep Navy) */
+    --scmd-panel: #112240;     /* Nền khối/Menu (Light Navy) */
+    --scmd-hover: #233554;     /* Màu khi di chuột */
+    
+    --scmd-text: #E6F1FF;      /* Chữ chính (Trắng xanh) */
+    --scmd-muted: #8892B0;     /* Chữ phụ (Xám xanh) */
+    
+    --scmd-warning: #d97706;    /* Cam cảnh báo (Action) */
+    --scmd-blue: #2563eb;      /* Xanh trạng thái */
+    
+    --scmd-border: #1E2D3D;    /* Viền mờ */
+}
+
+/* FIX: Dùng Be Vietnam Pro cho toàn bộ hệ thống */
+body {
+    font-family: 'Be Vietnam Pro', sans-serif !important;
+}
+
+/* Style chữ số công nghệ nhưng dùng font an toàn */
+.font-tech { 
+    font-family: 'Be Vietnam Pro', sans-serif; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+.font-num { 
+    font-family: 'Be Vietnam Pro', sans-serif; 
+    font-variant-numeric: tabular-nums; 
+    font-weight: 600;
+}
+
+/* Scrollbar đẹp */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--scmd-bg); }
+::-webkit-scrollbar-thumb { background: var(--scmd-hover); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--scmd-muted); }
+
+/* Hiệu ứng nền kính */
+.glass-nav {
+    background: rgba(17, 34, 64, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--scmd-border);
+}

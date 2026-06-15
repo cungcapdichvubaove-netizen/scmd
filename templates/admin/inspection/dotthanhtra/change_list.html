@@ -1,0 +1,45 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-shift-console">
+    <div class="scmd-shift-head">
+        <div>
+            <div class="scmd-shift-eyebrow">Thanh tra hiện trường</div>
+            <h1 class="scmd-shift-title">Quản trị đợt thanh tra</h1>
+            <p class="scmd-shift-subtitle">
+                Nhật ký thanh tra là dữ liệu đối soát vận hành: quân số thực tế, checklist hiện trường, ảnh bằng chứng và kiến nghị xử lý sau kiểm tra.
+            </p>
+        </div>
+        <div class="scmd-shift-actions">
+            <a class="scmd-shift-btn" href="{{ scmd_inspection_run_links.add }}">+ Thêm thanh tra</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_run_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_run_links.violations }}">Biên bản vi phạm</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_run_links.targets }}">Mục tiêu</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_run_links.dashboard }}">Bảng điều hành</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_inspection_run_links.mobile }}">Mobile</a>
+        </div>
+    </div>
+
+    <div class="scmd-shift-grid">
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_run_links.list }}"><span>Tổng đợt</span><strong>{{ scmd_inspection_run_stats.total }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_run_links.today }}"><span>Hôm nay</span><strong>{{ scmd_inspection_run_stats.today }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_run_links.month }}"><span>Tháng này</span><strong>{{ scmd_inspection_run_stats.month }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_inspection_run_links.passed }}"><span>Đạt</span><strong>{{ scmd_inspection_run_stats.passed }}</strong></a>
+        <a class="scmd-shift-stat danger" href="{{ scmd_inspection_run_links.failed }}"><span>Không đạt</span><strong>{{ scmd_inspection_run_stats.failed }}</strong></a>
+        <a class="scmd-shift-stat warning" href="{{ scmd_inspection_run_links.short_staff }}"><span>Thiếu quân</span><strong>{{ scmd_inspection_run_stats.short_staff }}</strong></a>
+        <a class="scmd-shift-stat warning" href="{{ scmd_inspection_run_links.checklist_fail }}"><span>Fail checklist</span><strong>{{ scmd_inspection_run_stats.checklist_fail }}</strong></a>
+        <a class="scmd-shift-stat warning" href="{{ scmd_inspection_run_links.missing_image }}"><span>Thiếu ảnh</span><strong>{{ scmd_inspection_run_stats.missing_image }}</strong></a>
+        <a class="scmd-shift-stat warning" href="{{ scmd_inspection_run_links.missing_note }}"><span>Thiếu nhận xét</span><strong>{{ scmd_inspection_run_stats.missing_note }}</strong></a>
+    </div>
+
+    <div class="scmd-shift-note">
+        Gợi ý kiểm soát: các đợt không đạt, thiếu quân, thiếu ảnh hoặc thiếu nhận xét cần được đối soát với biên bản vi phạm trước khi dùng làm căn cứ xử lý kỷ luật hoặc khấu trừ.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

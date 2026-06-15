@@ -1,0 +1,47 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-shift-console">
+    <div class="scmd-shift-head">
+        <div>
+            <div class="scmd-shift-eyebrow">Thanh tra & tuần tra</div>
+            <h1 class="scmd-shift-title">Điểm QR/GPS tuần tra</h1>
+            <p class="scmd-shift-subtitle">
+                Quản lý từng điểm kiểm soát trong tuyến tuần tra, mã QR định danh, tọa độ GPS gốc và bán kính sai lệch cho phép. Đây là dữ liệu nền ảnh hưởng trực tiếp đến xác thực tuần tra, cảnh báo gian lận và biên bản vi phạm.
+            </p>
+        </div>
+        <div class="scmd-shift-actions">
+            <a class="scmd-shift-btn" href="{{ scmd_patrol_point_links.add }}">+ Thêm điểm QR</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_point_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_point_links.routes }}">Tuyến</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_point_links.sessions }}">Lượt tuần tra</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_point_links.scans }}">Lượt quét</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_point_links.violations }}">Vi phạm</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_point_links.targets }}">Mục tiêu</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_point_links.dashboard }}">Bảng điều hành</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_point_links.mobile }}">Mobile</a>
+        </div>
+    </div>
+
+    <div class="scmd-shift-grid">
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_point_links.list }}"><span>Tổng điểm</span><strong>{{ scmd_patrol_point_stats.total }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_point_links.with_coordinates }}"><span>Đã có GPS</span><strong>{{ scmd_patrol_point_stats.with_coordinates }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_point_links.missing_coordinates }}"><span>Thiếu GPS</span><strong>{{ scmd_patrol_point_stats.missing_coordinates }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_point_links.never_scanned }}"><span>Chưa quét</span><strong>{{ scmd_patrol_point_stats.never_scanned }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_point_links.scanned_today }}"><span>Quét hôm nay</span><strong>{{ scmd_patrol_point_stats.scanned_today }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_point_links.has_warning }}"><span>Có cảnh báo</span><strong>{{ scmd_patrol_point_stats.has_warning }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_point_links.radius_under_30 }}"><span>Bán kính &lt;30m</span><strong>{{ scmd_patrol_point_stats.radius_under_30 }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_point_links.radius_over_100 }}"><span>Bán kính &gt;100m</span><strong>{{ scmd_patrol_point_stats.radius_over_100 }}</strong></a>
+    </div>
+
+    <div class="scmd-shift-note">
+        Gợi ý kiểm soát: điểm thiếu GPS hoặc bán kính quá rộng có thể làm giảm độ tin cậy của dữ liệu tuần tra. Khi đổi mã QR/tọa độ cho điểm đã phát sinh lượt quét, cần đối soát lại nhật ký quét và biên bản liên quan.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

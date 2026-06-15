@@ -1,0 +1,285 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SCMD Pro{% endblock %}</title>
+
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="icon" href="{% static 'img/brand/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/favicon-16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/favicon-32x32.png' %}">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'img/brand/favicon-48x48.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'img/brand/apple-touch-icon.png' %}">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="SCMD Pro">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="format-detection" content="telephone=no">
+
+    <link rel="stylesheet" href="{% static 'vendor/fonts/be-vietnam-pro.css' %}">
+
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+    <script defer src="{% static 'vendor/alpine/alpine.min.js' %}"></script>
+
+    <link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'vendor/select2/select2.min.css' %}">
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        body, button, input, select, textarea {
+            font-family: var(--scmd-font-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif) !important;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scmd-neutral-500); border-radius: 999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--scmd-neutral-600); }
+
+        .select2-container .select2-selection--single {
+            height: 40px !important;
+            border: 1px solid var(--scmd-border) !important;
+            border-radius: 12px !important;
+            padding-top: 6px;
+            background-color: var(--scmd-surface);
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 38px !important;
+        }
+
+        canvas { max-width: 100%; }
+
+        .scmd-notification-badge { background: var(--scmd-danger); }
+
+        .sidebar-collapsed { width: 5rem !important; }
+        .sidebar-collapsed .sidebar-text { display: none !important; }
+        .sidebar-collapsed .menu-group button { justify-content: center; }
+        .sidebar-collapsed .menu-group i.fa-chevron-right { display: none; }
+
+        .scmd-nav-link-disabled {
+            opacity: 0.48;
+            filter: saturate(0.45);
+        }
+
+        .scmd-nav-link-disabled:hover {
+            opacity: 0.7;
+        }
+
+        .scmd-nav-link-disabled .scmd-nav-icon {
+            background: rgba(255, 255, 255, 0.06);
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="scmd-shell-body overflow-hidden font-sans antialiased" data-scmd-accounting-dashboard-url="{% url 'accounting:dashboard' %}">
+    <div class="relative flex h-screen w-full">
+        <aside
+            id="main-sidebar"
+            class="scmd-sidebar-shell z-30 hidden h-full w-52 flex-shrink-0 flex-col transition-all duration-300 ease-in-out md:flex xl:w-56"
+        >
+            {% include "partials/_sidebar.html" %}
+
+            <button id="mobile-sidebar-close" type="button" class="scmd-focus-ring absolute right-4 top-4 text-white md:hidden" aria-label="Đóng menu điều hướng">
+                <i class="fas fa-times text-2xl"></i>
+            </button>
+        </aside>
+
+        <div class="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden">
+            <header class="scmd-shell-header z-20 flex h-16 items-center justify-between px-6">
+                <div class="flex items-center gap-4">
+                    <button id="sidebar-collapse-toggle" type="button" class="scmd-header-btn scmd-focus-ring hidden rounded-xl p-2 transition-colors focus:outline-none md:flex" aria-controls="main-sidebar" aria-expanded="true" aria-label="Thu gọn hoặc mở rộng menu điều hướng">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <button id="mobile-sidebar-open" type="button" class="scmd-header-btn scmd-focus-ring rounded-xl p-2 transition-colors focus:outline-none md:hidden" aria-controls="main-sidebar" aria-expanded="false" aria-label="Mở menu điều hướng">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+
+                    <h2 class="hidden text-lg font-bold text-slate-900 sm:block">
+                        {% block header_title %}Tổng quan{% endblock %}
+                    </h2>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <button class="scmd-header-btn scmd-focus-ring relative rounded-xl p-2 transition-colors focus:outline-none" type="button" aria-label="Thông báo{% if notification_count %}: {{ notification_count }} chưa đọc{% endif %}">
+                        <i class="fas fa-bell text-lg"></i>
+                        {% if notification_count %}
+                        <span class="scmd-notification-badge absolute -right-1 -top-1 min-w-5 rounded-full border border-white px-1 text-center text-[10px] font-bold leading-5 text-white">
+                            {% if notification_count > 99 %}99+{% else %}{{ notification_count }}{% endif %}
+                        </span>
+                        {% endif %}
+                    </button>
+
+                    {% if user.is_authenticated %}
+                    <div class="relative" id="scmd-user-menu-root">
+                        <button
+                            id="scmd-user-menu-toggle"
+                            type="button"
+                            aria-controls="scmd-user-menu"
+                            aria-expanded="false"
+                            class="scmd-user-trigger scmd-focus-ring flex items-center gap-3 rounded-xl p-1.5 transition-all focus:outline-none"
+                        >
+                            <div class="hidden text-right md:block">
+                                <p class="mb-1 text-xs font-bold leading-none text-slate-900">{{ user.username }}</p>
+                                <p class="text-[10px] font-medium" style="color: var(--scmd-success);">Trực tuyến</p>
+                            </div>
+                            <div class="scmd-user-avatar flex h-9 w-9 items-center justify-center rounded-full font-bold shadow-md ring-2 ring-white">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                            <i class="fas fa-chevron-down text-[10px] text-slate-400 transition-transform" data-user-menu-chevron></i>
+                        </button>
+
+                        <div
+                            id="scmd-user-menu"
+                            class="scmd-user-menu absolute right-0 z-50 mt-2 hidden w-56 rounded-2xl py-2"
+                        >
+                            <div class="mb-1 border-b border-slate-100 px-4 py-3">
+                                <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Tài khoản quản trị</p>
+                                <p class="truncate text-sm font-semibold text-slate-700">{{ user.email|default:user.username }}</p>
+                            </div>
+                            <a href="{% url 'admin:password_change' %}" class="scmd-user-link flex items-center px-4 py-2.5 text-sm transition-colors">
+                                <i class="fas fa-key mr-3 w-4 text-center"></i> Đổi mật khẩu
+                            </a>
+                            <a href="{% url 'admin:index' %}" class="scmd-user-link flex items-center px-4 py-2.5 text-sm transition-colors">
+                                <i class="fas fa-user-cog mr-3 w-4 text-center"></i> Bảng quản trị kỹ thuật
+                            </a>
+                            <div class="mx-2 my-1 h-px bg-slate-100"></div>
+                            <a href="{% url 'admin_logout_fix' %}" class="scmd-user-link scmd-user-link-danger flex items-center px-4 py-2.5 text-sm font-bold transition-colors">
+                                <i class="fas fa-sign-out-alt mr-3 w-4 text-center"></i> Thoát tài khoản
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </header>
+
+            <main class="custom-scrollbar flex-1 overflow-y-auto scroll-smooth p-4 md:p-6">
+                {% if messages %}
+                <div class="mb-6 space-y-3">
+                    {% for message in messages %}
+                    <div class="scmd-message flex items-center p-4 {% if message.tags == 'success' %}scmd-message--success{% elif message.tags == 'error' %}scmd-message--error{% else %}scmd-message--info{% endif %}">
+                        <i class="fas {% if message.tags == 'success' %}fa-check-circle{% elif message.tags == 'error' %}fa-exclamation-circle{% else %}fa-info-circle{% endif %} mr-3 text-lg"></i>
+                        <span class="font-medium">{{ message }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="{% static 'vendor/jquery/jquery-3.7.0.min.js' %}"></script>
+    <script src="{% static 'vendor/select2/select2.min.js' %}"></script>
+    <script>
+        function toggleMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            const arrow = document.getElementById("arrow-" + menuId);
+            if (menu && menu.classList.contains("hidden")) {
+                menu.classList.remove("hidden");
+                if (arrow) arrow.classList.add("rotate-90");
+            } else if (menu) {
+                menu.classList.add("hidden");
+                if (arrow) arrow.classList.remove("rotate-90");
+            }
+        }
+
+
+        (function () {
+            const sidebar = document.getElementById("main-sidebar");
+            const collapseToggle = document.getElementById("sidebar-collapse-toggle");
+            const mobileOpen = document.getElementById("mobile-sidebar-open");
+            const mobileClose = document.getElementById("mobile-sidebar-close");
+            const userMenuRoot = document.getElementById("scmd-user-menu-root");
+            const userMenuToggle = document.getElementById("scmd-user-menu-toggle");
+            const userMenu = document.getElementById("scmd-user-menu");
+            const userMenuChevron = userMenuToggle ? userMenuToggle.querySelector("[data-user-menu-chevron]") : null;
+
+            function setSidebarCollapsed(collapsed) {
+                if (!sidebar) return;
+                sidebar.classList.toggle("sidebar-collapsed", collapsed);
+                if (collapseToggle) {
+                    collapseToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+                }
+                try {
+                    window.localStorage.setItem("scmdSidebarCollapsed", collapsed ? "1" : "0");
+                } catch (error) {
+                    /* Local storage is optional; layout must still work. */
+                }
+            }
+
+            function openMobileSidebar() {
+                if (!sidebar) return;
+                sidebar.classList.remove("hidden");
+                sidebar.classList.add("fixed", "inset-0", "z-50", "flex", "w-64");
+                if (mobileOpen) mobileOpen.setAttribute("aria-expanded", "true");
+            }
+
+            function closeMobileSidebar() {
+                if (!sidebar) return;
+                sidebar.classList.add("hidden");
+                sidebar.classList.remove("fixed", "inset-0", "z-50", "flex");
+                if (mobileOpen) mobileOpen.setAttribute("aria-expanded", "false");
+            }
+
+            function setUserMenuOpen(open) {
+                if (!userMenu || !userMenuToggle) return;
+                userMenu.classList.toggle("hidden", !open);
+                userMenuToggle.setAttribute("aria-expanded", open ? "true" : "false");
+                if (userMenuChevron) userMenuChevron.classList.toggle("rotate-180", open);
+            }
+
+            try {
+                setSidebarCollapsed(window.localStorage.getItem("scmdSidebarCollapsed") === "1");
+            } catch (error) {
+                setSidebarCollapsed(false);
+            }
+
+            if (collapseToggle) {
+                collapseToggle.addEventListener("click", function () {
+                    setSidebarCollapsed(!sidebar.classList.contains("sidebar-collapsed"));
+                });
+            }
+
+            if (mobileOpen) mobileOpen.addEventListener("click", openMobileSidebar);
+            if (mobileClose) mobileClose.addEventListener("click", closeMobileSidebar);
+
+            if (userMenuToggle) {
+                userMenuToggle.addEventListener("click", function (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setUserMenuOpen(userMenu.classList.contains("hidden"));
+                });
+            }
+
+            document.addEventListener("click", function (event) {
+                if (userMenuRoot && userMenuRoot.contains(event.target)) return;
+                setUserMenuOpen(false);
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape") {
+                    setUserMenuOpen(false);
+                    closeMobileSidebar();
+                }
+            });
+        })();
+
+        $(document).ready(function () {
+            if ($(".select2").length > 0) {
+                $(".select2").select2({ width: "100%", placeholder: "Tìm kiếm...", allowClear: true });
+            }
+        });
+    </script>
+    <script defer src="{% static 'pwa/pwa-register.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

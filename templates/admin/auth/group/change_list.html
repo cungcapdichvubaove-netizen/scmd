@@ -1,0 +1,53 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+
+{% block content %}
+<div class="scmd-group-console">
+  <section class="scmd-group-head">
+    <div>
+      <p class="scmd-group-eyebrow">Quản trị hệ thống</p>
+      <h1 class="scmd-group-title">Quản trị nhóm quyền</h1>
+      <p class="scmd-group-subtitle">
+        Thiết lập quyền theo vai trò phòng ban/chức danh. Mục tiêu là cấp đúng quyền cần dùng, tránh cấp dư quyền cho tài khoản vận hành.
+      </p>
+    </div>
+    <div class="scmd-group-actions">
+      <a class="scmd-group-btn scmd-group-btn-primary" href="{{ scmd_group_links.add_group }}">+ Thêm nhóm quyền</a>
+      <a class="scmd-group-btn" href="{{ scmd_group_links.user_list }}">Tài khoản</a>
+      <a class="scmd-group-btn" href="{{ scmd_group_links.department_list }}">Phòng ban</a>
+      <a class="scmd-group-btn" href="{{ scmd_group_links.position_list }}">Chức danh</a>
+    </div>
+  </section>
+
+  <section class="scmd-group-grid" aria-label="Tổng quan nhóm quyền">
+    <div class="scmd-group-stat">
+      <p class="scmd-group-stat-label">Tổng nhóm</p>
+      <div class="scmd-group-stat-value">{{ scmd_group_stats.total_groups }}</div>
+      <p class="scmd-group-stat-note">Nhóm quyền đang tồn tại</p>
+    </div>
+    <div class="scmd-group-stat">
+      <p class="scmd-group-stat-label">Đang dùng</p>
+      <div class="scmd-group-stat-value">{{ scmd_group_stats.active_groups }}</div>
+      <p class="scmd-group-stat-note">Có người dùng gắn trực tiếp</p>
+    </div>
+    <div class="scmd-group-stat">
+      <p class="scmd-group-stat-label">Chưa gắn</p>
+      <div class="scmd-group-stat-value">{{ scmd_group_stats.orphan_groups }}</div>
+      <p class="scmd-group-stat-note">Không có người dùng/phòng ban/chức danh</p>
+    </div>
+    <div class="scmd-group-stat">
+      <p class="scmd-group-stat-label">Cần rà soát</p>
+      <div class="scmd-group-stat-value">{{ scmd_group_stats.high_risk_groups }}</div>
+      <p class="scmd-group-stat-note">Nhóm có nhiều quyền</p>
+    </div>
+  </section>
+
+  <section class="scmd-group-note" aria-label="Hướng dẫn thao tác">
+    <div class="scmd-group-note-item"><strong>1. Tạo nhóm theo vai trò</strong>Ví dụ: Kế toán, Kho, Thanh tra, Kinh doanh, HCNS, Nghiệp vụ.</div>
+    <div class="scmd-group-note-item"><strong>2. Gắn vào phòng ban/chức danh</strong>Dùng nút Phòng ban/Chức danh để áp nhóm quyền mặc định cho nhân sự.</div>
+    <div class="scmd-group-note-item"><strong>3. Kiểm tra tài khoản</strong>Dùng nút Tài khoản để đối soát người dùng có nhóm quyền và hồ sơ nhân sự đúng.</div>
+  </section>
+</div>
+{{ block.super }}
+{% endblock %}

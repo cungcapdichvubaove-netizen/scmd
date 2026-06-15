@@ -1,0 +1,45 @@
+{% extends "admin/change_list.html" %}
+{% load i18n static %}
+
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/admin_operations_compact.css' %}">
+{% endblock %}
+
+{% block object-tools %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-header" aria-label="Tổng quan phân công ca trực">
+    <div>
+      <div class="scmd-op-kicker">Vận hành / Phân công ca</div>
+      <h1 class="scmd-op-title">Danh sách phân công ca trực</h1>
+      <p class="scmd-op-subtitle">Ưu tiên ca hôm nay chưa check-in, ca đang trực và ca quá hạn.</p>
+    </div>
+    <div class="scmd-op-actions">
+      <a class="scmd-op-btn primary" href="{{ scmd_assignment_links.add }}"><i class="fas fa-plus-circle" aria-hidden="true"></i> Thêm phân công</a>
+      <a class="scmd-op-btn" href="{{ scmd_assignment_links.schedule }}"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Xếp lịch</a>
+      <a class="scmd-op-btn" href="{{ scmd_assignment_links.attendance }}"><i class="fas fa-clock" aria-hidden="true"></i> Chấm công</a>
+      <a class="scmd-op-btn" href="{{ scmd_assignment_links.posts }}"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> Chốt trực</a>
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block result_list %}
+<div class="scmd-op-list scmd-op-table-first">
+  <section class="scmd-op-metrics" aria-label="Chỉ số phân công ca trực">
+    <div class="scmd-op-metric"><span>Tổng phân công</span><strong>{{ scmd_assignment_stats.total }}</strong></div>
+    <div class="scmd-op-metric info"><span>Hôm nay</span><strong>{{ scmd_assignment_stats.today }}</strong></div>
+    <div class="scmd-op-metric warning"><span>Chưa check-in</span><strong>{{ scmd_assignment_stats.missing_checkin_today }}</strong></div>
+    <div class="scmd-op-metric danger"><span>Quá hạn</span><strong>{{ scmd_assignment_stats.past_unchecked }}</strong></div>
+  </section>
+  {% if scmd_assignment_stats.missing_checkin_today or scmd_assignment_stats.past_unchecked %}
+  <details class="scmd-op-note">
+    <summary>Việc cần rà soát: {{ scmd_assignment_stats.missing_checkin_today }} ca hôm nay chưa check-in · {{ scmd_assignment_stats.past_unchecked }} ca quá hạn</summary>
+    <p>Dùng bộ lọc “Tình trạng phân công” để mở đúng nhóm ca cần xử lý trước giờ giao ca.</p>
+  </details>
+  {% endif %}
+</div>
+{{ block.super }}
+{% endblock %}

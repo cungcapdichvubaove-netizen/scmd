@@ -1,0 +1,11 @@
+/* Local font contract for SCMD Pro.
+   Keep system UI fonts first to render Vietnamese reliably when optional self-hosted font files are not packaged. */
+:root {
+    --scmd-font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "Helvetica Neue", sans-serif;
+}
+body, button, input, select, textarea {
+    font-family: var(--scmd-font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+}

@@ -1,0 +1,159 @@
+{# file: operations/templates/operations/mobile/cham_cong.html #}
+{% extends "mobile/base.html" %}
+{% load static %}
+
+{% block title %}Chấm công{% endblock %}
+
+{% block content %}
+<div class="space-y-4 fade-in">
+    <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-circle btn-ghost btn-sm">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div>
+                <h1 class="text-lg font-bold text-slate-800">Chấm công</h1>
+                <p class="text-xs text-slate-500">Vào ca và kết thúc ca bằng GPS thực và ảnh xác thực.</p>
+            </div>
+        </div>
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-50 text-blue-600">
+            <i class="fas fa-location-dot text-lg"></i>
+        </div>
+    </div>
+
+    {% if ca_truc_hom_nay %}
+    <div class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+        <div class="mb-3 flex items-start justify-between gap-3">
+            <div>
+                <div class="text-[10px] font-bold uppercase tracking-wide text-slate-400">Ca trực hiện tại</div>
+                <div class="text-lg font-bold text-slate-800">{{ ca_truc_hom_nay.ca_lam_viec.ten_ca }}</div>
+            </div>
+            {% if trang_thai_checkin == True %}
+            <span class="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Đang trực</span>
+            {% elif trang_thai_checkin == 'DONE' %}
+            <span class="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-bold text-slate-500">Đã hoàn thành</span>
+            {% else %}
+            <span class="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">Chưa vào ca</span>
+            {% endif %}
+        </div>
+
+        <div class="space-y-2 text-sm text-slate-600">
+            <div class="flex items-start gap-2">
+                <i class="fas fa-shield-alt mt-1 text-blue-600"></i>
+                <div>
+                    <div class="font-bold text-slate-800">{{ ca_truc_hom_nay.vi_tri_chot.muc_tieu.ten_muc_tieu }}</div>
+                    <div class="text-xs text-slate-500">{{ ca_truc_hom_nay.vi_tri_chot.ten_vi_tri }}</div>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <i class="far fa-clock text-slate-400"></i>
+                <span class="font-mono">{{ ca_truc_hom_nay.ca_lam_viec.gio_bat_dau|date:"H:i" }} - {{ ca_truc_hom_nay.ca_lam_viec.gio_ket_thuc|date:"H:i" }}</span>
+            </div>
+        </div>
+
+        <div class="mt-4">
+            {% if trang_thai_checkin == True %}
+            <form action="{% url 'operations:check_out' ca_truc_hom_nay.id %}" method="post" enctype="multipart/form-data" class="space-y-3">
+                {% csrf_token %}
+                <input type="hidden" name="lat" id="mobile-out-lat">
+                <input type="hidden" name="lng" id="mobile-out-lng">
+                <input type="file" name="anh_check_out" id="mobile-checkout-cam" class="hidden" accept="image/*" capture="user">
+                <label for="mobile-checkout-cam" class="btn h-12 w-full border-red-200 bg-white text-red-600 hover:bg-red-50">
+                    <i class="fas fa-right-from-bracket"></i> Kết thúc ca
+                </label>
+            </form>
+            {% elif trang_thai_checkin == 'DONE' %}
+            <div class="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-center text-sm font-medium text-slate-500">
+                Ca trực hôm nay đã được chấm công đầy đủ.
+            </div>
+            {% else %}
+            <form action="{% url 'operations:check_in' ca_truc_hom_nay.id %}" method="post" enctype="multipart/form-data" class="space-y-3">
+                {% csrf_token %}
+                <input type="hidden" name="lat" id="mobile-in-lat">
+                <input type="hidden" name="lng" id="mobile-in-lng">
+                <input type="file" name="anh_check_in" id="mobile-checkin-cam" class="hidden" accept="image/*" capture="user">
+                <label for="mobile-checkin-cam" class="btn h-12 w-full border-none bg-blue-600 text-white hover:bg-blue-700">
+                    <i class="fas fa-fingerprint"></i> Bắt đầu ca
+                </label>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <div class="rounded-xl border border-dashed border-slate-200 bg-white px-4 py-10 text-center opacity-70">
+        <i class="fas fa-calendar-xmark mb-3 text-4xl text-slate-300"></i>
+        <p class="text-sm font-medium text-slate-600">Hiện không có ca trực phù hợp để chấm công.</p>
+    </div>
+    {% endif %}
+
+    <div class="rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+        <div class="mb-3 flex items-center justify-between">
+            <div>
+                <h2 class="text-sm font-bold text-slate-800">Lịch sử gần đây</h2>
+                <p class="text-xs text-slate-500">Kiểm tra nhanh các lần chấm công mới nhất.</p>
+            </div>
+            <a href="{% url 'operations:mobile_lich_su_cham_cong' %}" class="text-xs font-bold text-blue-600">Xem tất cả</a>
+        </div>
+        <div class="space-y-3">
+            {% for item in attendance_history %}
+            <div class="rounded-lg border border-slate-100 bg-slate-50 px-3 py-3">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <div class="text-sm font-bold text-slate-700">{{ item.ngay_truc|date:"d/m/Y" }}</div>
+                        <div class="text-xs text-slate-500">{{ item.vi_tri_chot.muc_tieu.ten_muc_tieu }}</div>
+                    </div>
+                    <div class="text-right text-xs">
+                        {% if item.chamcong.thoi_gian_check_in %}
+                        <div class="font-mono font-bold text-emerald-600">Vào {{ item.chamcong.thoi_gian_check_in|date:"H:i" }}</div>
+                        {% else %}
+                        <div class="font-medium text-slate-400">Chưa vào ca</div>
+                        {% endif %}
+                        {% if item.chamcong.thoi_gian_check_out %}
+                        <div class="font-mono text-rose-500">Ra {{ item.chamcong.thoi_gian_check_out|date:"H:i" }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-sm text-slate-400">Chưa có dữ liệu chấm công gần đây.</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function fillGps(latId, lngId, form) {
+        if (!navigator.geolocation) {
+            window.alert("Thiết bị không hỗ trợ GPS.");
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                document.getElementById(latId).value = position.coords.latitude;
+                document.getElementById(lngId).value = position.coords.longitude;
+                form.submit();
+            },
+            function () {
+                window.alert("Không thể lấy GPS thực. Vui lòng bật định vị rồi thử lại.");
+            },
+            { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 }
+        );
+    }
+
+    var checkinInput = document.getElementById("mobile-checkin-cam");
+    if (checkinInput) {
+        checkinInput.addEventListener("change", function () {
+            fillGps("mobile-in-lat", "mobile-in-lng", checkinInput.form);
+        });
+    }
+
+    var checkoutInput = document.getElementById("mobile-checkout-cam");
+    if (checkoutInput) {
+        checkoutInput.addEventListener("change", function () {
+            fillGps("mobile-out-lat", "mobile-out-lng", checkoutInput.form);
+        });
+    }
+</script>
+{% endblock %}

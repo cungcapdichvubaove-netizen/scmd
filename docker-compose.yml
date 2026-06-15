@@ -1,0 +1,84 @@
+services:
+  db:
+    image: postgis/postgis:15-3.3-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=scmd_db
+      - POSTGRES_USER=scmd_user
+      - POSTGRES_PASSWORD=scmd_pass
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scmd_user -d scmd_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+
+  web:
+    build: .
+    volumes:
+      - .:/app
+    # Sử dụng command để đảm bảo database sẵn sàng và kiểm tra integrity mỗi khi code đổi
+    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+    ports:
+      - "8000:8000"
+    environment:
+      - DEBUG=True
+      - SECRET_KEY=django-insecure-local-dev-key
+      - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
+      - REDIS_URL=redis://redis:6379/0
+      - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+      - STATIC_ROOT=/tmp/scmd_staticfiles
+      - SCMD_COLLECTSTATIC_ON_START=1
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import sys, urllib.request; response = urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=5); sys.exit(0 if response.status == 200 else 1)",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  celery_worker:
+    build: .
+    # Thêm watchdog nếu đã cài hoặc restart đơn giản để nhận code mới
+    command: watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A config worker -l info
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
+      - REDIS_URL=redis://redis:6379/0
+      - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+      - STATIC_ROOT=/tmp/scmd_staticfiles
+      - SCMD_COLLECTSTATIC_ON_START=0
+    depends_on:
+      - db
+      - redis
+
+  celery_beat:
+    build: .
+    command: celery -A config beat -l info
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
+      - REDIS_URL=redis://redis:6379/0
+      - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+      - STATIC_ROOT=/tmp/scmd_staticfiles
+      - SCMD_COLLECTSTATIC_ON_START=0
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:

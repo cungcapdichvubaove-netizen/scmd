@@ -1,0 +1,440 @@
+BRAND IDENTITY GUIDELINES
+Bộ quy chuẩn nhận diện thương hiệu SCMD & sản phẩm SCMD Pro
+Phiên bản 1.0 | Định vị: công ty công nghệ cung cấp phần mềm cho doanh nghiệp dịch vụ bảo vệ chuyên nghiệp
+Tuyên ngôn định vị
+SCMD là thương hiệu công ty công nghệ. SCMD Pro là sản phẩm phần mềm thương mại giúp doanh nghiệp dịch vụ bảo vệ chỉ huy, quản trị, kiểm soát và đối soát vận hành trên một nền tảng thống nhất.
+Mục lục điều hành
+1. Bản chất thương hiệu
+2. Kiến trúc thương hiệu SCMD / SCMD Pro
+3. Định vị chiến lược & thông điệp
+4. Tài sản logo và hệ thống sử dụng
+5. Màu sắc thương hiệu
+6. Typography & ngôn ngữ thiết kế
+7. Giọng nói thương hiệu
+8. Ứng dụng trên phần mềm, website, tài liệu và bán hàng
+9. Quy chuẩn không được làm
+10. Lộ trình triển khai nhận diện thương hiệu
+Nguyên tắc đọc tài liệu
+Đây là brand system cấp nền tảng. Mọi thiết kế logo, giao diện sản phẩm, tài liệu bán hàng, website, proposal, hợp đồng, dashboard, mobile app và bài truyền thông phải tuân thủ các chuẩn này để SCMD Pro được cảm nhận như một sản phẩm phần mềm B2B chuyên nghiệp, không phải logo của một công ty bảo vệ trực tiếp.
+1. Bản chất thương hiệu
+1.1 Nhận định cốt lõi
+SCMD không định vị là một công ty bảo vệ. SCMD định vị là công ty công nghệ xây dựng nền tảng phần mềm cho ngành dịch vụ bảo vệ. Biểu tượng khiên chỉ là mã nhận diện ngành, còn chữ S cách điệu là mã nhận diện công nghệ, hệ thống và khả năng chỉ huy.
+SCMD Pro không bán “một phần mềm quản lý đơn lẻ”, mà bán một năng lực vận hành mới: chỉ huy tập trung, quản trị minh bạch, kiểm soát dữ liệu thực địa, đối soát lương - ca trực - sự cố - kho - hợp đồng trên một nền tảng thống nhất.
+1.2 Thương hiệu phải tạo cảm nhận gì?
+Công nghệ: Khách hàng phải cảm nhận đây là nền tảng phần mềm hiện đại, không phải logo đội bảo vệ.
+Tin cậy: Dữ liệu vận hành, chấm công, lương, sự cố và báo cáo phải tạo niềm tin khi đối soát.
+Chỉ huy: SCMD Pro là bộ não điều hành, không chỉ là nơi nhập liệu.
+Chuyên nghiệp: Ngôn ngữ, hình ảnh, UI và tài liệu phải đủ chuẩn để bán cho doanh nghiệp B2B.
+Thực chiến: Thương hiệu phải gắn với bài toán thật của ngành bảo vệ: ca trực, quân số, mục tiêu, tuần tra, sự cố, lương, kho, khách hàng.
+1.3 Tuyên ngôn thương hiệu
+Brand Manifesto
+SCMD tạo ra hạ tầng phần mềm để doanh nghiệp dịch vụ bảo vệ vận hành chính xác hơn, minh bạch hơn và chuyên nghiệp hơn. SCMD Pro biến dữ liệu hiện trường thành năng lực chỉ huy, biến hoạt động rời rạc thành quy trình có kiểm soát, và biến niềm tin của khách hàng thành lợi thế cạnh tranh bền vững.
+2. Kiến trúc thương hiệu SCMD / SCMD Pro
+Cấp thương hiệu
+Tên chính thức
+Vai trò
+Cách dùng chuẩn
+Công ty / brand mẹ
+SCMD
+Thương hiệu công nghệ, chủ sở hữu hệ sinh thái sản phẩm
+Dùng trên pháp lý, website công ty, profile, tuyển dụng, đối tác, truyền thông cấp công ty
+Sản phẩm thương mại
+SCMD Pro
+Phần mềm bán cho doanh nghiệp dịch vụ bảo vệ
+Dùng trên app, dashboard, brochure, proposal, hợp đồng bán hàng, demo, tài liệu khách hàng
+Tên miền / digital asset
+scmdpro.com
+Kênh truy cập hoặc nhận diện digital
+Chỉ dùng trong lockup đặc biệt; không bắt buộc xuất hiện trong mọi logo
+Slogan cảm xúc
+Người đồng hành tin cậy
+Thông điệp niềm tin, phù hợp bán hàng và truyền thông
+Dùng linh hoạt; không thay thế mô tả sản phẩm
+Descriptor sản phẩm
+Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp
+Mô tả chính xác danh mục sản phẩm
+Dùng trong website, proposal, tài liệu giới thiệu, landing page, sales deck
+2.1 Quy tắc đặt tên
+Viết đúng: SCMD, SCMD Pro, SCMD Pro Mobile, SCMD Pro Command Center.
+Không viết lẫn lộn: SCMDERP, SCMD ERP, SCMD-PRO nếu không phải trong mã file kỹ thuật.
+Không dùng SCMD Pro để chỉ công ty. SCMD Pro là sản phẩm; SCMD là công ty / thương hiệu mẹ.
+Không dùng “ERP” làm tên brand chính. ERP là một nhóm năng lực bên trong sản phẩm.
+Không dùng “công ty bảo vệ SCMD” vì làm sai định vị. Nên dùng “công ty công nghệ SCMD” hoặc “nền tảng phần mềm SCMD Pro”.
+2.2 Câu định vị chuẩn
+One-line positioning
+SCMD Pro là phần mềm chỉ huy và quản trị dành cho doanh nghiệp dịch vụ bảo vệ chuyên nghiệp, giúp quản lý tập trung khách hàng, hợp đồng, mục tiêu, ca trực, chấm công, tuần tra, sự cố, quân số, kho, lương và báo cáo vận hành.
+3. Định vị chiến lược & thông điệp
+3.1 Category statement
+SCMD Pro thuộc nhóm phần mềm B2B chuyên ngành: Security Operations & Management Software for Guarding Companies. Trong tiếng Việt, nên gọi là “phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp”.
+3.2 Khách hàng mục tiêu
+Nhóm khách hàng
+Nỗi đau chính
+Thông điệp phù hợp
+Công ty bảo vệ vừa và nhỏ
+Quản lý ca trực thủ công, khó kiểm soát quân số, báo cáo thiếu minh bạch
+Chuẩn hóa vận hành và kiểm soát hiện trường bằng một nền tảng dễ triển khai
+Công ty bảo vệ chuyên nghiệp nhiều mục tiêu
+Dữ liệu phân tán, lương - chấm công - sự cố khó đối soát
+Tập trung dữ liệu vận hành, tăng năng lực chỉ huy và đối soát
+Ban điều hành / giám đốc
+Không có bức tranh vận hành tức thời, phụ thuộc báo cáo thủ công
+Bảng điều hành giúp nhìn thấy tình hình nhân sự, mục tiêu, ca trực, sự cố và KPI
+Phòng nhân sự / kế toán lương
+Chấm công lệch, tính lương khó giải thích, dễ tranh chấp
+Dữ liệu chấm công, ca trực và lương có thể truy vết và kiểm toán
+Chỉ huy đội / giám sát
+Khó theo dõi quân số, tuần tra, sự cố, check-in
+Công cụ chỉ huy hiện trường theo thời gian thực và có bằng chứng dữ liệu
+3.3 Trụ cột thông điệp
+Trụ cột
+Ý nghĩa
+Câu nói thương hiệu
+Chỉ huy hiệu quả
+Điều phối và giám sát vận hành theo dữ liệu
+Từ phân công đến báo cáo - mọi hoạt động nằm trong một bảng điều hành thống nhất.
+Quản trị toàn diện
+Không chỉ chấm công; bao phủ khách hàng, hợp đồng, mục tiêu, ca trực, kho, lương
+Một nền tảng cho toàn bộ vòng đời vận hành dịch vụ bảo vệ.
+Dữ liệu tin cậy
+Dữ liệu GPS, ảnh, ca trực, sự cố, lương có thể đối soát
+Biến dữ liệu hiện trường thành sự minh bạch trong quản trị.
+Báo cáo thông minh
+KPI, cảnh báo và báo cáo phục vụ quyết định
+Nhìn đúng tình hình, ra quyết định nhanh hơn.
+Mobile-first
+Phù hợp hiện trường, nhân viên, giám sát, chỉ huy
+Vận hành mọi lúc, mọi nơi, từ văn phòng đến mục tiêu bảo vệ.
+3.4 Tagline & slogan
+Khuyến nghị tách rõ hai lớp: slogan cảm xúc và descriptor sản phẩm. “Người đồng hành tin cậy” là slogan cảm xúc tốt, nhưng chưa đủ mô tả sản phẩm. Vì vậy nên đi kèm descriptor trong các bề mặt bán hàng và website.
+Loại câu
+Nội dung khuyến nghị
+Khi nào dùng
+Slogan cảm xúc
+Người đồng hành tin cậy.
+Logo lockup, booth, poster, email signature, truyền thông mềm
+Descriptor ngắn
+Phần mềm quản trị vận hành công ty bảo vệ chuyên nghiệp
+Website hero, proposal, brochure
+Descriptor đầy đủ
+Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp
+Tài liệu chiến lược, hợp đồng, landing page, sales deck
+English descriptor
+Software Platform for Security Companies
+Ngữ cảnh song ngữ, tài liệu đối tác, app store
+Enterprise descriptor
+Security Command & Management Platform
+Tài liệu định vị, pitch deck, sản phẩm B2B cao cấp
+4. Tài sản logo và hệ thống sử dụng
+4.1 Ý nghĩa biểu tượng
+Biểu tượng hiện tại là chữ S cách điệu trong hình dạng chiếc khiên. Phần đầu khiên hơi phình rộng tạo cảm giác che chở, bảo vệ và uy tín. Chữ S tạo lớp nghĩa “Security”, “System”, “Software” và “SCMD”. Đây là lựa chọn phù hợp vì vừa giữ liên hệ với ngành bảo vệ, vừa không biến thương hiệu thành một công ty bảo vệ trực tiếp.
+Nguyên tắc chiến lược: Khiên là ngữ cảnh ngành; chữ S hình học là bản sắc phần mềm. Không được thiết kế lại biểu tượng theo hướng huy hiệu quân sự, cảnh sát, tactical badge hoặc cyber-war room.
+4.2 Bộ logo hiện có
+Logo ngang nền sáng: dùng cho website, tài liệu, proposal, hợp đồng, landing page và các bề mặt nền trắng hoặc nền sáng.
+Logo ngang nền đen: dùng cho nền tối, slide mở đầu, video intro, booth, social banner và các bề mặt cần cảm giác premium.
+Icon: dùng cho favicon, PWA, mobile app, avatar, shortcut, watermark nhỏ, dashboard sidebar và trạng thái tải ứng dụng.
+4.3 Quy tắc ưu tiên logo
+Ngữ cảnh
+Logo ưu tiên
+Ghi chú
+Website header / landing page
+Logo ngang nền sáng hoặc dark theo nền
+Không cần slogan nếu không đủ không gian
+Proposal / báo giá / hợp đồng
+Logo ngang nền sáng
+Ưu tiên rõ ràng, sạch, chuyên nghiệp
+App icon / favicon / PWA
+Icon chữ S khiên
+Không dùng chữ nhỏ hoặc slogan
+Dashboard sidebar
+Icon + SCMD Pro dạng gọn
+Tối ưu đọc nhanh và tiết kiệm không gian
+Slide mở đầu / booth
+Logo ngang nền đen hoặc logo dọc
+Có thể dùng slogan để tăng cảm xúc
+Watermark / tài liệu mật
+Bản đơn sắc
+Không dùng gradient nếu in ấn hoặc đóng dấu tài liệu
+4.4 Clear space & kích thước tối thiểu
+Clear space là khoảng trống an toàn xung quanh logo. Lấy chiều cao chữ “S” trong wordmark làm đơn vị X. Mọi phiên bản logo phải có tối thiểu 0.5X ở bốn phía; phiên bản dùng trong tài liệu cao cấp nên có 1X để tạo cảm giác sang trọng.
+Phiên bản
+Kích thước tối thiểu màn hình
+Kích thước tối thiểu in ấn
+Lưu ý
+Icon
+24 px
+8 mm
+Dưới 24 px nên dùng bản flat, ít hiệu ứng 3D
+Logo ngang không slogan
+160 px chiều rộng
+35 mm chiều rộng
+Dùng cho header, footer, proposal
+Logo ngang có slogan
+300 px chiều rộng
+70 mm chiều rộng
+Không dùng quá nhỏ vì slogan mất nét
+Logo dọc
+220 px chiều rộng
+50 mm chiều rộng
+Dùng cho cover, poster, slide mở đầu
+4.5 Khi nào dùng .com?
+“.com” chỉ nên dùng trong phiên bản logo phục vụ marketing, website, banner hoặc chiến dịch digital. Trong sản phẩm phần mềm, dashboard, hợp đồng và tài liệu kỹ thuật, nên dùng “SCMD Pro” thay vì “SCMDPRO.com” để tránh biến tên sản phẩm thành một địa chỉ web.
+Quy tắc quan trọng
+SCMD Pro là tên sản phẩm. scmdpro.com là tài sản digital. Không để tên miền thay thế tên sản phẩm trong UI phần mềm.
+5. Hệ màu thương hiệu
+Bảng màu nên chuyển hóa từ logo sang hệ thống thiết kế phần mềm. Logo có thể có gradient và hiệu ứng 3D trong bề mặt marketing; UI sản phẩm phải dùng màu phẳng, rõ ràng, tương phản tốt và phù hợp enterprise software.
+Mẫu màu
+Token
+HEX
+Ứng dụng
+SCMD Navy
+#061C46
+Màu nền thương hiệu, sidebar, header cao cấp
+Deep Command Blue
+#083B96
+Màu chính cho primary UI, link, focus state
+Pro Blue
+#006DFF
+Màu năng lượng công nghệ, CTA, highlight
+Cyan Tech
+#00B7FF
+Màu ánh sáng công nghệ, gradient phụ, điểm nhấn digital
+Signal Blue
+#1745D6
+Màu chuyển tiếp trong gradient logo
+Trust White
+#FFFFFF
+Nền sáng, khoảng thở, tài liệu
+Steel Silver
+#DDE5EF
+Viền, divider, biểu tượng phụ, bản in
+Graphite
+#1F2937
+Text chính trên nền sáng
+5.1 Gradient thương hiệu
+Gradient được dùng cho logo, hero banner, visual brand và các điểm nhấn marketing. Không dùng gradient quá nhiều trong giao diện nghiệp vụ vì gây nhiễu và làm giảm khả năng đọc dữ liệu.
+Gradient
+Dải màu
+Ứng dụng
+SCMD Core Gradient
+#00B7FF → #006DFF → #083B96
+Logo, banner, app splash, cover tài liệu
+Premium Dark Gradient
+#020617 → #061C46 → #083B96
+Nền tối, slide mở đầu, video intro
+Light Interface Gradient
+#FFFFFF → #F3F8FF
+Background nhẹ cho website, card marketing
+5.2 Màu trạng thái trong phần mềm
+Trạng thái
+HEX khuyến nghị
+Dùng cho
+Success
+#16A34A
+Đã check-in, hoàn tất, xác nhận, paid
+Warning
+#F59E0B
+Thiếu dữ liệu, sắp trễ hạn, cần chú ý
+Danger
+#DC2626
+Sự cố nghiêm trọng, thiếu quân số, lỗi, quá hạn
+Info
+#0284C7
+Đang xử lý, thông tin bổ sung
+Neutral
+#64748B
+Draft, chưa phát sinh, trạng thái bình thường
+6. Typography & ngôn ngữ thiết kế
+6.1 Hệ chữ khuyến nghị
+Wordmark hiện tại có phong cách chữ nghiêng, mạnh, tốc độ và công nghệ. Phong cách này phù hợp cho logo marketing, nhưng không nên áp dụng toàn bộ cho UI vì có thể gây cảm giác “thể thao / racing”. UI và tài liệu nên dùng hệ chữ sạch, dễ đọc, enterprise.
+Vai trò
+Font khuyến nghị
+Tính cách
+Ghi chú
+Logo wordmark
+Custom SCMD Pro wordmark
+Mạnh, công nghệ, nhận diện riêng
+Giữ như tài sản thương hiệu; không thay bằng font thường
+Website / UI
+Inter, Be Vietnam Pro hoặc Arial
+Rõ ràng, hiện đại, hỗ trợ tiếng Việt
+Chọn 1 font chính để thống nhất
+Tài liệu / hợp đồng
+Arial hoặc Be Vietnam Pro
+Dễ đọc, nghiêm túc
+Ưu tiên khả năng render ổn định
+Slide / marketing
+Montserrat, Inter hoặc Be Vietnam Pro
+Hiện đại, B2B, sắc nét
+Không dùng quá nhiều font trong một tài liệu
+6.2 Ngôn ngữ hình khối
+Ưu tiên hình học rõ ràng: khối, đường, lưới, node, panel, card, dashboard.
+Khi dùng khiên, phải giữ cảm giác “software shield”, không thành huy hiệu bảo vệ truyền thống.
+Hình ảnh phụ nên gợi hệ thống, dữ liệu, chỉ huy, quy trình, bản đồ mục tiêu, dashboard, mobile app.
+Tránh hình ảnh quá quân sự, vũ khí, tactical grid, radar chiến tranh, neon cyberpunk.
+Các chi tiết 3D chỉ dùng cho logo hero; UI sản phẩm nên flat hoặc semi-flat.
+7. Giọng nói thương hiệu
+7.1 Tính cách ngôn từ
+Tính cách
+Nên thể hiện
+Không nên
+Chuyên gia
+Nói rõ vấn đề nghiệp vụ và giải pháp
+Nói chung chung kiểu “phần mềm tốt nhất”
+Tin cậy
+Dùng từ minh bạch, đối soát, dữ liệu, kiểm soát
+Thổi phồng thiếu căn cứ
+Thực chiến
+Bám nghiệp vụ bảo vệ: mục tiêu, ca trực, quân số, sự cố, lương
+Nói như phần mềm văn phòng generic
+Hiện đại
+Dùng ngôn ngữ platform, dashboard, mobile, data
+Lạm dụng thuật ngữ cyber/war-room
+Đồng hành
+Tôn trọng khách hàng, dễ hiểu, hướng dẫn rõ
+Giọng áp đặt hoặc quá kỹ thuật
+7.2 Cụm từ nên dùng
+Nền tảng phần mềm cho doanh nghiệp dịch vụ bảo vệ
+Phần mềm chỉ huy và quản trị vận hành bảo vệ
+Bảng điều hành vận hành
+Dữ liệu hiện trường có thể đối soát
+Quản lý tập trung mục tiêu, ca trực, quân số, sự cố và lương
+Kiểm soát vận hành theo thời gian thực
+Người đồng hành tin cậy
+7.3 Cụm từ cần tránh
+Phần mềm bảo vệ nếu làm người nghe hiểu là công ty bảo vệ
+Bảng điều hành vận hành, Vận hành, Cyber Command, SCMD Pro nếu dùng trong UI chính
+ERP nếu đứng một mình như tên sản phẩm chính
+Tối thượng, duy nhất, hoàn hảo tuyệt đối nếu không có bằng chứng
+Ngôn ngữ quân sự hóa hoặc phô diễn sức mạnh quá mức
+8. Ứng dụng nhận diện
+8.1 Website
+Website phải nói rõ SCMD Pro là phần mềm, không phải dịch vụ bảo vệ. Hero section nên dùng logo ngang, headline mô tả sản phẩm và CTA demo. Nên tránh ảnh nhân viên bảo vệ làm hình chủ đạo nếu nó khiến thương hiệu bị hiểu nhầm là công ty bảo vệ.
+Website hero khuyến nghị
+SCMD Pro - Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp. Quản lý mục tiêu, ca trực, chấm công, tuần tra, sự cố, quân số, kho, lương và báo cáo trên một nền tảng thống nhất.
+8.2 Giao diện sản phẩm
+Sidebar dùng SCMD Pro hoặc icon + SCMD Pro, không dùng tên miền .com.
+Dashboard gọi là “Bảng điều hành vận hành” hoặc “Command Center” nếu tài liệu đối ngoại cần tiếng Anh.
+Màu chính UI là navy/blue/neutral. Không dùng nền đen toàn bộ cho giao diện nghiệp vụ hằng ngày.
+Trạng thái nghiệp vụ phải có text + màu, không chỉ dùng màu.
+Logo trong app nên gọn, không gắn slogan vì chiếm không gian và khó đọc.
+8.3 Sales deck / proposal
+Trang / mục
+Cách dùng nhận diện
+Thông điệp chính
+Cover
+Logo ngang/dọc, nền sáng hoặc tối cao cấp
+SCMD Pro là giải pháp phần mềm chuyên ngành bảo vệ
+Problem
+Icon dữ liệu, ca trực, quân số, sự cố
+Nỗi đau vận hành phân tán và khó đối soát
+Solution
+Dashboard mockup, module map
+Một nền tảng thống nhất cho điều hành và quản trị
+Modules
+Card/module icon đồng bộ
+Khách hàng, hợp đồng, mục tiêu, ca trực, chấm công, tuần tra, sự cố, kho, lương
+ROI
+Biểu đồ, số liệu, quy trình
+Giảm sai sót, tăng minh bạch, tăng năng lực quản lý
+8.4 Mạng xã hội & truyền thông
+Avatar: dùng icon chữ S khiên.
+Cover: dùng logo ngang và câu định vị sản phẩm.
+Nội dung: ưu tiên bài viết về quản trị ca trực, chấm công GPS, tuần tra, sự cố, tính lương, đối soát vận hành.
+Không truyền thông như đơn vị cung cấp nhân sự bảo vệ.
+Không lạm dụng hình ảnh khiên, ánh sáng xanh, hiệu ứng 3D; cần có hình ảnh phần mềm, dashboard, mobile app.
+9. Quy chuẩn không được làm
+Không được
+Vì sao
+Thay bằng
+Dùng logo quá nhỏ kèm slogan
+Slogan mất nét, làm thương hiệu kém chuyên nghiệp
+Dùng icon hoặc logo không slogan
+Dùng SCMD Pro như tên công ty
+Làm sai kiến trúc thương hiệu
+SCMD là công ty; SCMD Pro là sản phẩm
+Dùng .com trong dashboard
+Biến UI phần mềm thành quảng cáo domain
+Dùng SCMD Pro trong sản phẩm
+Dùng ảnh nhân viên bảo vệ làm hero chính quá nhiều
+Dễ khiến khách hàng hiểu nhầm là công ty bảo vệ
+Dùng dashboard, app, data, quản trị, hiện trường có kiểm soát
+Dùng ngôn ngữ war-room/tactical
+Lệch định vị software B2B
+Dùng chỉ huy, quản trị, vận hành, đối soát, dữ liệu
+Đổi màu logo tùy tiện
+Làm mất nhận diện
+Dùng đúng palette hoặc bản đơn sắc được duyệt
+Kéo giãn, bóp méo logo
+Mất tỷ lệ và độ tin cậy
+Giữ nguyên tỷ lệ gốc
+Dùng nền rối hoặc ảnh phức tạp dưới logo
+Giảm độ đọc
+Dùng nền trắng, navy, black hoặc gradient kiểm soát
+10. Lộ trình triển khai nhận diện thương hiệu
+10.1 Giai đoạn 1 - Chuẩn hóa tài sản gốc
+Tập hợp logo gốc ở định dạng PNG/WebP/SVG/AI nếu có.
+Tạo bản icon, bản ngang, bản dọc, bản đơn sắc, bản nền sáng, bản nền tối.
+Đặt tên file chuẩn: scmd-pro-logo-horizontal-light.png, scmd-pro-logo-horizontal-dark.png, scmd-pro-icon.png.
+Xác định bản logo chính thức cho website, app, tài liệu, hợp đồng.
+10.2 Giai đoạn 2 - Đồng bộ sản phẩm SCMD Pro
+Đổi tên user-facing trong phần mềm từ SCMD ERP sang SCMD Pro nếu tài liệu/code còn tên cũ.
+Cập nhật login, dashboard, admin, PWA manifest, favicon, app icon.
+Chuẩn hóa title, meta, email template, PDF/export, print template.
+Tách rõ SCMD là công ty và SCMD Pro là sản phẩm trong mọi tài liệu khách hàng.
+10.3 Giai đoạn 3 - Xây hệ sinh thái thương hiệu
+Xây website chính thức scmdpro.com theo định vị software-first.
+Tạo sales deck, brochure, proposal template, email signature, social kit.
+Tạo UI design system cho dashboard và mobile app.
+Tạo brand governance: ai được duyệt logo, ai được tạo template, ai được phát hành tài liệu.
+10.4 Checklist kiểm tra trước khi công bố
+Khách hàng nhìn vào có hiểu ngay đây là phần mềm cho công ty bảo vệ không?
+Logo có đọc được ở kích thước nhỏ không?
+Có phân biệt rõ SCMD và SCMD Pro không?
+Có còn tài liệu nào gọi SCMD Pro là công ty bảo vệ không?
+UI có còn dùng SCMD ERP hoặc tên cũ không?
+Tagline có đủ rõ trong tài liệu bán hàng không?
+Tất cả nền sáng/nền tối đã có bản logo phù hợp chưa?
+Có bản đơn sắc cho hợp đồng, in ấn, watermark chưa?
+Phụ lục A - Bộ câu chữ chuẩn dùng ngay
+Ngữ cảnh
+Câu chữ chuẩn
+Câu giới thiệu ngắn
+SCMD Pro là phần mềm chỉ huy và quản trị dành cho doanh nghiệp dịch vụ bảo vệ chuyên nghiệp.
+Câu giới thiệu đầy đủ
+SCMD Pro giúp doanh nghiệp dịch vụ bảo vệ quản lý tập trung khách hàng, hợp đồng, mục tiêu, ca trực, chấm công, tuần tra, sự cố, quân số, kho, lương và báo cáo vận hành trên một nền tảng thống nhất.
+Câu về công ty
+SCMD là công ty công nghệ phát triển nền tảng phần mềm cho ngành dịch vụ bảo vệ.
+Slogan
+Người đồng hành tin cậy.
+English short descriptor
+Software Platform for Security Companies.
+English enterprise descriptor
+Security Command & Management Platform.
+Phụ lục B - Quy tắc tên file tài sản thương hiệu
+Tài sản
+Tên file khuyến nghị
+Icon chính
+scmd-pro-icon.png / scmd-pro-icon.svg
+Logo ngang nền sáng
+scmd-pro-logo-horizontal-light.png
+Logo ngang nền tối
+scmd-pro-logo-horizontal-dark.png
+Logo dọc nền sáng
+scmd-pro-logo-vertical-light.png
+Logo dọc nền tối
+scmd-pro-logo-vertical-dark.png
+Logo đơn sắc đen
+scmd-pro-logo-mono-black.svg
+Logo đơn sắc trắng
+scmd-pro-logo-mono-white.svg
+Favicon
+favicon.ico / favicon-32.png / favicon-192.png
+PWA icon
+scmd-pro-pwa-512.png
+Phụ lục C - Quy tắc pháp lý và sở hữu
+Tài liệu này là quy chuẩn nhận diện nội bộ và định hướng triển khai thương hiệu, không thay thế tư vấn pháp lý về đăng ký nhãn hiệu.
+Trước khi công bố quy mô lớn, nên kiểm tra khả năng đăng ký nhãn hiệu SCMD, SCMD Pro và biểu tượng chữ S khiên tại các thị trường mục tiêu.
+Không chia sẻ file logo gốc cho bên thứ ba nếu chưa có quy định sử dụng và cam kết không chỉnh sửa.
+Mọi agency, designer, developer và đối tác truyền thông phải dùng đúng bộ tài sản thương hiệu đã duyệt.
+Kết luận chiến lược
+Hướng thương hiệu tối ưu là: SCMD = công ty công nghệ; SCMD Pro = sản phẩm phần mềm thương mại; biểu tượng chữ S trong khiên = cầu nối giữa ngành bảo vệ và năng lực phần mềm. Toàn bộ nhận diện phải nhất quán với vị thế: software-first, security-domain, enterprise-grade.

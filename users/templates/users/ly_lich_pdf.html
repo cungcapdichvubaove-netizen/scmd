@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @font-face {
+            font-family: 'DejaVu Sans';
+            src: url(https://github.com/dejavu-fonts/dejavu-fonts/blob/master/ttf/DejaVuSans.ttf?raw=true);
+        }
+        body { 
+            font-family: 'DejaVu Sans', Arial, sans-serif; 
+            font-size: 11px; 
+            line-height: 1.6; 
+            color: #333;
+        }
+        .report-logo { max-height: 52px; max-width: 190px; object-fit: contain; margin-bottom: 8px; }
+        .header { 
+            text-align: center; 
+            border-bottom: 2px solid #0056b3; 
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .header h2 { 
+            margin: 0; 
+            color: #0056b3;
+        }
+        .header p { 
+            margin: 2px 0; 
+            font-size: 10px; 
+        }
+        .title { 
+            text-align: center; 
+            font-size: 20px; 
+            font-weight: bold; 
+            margin: 20px 0;
+        }
+        .container {
+            width: 100%;
+        }
+        .left-column { 
+            width: 28%; 
+            float: left;
+            padding-right: 20px;
+        }
+        .right-column { 
+            width: 68%; 
+            float: right;
+        }
+        .avatar { 
+            width: 130px; 
+            height: auto; 
+            border: 3px solid #eee; 
+            border-radius: 5px; 
+            margin-bottom: 10px;
+        }
+        .name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0056b3;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .position {
+            font-size: 14px;
+            font-weight: bold;
+            color: #555;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        .section { 
+            margin-bottom: 20px; 
+            clear: both;
+        }
+        .section h3 { 
+            border-bottom: 1px solid #0056b3; 
+            color: #0056b3; 
+            padding-bottom: 5px; 
+            margin-top: 0; 
+            font-size: 14px;
+        }
+        .info-table { 
+            width: 100%; 
+        }
+        .info-table td { 
+            padding: 3px 0; 
+            vertical-align: top;
+        }
+        .info-table td:first-child { 
+            font-weight: bold; 
+            width: 100px; 
+        }
+        .history-table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        .history-table th, .history-table td { 
+            border: 1px solid #ddd; 
+            padding: 8px; 
+        }
+        .history-table th { 
+            background-color: #f2f2f2; 
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        {% if COMPANY.logo %}<img src="{{ COMPANY.logo.url }}" class="report-logo" alt="{{ COMPANY.display_name }}">{% else %}<img src="{% static 'img/brand/report-header-logo.png' %}" class="report-logo" alt="SCMD Pro">{% endif %}
+        <h2>{{ COMPANY.display_name|default:"CÔNG TY DỊCH VỤ BẢO VỆ SCMD" }}</h2>
+        <p>Địa chỉ: {{ COMPANY.dia_chi|default:"Chưa cấu hình địa chỉ công ty" }} | SĐT: {{ COMPANY.contact_phone|default:"Chưa cấu hình số điện thoại" }}</p>
+    </div>
+
+    <p class="title">LÝ LỊCH TRÍCH NGANG NHÂN VIÊN</p>
+
+    <div class="container">
+        <div class="left-column">
+            {% if options.bao_gom_anh_the and avatar_uri %}<img src="{{ avatar_uri }}" class="avatar">{% endif %}
+            <p class="name">{{ nhan_vien.ho_ten }}</p>
+            <p class="position">{{ nhan_vien.chuc_danh.ten_chuc_danh }}</p>
+        </div>
+        <div class="right-column">
+            {% if options.bao_gom_thong_tin_ca_nhan %}
+            <div class="section">
+                <h3>Thông tin cá nhân</h3>
+                <table class="info-table">
+                    <tr><td>Mã số NV:</td><td>{{ nhan_vien.ma_nhan_vien }}</td></tr>
+                    <tr><td>Ngày sinh:</td><td>{{ nhan_vien.ngay_sinh|date:"d/m/Y" }}</td></tr>
+                    <tr><td>Giới tính:</td><td>{{ nhan_vien.get_gioi_tinh_display }}</td></tr>
+                    <tr><td>Điện thoại:</td><td>{{ nhan_vien.sdt_chinh }}</td></tr>
+                    <tr><td>Địa chỉ:</td><td>{{ nhan_vien.dia_chi_tam_tru }}</td></tr>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="section">
+        {% if options.bao_gom_bang_cap %}
+        <div class="section">
+            <h3>Bằng cấp & Chứng chỉ</h3>
+            <table class="history-table">
+                <thead><tr><th>Tên bằng cấp</th><th>Ngày cấp</th><th>Ngày hết hạn</th></tr></thead>
+                <tbody>
+                    {% for bc in bang_cap %}
+                    <tr>
+                        <td>{{ bc.ten_bang_cap }}</td>
+                        <td>{{ bc.ngay_cap|date:"d/m/Y" }}</td>
+                        <td>{{ bc.ngay_het_han|date:"d/m/Y"|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align: center;">Chưa có thông tin.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if options.bao_gom_lich_su_cong_tac %}
+        <div class="section">
+            <h3>Lịch sử Công tác</h3>
+            <table class="history-table">
+                <thead><tr><th>Thời gian</th><th>Mục tiêu</th><th>Chức vụ</th></tr></thead>
+                <tbody>
+                    {% for ls in lich_su_cong_tac %}
+                    <tr>
+                        <td>{{ ls.ngay_bat_dau|date:"m/Y" }} - {{ ls.ngay_ket_thuc|date:"m/Y"|default:"Hiện tại" }}</td>
+                        <td>{{ ls.muc_tieu.ten_muc_tieu }}</td>
+                        <td>{{ ls.chuc_danh_kiem_nhiem.ten_chuc_danh }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align: center;">Chưa có thông tin.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

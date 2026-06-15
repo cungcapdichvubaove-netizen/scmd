@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Phiếu Xuất Kho {{ phieu.so_phieu }}</title>
+    <style>
+        body { font-family: DejaVu Sans, sans-serif; margin: 40px; font-size: 12px; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .info { margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid black; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .signatures { margin-top: 50px; display: table; width: 100%; }
+        .signature-box { text-align: center; display: table-cell; width: 33.3%; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>PHIẾU XUẤT KHO</h1>
+        <p>Số: {{ phieu.so_phieu }}</p>
+    </div>
+    <div class="info">
+        <p><strong>Ngày xuất:</strong> {{ phieu.ngay_xuat|date:"d/m/Y H:i" }}</p>
+        <p><strong>Xuất cho mục tiêu:</strong> {{ phieu.muc_tieu.ten_muc_tieu }}</p>
+        <p><strong>Địa chỉ:</strong> {{ phieu.muc_tieu.dia_chi }}</p>
+        {# --- DÒNG MỚI: Hiển thị thông tin người nhận là Chỉ huy trưởng --- #}
+        <p><strong>Người nhận (Chỉ huy):</strong> 
+            {{ phieu.muc_tieu.quan_ly_muc_tieu.ho_ten|default_if_none:"Chưa chỉ định" }} 
+            (MSNV: {{ phieu.muc_tieu.quan_ly_muc_tieu.ma_nhan_vien|default_if_none:"N/A" }})
+        </p>
+        <p><strong>Ghi chú:</strong> {{ phieu.ghi_chu|default_if_none:"" }}</p>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>STT</th>
+                <th>Tên vật tư</th>
+                <th>ĐVT</th>
+                <th>Số lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in phieu.chi_tiet.all %}
+            <tr>
+                <td style="text-align: center;">{{ forloop.counter }}</td>
+                <td>{{ item.vat_tu.ten_vat_tu }}</td>
+                <td style="text-align: center;">{{ item.vat_tu.don_vi_tinh }}</td>
+                <td style="text-align: center;">{{ item.so_luong }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <div class="signatures">
+        <div class="signature-box">
+            <p><strong>Người xuất kho</strong></p>
+            <p>(Ký, ghi rõ họ tên)</p>
+            <br><br><br>
+            <p>{{ phieu.nguoi_xuat.username }}</p>
+        </div>
+        <div class="signature-box">
+            <p><strong>Thủ kho</strong></p>
+            <p>(Ký, ghi rõ họ tên)</p>
+        </div>
+        <div class="signature-box">
+            <p><strong>Người nhận</strong></p>
+            <p>(Ký, ghi rõ họ tên)</p>
+            <br><br><br>
+            {# --- DÒNG MỚI: Hiển thị tên Chỉ huy trưởng ở phần ký nhận --- #}
+            <p>{{ phieu.muc_tieu.quan_ly_muc_tieu.ho_ten|default_if_none:"" }}</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,147 @@
+{% extends "admin/base_site.html" %}
+{% load admin_console static %}
+
+{% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'common/css/operations_ux.css' %}">
+{% endblock %}
+
+{% block content %}
+{% admin_console_metrics request.user as admin_metrics %}
+{% admin_operations_ux request.user as operations_ux %}
+{% operations_workspace_sections request.user as workspace_sections %}
+
+<div class="scmd-ops-page scmd-ops-dashboard">
+
+  <section class="scmd-ops-dashboard-grid" aria-label="Việc cần xử lý và lối tắt">
+    <div class="scmd-ops-dashboard-main">
+      {% include "admin/includes/scmd_work_queue_panel.html" with work_queue_items=operations_ux.work_queue_items work_queue_title="Việc cần xử lý" work_queue_subtitle=operations_ux.role_summary compact=True only %}
+      {% include "admin/includes/scmd_summary_cards.html" with summary_cards=operations_ux.dashboard_cards compact=True only %}
+    </div>
+
+    <aside class="scmd-ops-panel scmd-ops-panel--compact" aria-label="Lối tắt vận hành">
+      <div class="scmd-ops-panel__head">
+        <div>
+          <h3>Lối tắt xử lý</h3>
+          <p>Mở nhanh các danh sách thường dùng.</p>
+        </div>
+      </div>
+      <div class="scmd-ops-link-grid scmd-ops-link-grid--single">
+        {% for item in admin_metrics.critical_links %}
+          {% if item.url and item.url != '#' %}
+          <a class="scmd-ops-navlink" href="{{ item.url }}">
+            <span class="scmd-ops-navlink__icon"><i class="{{ item.icon }}" aria-hidden="true"></i></span>
+            <span>{{ item.label }}</span>
+          </a>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </aside>
+  </section>
+
+  {% if request.user.is_superuser %}
+  <section class="scmd-ops-panel scmd-ops-panel--muted" aria-label="Cảnh báo kỹ thuật hệ thống">
+    <div class="scmd-ops-panel__head">
+      <div>
+        <h3>Cảnh báo kỹ thuật</h3>
+        <p>Chỉ phục vụ quản trị hệ thống. Người vận hành xử lý nghiệp vụ ở phần trên.</p>
+      </div>
+      <span class="scmd-ops-status scmd-ops-status--{{ admin_metrics.status_tone }}">{{ admin_metrics.status_label }}</span>
+    </div>
+    <div class="scmd-ops-alert-list">
+      {% for item in admin_metrics.attention_items %}
+      <article class="scmd-ops-alert scmd-ops-alert--{{ item.tone }}">
+        <div>
+          <strong>{{ item.title }}</strong>
+          <p>{{ item.note }}</p>
+        </div>
+        {% if item.url and item.url != '#' %}<a class="scmd-ops-mini-link" href="{{ item.url }}">{{ item.cta }}</a>{% endif %}
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <section class="scmd-ops-panel" aria-label="Không gian làm việc">
+    <div class="scmd-ops-panel__head">
+      <div>
+        <h3>Không gian làm việc</h3>
+        <p>Lối vào theo tác vụ nghiệp vụ. Danh mục app/model kỹ thuật được đưa xuống phần quản trị nâng cao.</p>
+      </div>
+      <span class="scmd-ops-muted">{{ workspace_sections|length }} nhóm nghiệp vụ</span>
+    </div>
+
+    <div class="scmd-ops-workspace-sections">
+      {% for section in workspace_sections %}
+      <article class="scmd-ops-workspace-section">
+        <header>
+          <h4>{{ section.title }}</h4>
+          <p>{{ section.note }}</p>
+        </header>
+        <div class="scmd-ops-link-grid">
+          {% for item in section.links %}
+          <a class="scmd-ops-navlink" href="{{ item.url }}">
+            <span class="scmd-ops-navlink__icon"><i class="{{ item.icon }}" aria-hidden="true"></i></span>
+            <span>{{ item.label }}</span>
+          </a>
+          {% endfor %}
+        </div>
+      </article>
+      {% empty %}
+      <div class="scmd-ops-empty">Chưa có lối tắt nghiệp vụ trong phạm vi quyền hiện tại.</div>
+      {% endfor %}
+    </div>
+
+    <details class="scmd-ops-advanced-admin" {% if request.GET.advanced == '1' %}open{% endif %} id="advanced-admin">
+      <summary>Dữ liệu quản trị nâng cao</summary>
+      <p class="scmd-ops-muted">Khu vực này giữ Django Admin app/model để phục vụ cấu hình và xử lý ngoại lệ.</p>
+      {% if request.GET.advanced != '1' %}
+      <div class="scmd-ops-empty">
+        Cây app/model nâng cao chỉ tải khi cần để giảm chi phí render ban đầu.
+        <a class="scmd-ops-mini-link" href="{% url 'admin:index' %}?advanced=1#advanced-admin">Tải danh mục nâng cao</a>
+      </div>
+      {% else %}
+      {% group_admin_apps app_list as grouped_app_list %}
+      <div class="scmd-ops-admin-groups">
+        {% for group in grouped_app_list %}
+        <article class="scmd-ops-admin-group">
+          <header class="scmd-ops-admin-group__head">
+            <h4>{{ group.title }}</h4>
+            <span>{{ group.apps|length }} nhóm dữ liệu</span>
+          </header>
+          <div class="scmd-ops-admin-apps">
+            {% for app in group.apps %}
+            <section class="scmd-ops-admin-app">
+              <div class="scmd-ops-admin-app__head">
+                <strong>{{ app.name }}</strong>
+                {% if app.app_url %}<a class="scmd-ops-mini-link" href="{{ app.app_url }}">Mở</a>{% endif %}
+              </div>
+              <div class="scmd-ops-admin-models">
+                {% for model in app.models %}
+                {% model_badges model as badges %}
+                <div class="scmd-ops-admin-model">
+                  <div class="scmd-ops-admin-model__title">
+                    {% if model.admin_url %}<a href="{{ model.admin_url }}">{{ model.name }}</a>{% else %}<span>{{ model.name }}</span>{% endif %}
+                    {% for label, tone in badges %}<em class="scmd-ops-badge scmd-ops-badge--{{ tone }}">{{ label }}</em>{% endfor %}
+                  </div>
+                  <div class="scmd-ops-admin-model__actions">
+                    {% if model.add_url %}<a href="{{ model.add_url }}">Thêm</a>{% endif %}
+                    {% if model.admin_url %}<a href="{{ model.admin_url }}">Xem</a>{% endif %}
+                  </div>
+                </div>
+                {% empty %}
+                <div class="scmd-ops-admin-model"><span>Chưa có dữ liệu được cấp quyền.</span></div>
+                {% endfor %}
+              </div>
+            </section>
+            {% endfor %}
+          </div>
+        </article>
+        {% empty %}
+        <div class="scmd-ops-empty">Chưa có danh mục quản trị trong phạm vi quyền hiện tại.</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </details>
+  </section>
+</div>
+{% endblock %}

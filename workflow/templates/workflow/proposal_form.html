@@ -1,0 +1,332 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Soạn tờ trình | SCMD Pro{% endblock %}
+{% block header_title %}Đề xuất & Công việc{% endblock %}
+
+{% block content %}
+<style>
+    .wf-proposal-page {
+        --wf-navy: #0f2544;
+        --wf-blue: #1d4ed8;
+        --wf-green: #059669;
+        --wf-amber: #d97706;
+        --wf-red: #dc2626;
+        --wf-border: #e2e8f0;
+        --wf-muted: #64748b;
+        color: #0f172a;
+    }
+    .wf-proposal-page * { box-sizing: border-box; }
+    .wf-shell { max-width: 1180px; margin: 0 auto; }
+    .wf-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 14px;
+    }
+    .wf-back-title { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .wf-back {
+        width: 40px; height: 40px; border-radius: 12px;
+        display: inline-flex; align-items: center; justify-content: center;
+        background: #fff; border: 1px solid var(--wf-border); color: #475569;
+        text-decoration: none !important;
+    }
+    .wf-title { margin: 0; font-size: 26px; line-height: 1.15; font-weight: 800; letter-spacing: -.035em; color: #07152f; }
+    .wf-subtitle { margin: 5px 0 0; color: var(--wf-muted); font-size: 13px; line-height: 1.45; }
+    .wf-policy {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 8px 11px; border-radius: 999px; background: #eff6ff;
+        border: 1px solid #bfdbfe; color: #1e3a8a; font-size: 12px; font-weight: 800;
+        white-space: nowrap;
+    }
+    .wf-form-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(320px, .65fr); gap: 16px; align-items: start; }
+    .wf-panel {
+        background: #fff; border: 1px solid var(--wf-border); border-radius: 18px;
+        box-shadow: 0 14px 34px rgba(15, 23, 42, .06); overflow: hidden;
+    }
+    .wf-panel-header {
+        display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+        padding: 15px 18px; border-bottom: 1px solid #eef2f7; background: linear-gradient(180deg,#fff,#f8fafc);
+    }
+    .wf-panel-title { margin: 0; display: flex; align-items: center; gap: 9px; font-size: 15px; font-weight: 800; color: #0f172a; }
+    .wf-panel-subtitle { margin: 4px 0 0; color: var(--wf-muted); font-size: 12px; line-height: 1.4; }
+    .wf-panel-body { padding: 18px; }
+    .wf-fields-2 { display: grid; grid-template-columns: minmax(180px, .4fr) minmax(0, 1fr); gap: 14px; margin-bottom: 14px; }
+    .wf-field { min-width: 0; }
+    .wf-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; color: #475569; font-size: 11px; font-weight: 800; letter-spacing: var(--scmd-eyebrow-l2-tracking); text-transform: uppercase; }
+    .wf-hint { display: block; margin-top: 6px; color: #64748b; font-size: 12px; line-height: 1.45; }
+    .workflow-input {
+        width: 100%; min-height: 42px; border: 1px solid #cbd5e1; border-radius: 12px;
+        padding: 10px 12px; background: #fff; color: #0f172a; font-size: 14px; outline: none;
+    }
+    .workflow-input:focus { border-color: var(--wf-blue); box-shadow: 0 0 0 3px rgba(29, 78, 216, .12); }
+    .workflow-title-input { font-weight: 800; }
+    .workflow-textarea { resize: vertical; min-height: 380px; line-height: 1.55; }
+    .workflow-file-input { width: 100%; font-size: 13px; color: #475569; }
+    .workflow-file-input::file-selector-button {
+        margin-right: 12px; border: 0; border-radius: 999px; padding: 9px 14px;
+        background: #eef2ff; color: #3730a3; font-weight: 800; cursor: pointer;
+    }
+    .wf-side-stack { display: grid; gap: 14px; }
+    .wf-approver-filters { display: grid; gap: 10px; margin-bottom: 12px; }
+    .wf-filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .wf-filter-input, .wf-filter-select {
+        width: 100%; min-height: 38px; border: 1px solid #cbd5e1; border-radius: 11px;
+        background: #fff; color: #0f172a; padding: 8px 10px; font-size: 12px; font-weight: 750;
+    }
+    .wf-filter-input:focus, .wf-filter-select:focus { outline: none; border-color: var(--wf-blue); box-shadow: 0 0 0 3px rgba(29,78,216,.10); }
+    .wf-result-meta { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #64748b; font-size: 12px; margin: 8px 0 0; }
+    .wf-count-badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 9px; background: #f8fafc; border: 1px solid #e2e8f0; font-weight: 800; color: #334155; }
+    .wf-selected-card {
+        display: none; margin-top: 12px; padding: 11px; border-radius: 14px;
+        background: #f8fafc; border: 1px solid #e2e8f0;
+    }
+    .wf-selected-name { font-weight: 800; color: #0f172a; font-size: 13px; }
+    .wf-selected-meta { color: #64748b; font-size: 12px; margin-top: 3px; line-height: 1.45; }
+    .wf-flow {
+        display: grid; gap: 8px; color: #475569; font-size: 12px; line-height: 1.45;
+    }
+    .wf-flow-step { display: grid; grid-template-columns: 26px minmax(0, 1fr); gap: 8px; align-items: start; }
+    .wf-flow-num { width: 26px; height: 26px; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: #eff6ff; color: #1d4ed8; font-size: 11px; font-weight: 800; }
+    .wf-submit {
+        width: 100%; min-height: 46px; border: 0; border-radius: 14px;
+        display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+        background: linear-gradient(135deg, #1d4ed8, #0f2544); color: #fff; font-weight: 800;
+        box-shadow: 0 14px 26px rgba(29, 78, 216, .20); cursor: pointer;
+    }
+    .wf-submit:hover { filter: brightness(.98); transform: translateY(-1px); }
+    .wf-error { margin-top: 7px; color: #be123c; font-size: 12px; font-weight: 750; }
+    .wf-errors-global { margin-bottom: 14px; padding: 12px 14px; border: 1px solid #fecdd3; background: #fff1f2; color: #be123c; border-radius: 14px; font-size: 13px; }
+    .select2-container .select2-selection--single { min-height: 42px; border-color: #cbd5e1; border-radius: 12px; display: flex; align-items: center; }
+    .select2-container--default .select2-selection--single .select2-selection__rendered { color: #0f172a; font-size: 13px; line-height: 42px; padding-left: 12px; }
+    .select2-container--default .select2-selection--single .select2-selection__arrow { height: 42px; }
+    .select2-dropdown { border-color: #cbd5e1; border-radius: 12px; overflow: hidden; }
+    .select2-results__option { font-size: 13px; padding: 9px 11px; }
+    @media (max-width: 960px) { .wf-form-grid, .wf-fields-2 { grid-template-columns: 1fr; } .wf-policy { display: none; } }
+</style>
+
+<div class="wf-proposal-page">
+    <div class="wf-shell">
+        <div class="wf-topbar">
+            <div class="wf-back-title">
+                <a href="{% url 'workflow:dashboard' %}" class="wf-back" aria-label="Quay lại dashboard"><i class="fas fa-arrow-left"></i></a>
+                <div>
+                    <h1 class="wf-title">Soạn tờ trình</h1>
+                    <p class="wf-subtitle">Dành cho khối quản lý/phòng ban. Kiến nghị từ bảo vệ hiện trường phải qua phòng nghiệp vụ trước khi trình lên workflow chung.</p>
+                </div>
+            </div>
+            <div class="wf-policy"><i class="fas fa-route"></i> Luồng nội bộ phòng ban</div>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="wf-errors-global">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="wf-form-grid" id="proposal-form">
+            {% csrf_token %}
+            <div class="wf-panel">
+                <div class="wf-panel-header">
+                    <div>
+                        <h2 class="wf-panel-title"><i class="fas fa-file-signature text-blue-600"></i> Nội dung đề xuất</h2>
+                        <p class="wf-panel-subtitle">Nhập trích yếu rõ việc cần duyệt, căn cứ, tác động và đơn vị thực hiện sau khi được duyệt.</p>
+                    </div>
+                </div>
+                <div class="wf-panel-body">
+                    <div class="wf-fields-2">
+                        <div class="wf-field">
+                            <label class="wf-label" for="{{ form.loai_de_xuat.id_for_label }}">Loại đề xuất</label>
+                            {{ form.loai_de_xuat }}
+                            {% for error in form.loai_de_xuat.errors %}<div class="wf-error">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="wf-field">
+                            <label class="wf-label" for="{{ form.tieu_de.id_for_label }}">Trích yếu / V/v</label>
+                            {{ form.tieu_de }}
+                            <span class="wf-hint">Viết ngắn gọn để người duyệt hiểu ngay nội dung cần xử lý.</span>
+                            {% for error in form.tieu_de.errors %}<div class="wf-error">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+                    <div class="wf-field">
+                        <label class="wf-label" for="{{ form.noi_dung.id_for_label }}">Nội dung trình duyệt</label>
+                        {{ form.noi_dung }}
+                        {% for error in form.noi_dung.errors %}<div class="wf-error">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <aside class="wf-side-stack">
+                <div class="wf-panel">
+                    <div class="wf-panel-header">
+                        <div>
+                            <h2 class="wf-panel-title"><i class="fas fa-paper-plane text-blue-600"></i> Kính trình</h2>
+                            <p class="wf-panel-subtitle">Lọc nhanh theo phòng ban, chức danh hoặc tên người duyệt.</p>
+                        </div>
+                    </div>
+                    <div class="wf-panel-body">
+                        <div class="wf-approver-filters" aria-label="Bộ lọc người duyệt">
+                            <input type="search" id="approver-keyword" class="wf-filter-input" placeholder="Tìm tên, mã NV, phòng ban...">
+                            <div class="wf-filter-grid">
+                                <select id="approver-department" class="wf-filter-select"><option value="">Tất cả phòng ban</option></select>
+                                <select id="approver-title" class="wf-filter-select"><option value="">Tất cả chức danh</option></select>
+                            </div>
+                        </div>
+                        <label class="wf-label" for="{{ form.nguoi_duyet_hien_tai.id_for_label }}">Người duyệt đầu tiên</label>
+                        {{ form.nguoi_duyet_hien_tai }}
+                        <div class="wf-result-meta">
+                            <span class="wf-count-badge"><i class="fas fa-users"></i> <span id="approver-count">0</span> phù hợp</span>
+                            <button type="button" id="approver-clear" class="text-blue-700 font-bold text-xs">Xóa lọc</button>
+                        </div>
+                        <div class="wf-selected-card" id="approver-selected-card">
+                            <div class="wf-selected-name" id="approver-selected-name"></div>
+                            <div class="wf-selected-meta" id="approver-selected-meta"></div>
+                        </div>
+                        {% if form.nguoi_duyet_hien_tai.help_text %}<span class="wf-hint">{{ form.nguoi_duyet_hien_tai.help_text }}</span>{% endif %}
+                        {% for error in form.nguoi_duyet_hien_tai.errors %}<div class="wf-error">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="wf-panel">
+                    <div class="wf-panel-header">
+                        <div>
+                            <h2 class="wf-panel-title"><i class="fas fa-paperclip text-orange-500"></i> Đính kèm</h2>
+                            <p class="wf-panel-subtitle">Biên bản, báo giá, ảnh hiện trường hoặc file căn cứ nếu có.</p>
+                        </div>
+                    </div>
+                    <div class="wf-panel-body">
+                        {{ form.file_dinh_kem }}
+                        {% for error in form.file_dinh_kem.errors %}<div class="wf-error">{{ error }}</div>{% endfor %}
+                    </div>
+                </div>
+
+                <div class="wf-panel">
+                    <div class="wf-panel-header">
+                        <div>
+                            <h2 class="wf-panel-title"><i class="fas fa-sitemap text-green-600"></i> Luồng xử lý</h2>
+                            <p class="wf-panel-subtitle">Đề xuất sau khi gửi sẽ nằm trong hàng đợi của người được kính trình.</p>
+                        </div>
+                    </div>
+                    <div class="wf-panel-body wf-flow">
+                        <div class="wf-flow-step"><span class="wf-flow-num">1</span><span>Phòng ban tạo tờ trình với nội dung và tài liệu căn cứ.</span></div>
+                        <div class="wf-flow-step"><span class="wf-flow-num">2</span><span>Người duyệt đầu tiên thụ lý, duyệt, yêu cầu sửa hoặc trình tiếp.</span></div>
+                        <div class="wf-flow-step"><span class="wf-flow-num">3</span><span>Hồ sơ được chuyển thành công việc thực hiện nếu đã được duyệt.</span></div>
+                    </div>
+                </div>
+
+                <button type="submit" class="wf-submit"><i class="fas fa-paper-plane"></i> Trình duyệt</button>
+            </aside>
+        </form>
+    </div>
+</div>
+
+<script>
+(function() {
+    function parseOptionText(text) {
+        var parts = (text || '').split(' — ');
+        return {
+            full: (text || '').trim(),
+            name: (parts[0] || text || '').trim(),
+            department: (parts[1] || 'Chưa rõ phòng ban').trim(),
+            title: (parts[2] || 'Chưa rõ chức danh').trim()
+        };
+    }
+
+    function initApproverFilter() {
+        var $select = $('#id_nguoi_duyet_hien_tai');
+        if (!$select.length) return;
+
+        var originalOptions = [];
+        $select.find('option').each(function() {
+            var $option = $(this);
+            originalOptions.push({
+                value: $option.attr('value') || '',
+                text: $option.text(),
+                selected: $option.is(':selected')
+            });
+        });
+
+        function uniqueSorted(values) {
+            var map = {};
+            values.forEach(function(v) { if (v) map[v] = true; });
+            return Object.keys(map).sort(function(a, b) { return a.localeCompare(b, 'vi'); });
+        }
+
+        var approverMeta = originalOptions.filter(function(o) { return o.value; }).map(function(o) { return parseOptionText(o.text); });
+        uniqueSorted(approverMeta.map(function(m) { return m.department; })).forEach(function(label) {
+            $('#approver-department').append($('<option/>').val(label).text(label));
+        });
+        uniqueSorted(approverMeta.map(function(m) { return m.title; })).forEach(function(label) {
+            $('#approver-title').append($('<option/>').val(label).text(label));
+        });
+
+        function rebuildOptions() {
+            var keyword = ($('#approver-keyword').val() || '').toLowerCase().trim();
+            var department = $('#approver-department').val() || '';
+            var title = $('#approver-title').val() || '';
+            var currentValue = $select.val();
+            var matched = 0;
+            var hasCurrent = false;
+
+            $select.empty();
+            originalOptions.forEach(function(o) {
+                if (!o.value) {
+                    $select.append($('<option/>').val('').text(o.text));
+                    return;
+                }
+                var meta = parseOptionText(o.text);
+                var textLower = meta.full.toLowerCase();
+                var ok = true;
+                if (keyword && textLower.indexOf(keyword) === -1) ok = false;
+                if (department && meta.department !== department) ok = false;
+                if (title && meta.title !== title) ok = false;
+                if (ok) {
+                    matched += 1;
+                    if (o.value === currentValue) hasCurrent = true;
+                    $select.append($('<option/>').val(o.value).text(o.text));
+                }
+            });
+
+            if (!hasCurrent) currentValue = '';
+            $select.val(currentValue);
+            $('#approver-count').text(matched);
+            $select.trigger('change.select2');
+            updateSelectedCard();
+        }
+
+        function updateSelectedCard() {
+            var selectedText = $select.find('option:selected').text();
+            var selectedValue = $select.val();
+            var card = $('#approver-selected-card');
+            if (!selectedValue) {
+                card.hide();
+                return;
+            }
+            var meta = parseOptionText(selectedText);
+            $('#approver-selected-name').text(meta.name);
+            $('#approver-selected-meta').text(meta.department + ' · ' + meta.title);
+            card.show();
+        }
+
+        $select.select2({
+            width: '100%',
+            placeholder: $select.data('placeholder') || 'Chọn người duyệt đầu tiên...',
+            allowClear: true
+        });
+
+        $('#approver-keyword').on('input', rebuildOptions);
+        $('#approver-department, #approver-title').on('change', rebuildOptions);
+        $('#approver-clear').on('click', function() {
+            $('#approver-keyword').val('');
+            $('#approver-department').val('');
+            $('#approver-title').val('');
+            rebuildOptions();
+        });
+        $select.on('change', updateSelectedCard);
+        rebuildOptions();
+    }
+
+    if (window.jQuery) {
+        $(document).ready(initApproverFilter);
+    }
+})();
+</script>
+{% endblock %}

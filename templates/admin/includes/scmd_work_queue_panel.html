@@ -1,0 +1,27 @@
+{% if work_queue_items %}
+<section class="scmd-ops-workqueue {% if compact %}scmd-ops-workqueue--compact{% endif %} {% if minimal %}scmd-ops-workqueue--minimal{% endif %}" aria-label="Việc cần xử lý">
+  <div class="scmd-ops-section-head">
+    <div>
+      <h3>{{ work_queue_title|default:"Việc cần xử lý" }}</h3>
+      {% if work_queue_subtitle %}<p>{{ work_queue_subtitle }}</p>{% endif %}
+    </div>
+  </div>
+  <div class="scmd-ops-workqueue__list">
+    {% for item in work_queue_items %}
+    <article class="scmd-ops-workitem scmd-ops-workitem--{{ item.tone|default:'neutral' }}">
+      <span class="scmd-ops-workitem__count">{% if item.display_count %}{{ item.display_count }}{% else %}{{ item.count|default:0 }}{% endif %}</span>
+      <div class="scmd-ops-workitem__body">
+        <strong>{{ item.label }}</strong>
+        {% if item.note %}<p>{{ item.note }}</p>{% endif %}
+      </div>
+      <div class="scmd-ops-workitem__actions">
+        {% if item.url and item.url != '#' %}<a class="scmd-ops-mini-link scmd-ops-mini-link--primary" href="{{ item.url }}">{{ item.cta|default:"Mở" }}</a>{% endif %}
+        {% for action in item.next_actions %}
+          {% if action.url %}<a class="scmd-ops-mini-link" href="{{ action.url }}">{{ action.label }}</a>{% endif %}
+        {% endfor %}
+      </div>
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}

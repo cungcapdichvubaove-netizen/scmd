@@ -1,0 +1,627 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Bảng điều hành vận hành | SCMD Pro{% endblock %}
+{% block header_title %}Bảng điều hành vận hành{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'vendor/leaflet/leaflet.css' %}?v=20260612b">
+<style>
+    .ops-map-shell {
+        height: clamp(320px, 42vh, 500px);
+        border-radius: var(--scmd-radius-md);
+        overflow: hidden;
+        background: var(--scmd-surface-muted);
+    }
+
+    .ops-map {
+        height: 100%;
+        width: 100%;
+    }
+
+    .ops-map .leaflet-tile,
+    .ops-map .leaflet-container img.leaflet-tile {
+        mix-blend-mode: normal !important;
+    }
+
+    .ops-map .leaflet-container {
+        background: var(--scmd-surface-muted);
+    }
+
+    .ops-marker {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid var(--scmd-surface);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.18);
+        overflow: hidden;
+    }
+
+    .ops-marker img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .ops-incident-pin {
+        background: var(--scmd-danger);
+        color: var(--scmd-on-brand);
+        animation: ops-pulse 2s infinite;
+    }
+
+    @keyframes ops-pulse {
+        0% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.55); }
+        70% { transform: scale(1); box-shadow: 0 0 0 14px rgba(220, 38, 38, 0); }
+        100% { transform: scale(0.96); box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+
+
+    .ops-mini-badge {
+        border-radius: 999px;
+        padding: 0.22rem 0.5rem;
+        font-size: 10px;
+        line-height: 1;
+        white-space: nowrap;
+    }
+
+    .ops-compact-list {
+        border: 1px solid var(--scmd-border);
+        border-radius: var(--scmd-radius-md);
+        background: var(--scmd-surface);
+    }
+
+    #incident-list,
+    #activity-log {
+        gap: 0 !important;
+    }
+
+    #incident-list.ops-incident-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 0.5rem !important;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        padding: 0.05rem;
+    }
+
+    @media (min-width: 1280px) {
+        #incident-list.ops-incident-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            max-height: 420px;
+        }
+    }
+
+    .ops-incident-card {
+        min-height: 82px;
+        border: 1px solid var(--scmd-border);
+        border-radius: 0.9rem;
+        background: var(--scmd-surface);
+        padding: 0.55rem 0.65rem;
+        transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .ops-incident-card:hover,
+    .ops-incident-card.is-active {
+        border-color: color-mix(in srgb, var(--scmd-info) 45%, var(--scmd-border));
+        background: var(--scmd-surface-muted);
+        box-shadow: 0 8px 18px rgba(var(--scmd-blue-700-rgb), 0.08);
+    }
+
+    .ops-incident-card__top,
+    .ops-incident-card__actions {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+    }
+
+    .ops-incident-card__top {
+        justify-content: space-between;
+        min-width: 0;
+    }
+
+    .ops-incident-card__main {
+        display: flex;
+        align-items: center;
+        gap: 0.45rem;
+        min-width: 0;
+    }
+
+    .ops-incident-card__severity {
+        flex: 0 0 auto;
+        padding: 0.18rem 0.45rem !important;
+        font-size: 10px !important;
+        line-height: 1 !important;
+        white-space: nowrap;
+    }
+
+    .ops-incident-card__title,
+    .ops-incident-card__meta,
+    .ops-incident-card__sub {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .ops-incident-card__title {
+        color: var(--scmd-text);
+        font-size: 13px;
+        font-weight: 900;
+        line-height: 1.2;
+    }
+
+    .ops-incident-card__time {
+        flex: 0 0 auto;
+        color: var(--scmd-text-muted);
+        font-size: 11px;
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    .ops-incident-card__meta {
+        margin-top: 0.28rem;
+        color: var(--scmd-text-muted);
+        font-size: 11px;
+        font-weight: 650;
+        line-height: 1.25;
+    }
+
+    .ops-incident-card__bottom {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
+        margin-top: 0.4rem;
+        min-width: 0;
+    }
+
+    .ops-incident-card__sub {
+        color: var(--scmd-text-muted);
+        font-size: 11px;
+        font-weight: 650;
+        line-height: 1.25;
+    }
+
+    .ops-incident-action {
+        flex: 0 0 auto;
+        min-height: 28px;
+        border-radius: 999px;
+        border: 1px solid var(--scmd-border);
+        background: var(--scmd-surface);
+        padding: 0.34rem 0.55rem;
+        color: var(--scmd-text-soft);
+        font-size: 10px;
+        font-weight: 900;
+        line-height: 1;
+        text-decoration: none;
+        transition: border-color 0.16s ease, background-color 0.16s ease, color 0.16s ease;
+    }
+
+    .ops-incident-action:hover,
+    .ops-incident-action:focus {
+        border-color: color-mix(in srgb, var(--scmd-info) 55%, var(--scmd-border));
+        background: var(--scmd-info-soft);
+        color: var(--scmd-info);
+        outline: none;
+    }
+
+    .ops-incident-action--primary {
+        border-color: color-mix(in srgb, var(--scmd-info) 35%, var(--scmd-border));
+        background: var(--scmd-info-soft);
+        color: var(--scmd-info);
+    }
+
+    .ops-incident-empty {
+        border: 1px solid color-mix(in srgb, var(--scmd-success) 38%, var(--scmd-border));
+        border-radius: 0.9rem;
+        background: var(--scmd-success-soft);
+        padding: 0.75rem;
+        color: var(--scmd-success);
+        font-size: 13px;
+        font-weight: 800;
+    }
+
+    @media (max-width: 640px) {
+        .ops-incident-card {
+            min-height: 94px;
+        }
+
+        .ops-incident-card__bottom {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .ops-incident-card__actions {
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .ops-incident-action {
+            min-height: 40px;
+            padding-left: 0.7rem;
+            padding-right: 0.7rem;
+        }
+    }
+
+    #activity-log > div {
+        min-height: 50px;
+        padding: 0.45rem 0.65rem !important;
+        border: 0 !important;
+        border-bottom: 1px solid var(--scmd-border) !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+    }
+
+    #activity-log > div > div:first-child {
+        min-width: 0;
+    }
+
+    #activity-log > div > div:first-child > div:first-child,
+    #activity-log > div > div:nth-child(2) {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    #activity-log > div > div:first-child > div:first-child {
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+    }
+
+    #activity-log > div > div:first-child > div:last-child {
+        flex: 0 0 auto;
+        font-size: 11px !important;
+        white-space: nowrap;
+    }
+
+    #activity-log > div > div:nth-child(2) {
+        margin-top: 0.15rem !important;
+        font-size: 11px !important;
+        line-height: 1.25 !important;
+    }
+
+
+    .ops-action-summary {
+        min-height: auto;
+    }
+
+    .ops-summary-actions,
+    .ops-inline-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.35rem;
+    }
+
+    .ops-last-activity {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.65rem;
+        border: 1px solid var(--scmd-border);
+        border-radius: 0.85rem;
+        background: var(--scmd-surface-muted);
+        padding: 0.5rem 0.65rem;
+    }
+
+    .ops-activity-feed {
+        border: 1px solid var(--scmd-border);
+        border-radius: var(--scmd-radius-md);
+        background: var(--scmd-surface);
+    }
+
+    .ops-activity-item {
+        display: grid;
+        grid-template-columns: minmax(96px, 0.85fr) minmax(0, 1.55fr) auto auto;
+        align-items: center;
+        gap: 0.55rem;
+        min-height: 54px;
+        padding: 0.45rem 0.65rem;
+        border-bottom: 1px solid var(--scmd-border);
+    }
+
+    .ops-activity-item:last-child {
+        border-bottom: 0;
+    }
+
+    .ops-activity-item__actor,
+    .ops-activity-item__summary {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .ops-activity-item__actor {
+        color: var(--scmd-text);
+        font-size: 13px;
+        font-weight: 850;
+    }
+
+    .ops-activity-item__summary {
+        color: var(--scmd-text-muted);
+        font-size: 11px;
+        font-weight: 650;
+    }
+
+    .ops-activity-item__time {
+        color: var(--scmd-info);
+        font-size: 11px;
+        font-weight: 850;
+        white-space: nowrap;
+    }
+
+    .ops-activity-item__actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 0.35rem;
+        white-space: nowrap;
+    }
+
+    .ops-empty-row {
+        padding: 0.75rem;
+        color: var(--scmd-text-muted);
+        font-size: 13px;
+        font-weight: 750;
+    }
+
+    @media (max-width: 768px) {
+        .ops-last-activity {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .ops-activity-item {
+            grid-template-columns: minmax(0, 1fr) auto;
+            min-height: 66px;
+        }
+
+        .ops-activity-item__summary,
+        .ops-activity-item__actions {
+            grid-column: 1 / -1;
+        }
+
+        .ops-activity-item__actions {
+            justify-content: flex-start;
+            flex-wrap: wrap;
+        }
+    }
+
+    .ops-priority-strip {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    .ops-priority-item {
+        min-height: 58px;
+        border: 1px solid var(--scmd-border);
+        border-radius: 0.9rem;
+        background: var(--scmd-surface);
+        padding: 0.55rem 0.65rem;
+        text-decoration: none;
+    }
+
+    .ops-priority-item:hover,
+    .ops-priority-item:focus {
+        border-color: color-mix(in srgb, var(--scmd-info) 45%, var(--scmd-border));
+        background: var(--scmd-surface-muted);
+        outline: none;
+    }
+
+    .ops-priority-label {
+        color: var(--scmd-text-muted);
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .ops-priority-copy {
+        margin-top: 0.22rem;
+        color: var(--scmd-text);
+        font-size: 12px;
+        font-weight: 850;
+        line-height: 1.25;
+    }
+
+    @media (max-width: 900px) {
+        .ops-priority-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 520px) {
+        .ops-priority-strip { grid-template-columns: 1fr; }
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-3" data-ops-dashboard data-variant="desk" data-api-url="{{ dashboard_api_url }}" data-tile-url="{{ map_tile_url }}" data-tile-attribution="{{ map_attribution }}"{% if incident_report_url %} data-incident-reports-url="{{ incident_report_url }}"{% endif %}{% if attendance_report_url %} data-attendance-report-url="{{ attendance_report_url }}"{% endif %} {% if incident_admin_base_url %}data-incident-admin-base-url="{{ incident_admin_base_url }}"{% endif %}>
+    <section class="scmd-surface-card px-3 py-3 md:px-4 md:py-3">
+        <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-x-2 gap-y-1">
+                    <span class="rounded-full bg-slate-100 px-2.5 py-1 text-[10px] font-black tracking-[0.12em] text-slate-500">Phòng nghiệp vụ</span>
+                    <h1 class="text-xl font-black tracking-tight text-slate-900 md:text-2xl">Điều phối hiện trường</h1>
+                </div>
+                <p class="mt-1 text-sm leading-snug text-slate-600">
+                    Theo dõi quân số, check-in và sự cố mở trong ngày.
+                </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" data-refresh-dashboard class="min-h-[40px] rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-black tracking-[0.08em] text-slate-700 transition hover:border-blue-500 hover:text-blue-700">
+                    Làm mới
+                </button>
+                {% if schedule_url %}<a href="{{ schedule_url }}" class="inline-flex min-h-[40px] items-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] font-black tracking-[0.08em] text-slate-700 transition hover:border-blue-500 hover:text-blue-700">
+                    Xếp lịch
+                </a>{% endif %}
+                {% if presentation_url %}<a href="{{ presentation_url }}" class="inline-flex min-h-[40px] items-center rounded-xl bg-blue-600 px-3 py-2 text-[11px] font-black tracking-[0.08em] text-white transition hover:bg-blue-700">
+                    Trình chiếu
+                </a>{% endif %}
+            </div>
+        </div>
+    </section>
+
+    <section class="ops-priority-strip" aria-label="Việc cần làm trong 30 giây đầu">
+        {% if schedule_url %}<a href="{{ schedule_url }}" class="ops-priority-item">
+            <div class="ops-priority-label">Điều phối ca</div>
+            <div class="ops-priority-copy">Xử lý thiếu quân, đổi ca và phân công hôm nay</div>
+        </a>{% endif %}
+        {% if incident_report_url %}
+        <a href="{{ incident_report_url }}" class="ops-priority-item">
+            <div class="ops-priority-label">Sự cố mở</div>
+            <div class="ops-priority-copy">Mở danh sách sự cố để theo dõi người xử lý</div>
+        </a>
+        {% endif %}
+        {% if attendance_report_url %}
+        <a href="{{ attendance_report_url }}" class="ops-priority-item">
+            <div class="ops-priority-label">Chấm công</div>
+            <div class="ops-priority-copy">Kiểm tra check-in GPS/ảnh và ca thiếu dữ liệu</div>
+        </a>
+        {% endif %}
+        <button type="button" data-scroll-to-map class="ops-priority-item text-left">
+            <div class="ops-priority-label">Định vị</div>
+            <div class="ops-priority-copy">Nhảy tới bản đồ hiện trường đang cập nhật live</div>
+        </button>
+    </section>
+
+    <section class="grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
+        <div class="scmd-surface-card min-h-[74px] p-3">
+            <p class="text-[10px] font-black tracking-[0.12em] text-slate-500">Tổng ca</p>
+            <p id="stat-total" class="mt-1 text-2xl font-black leading-none text-slate-900">0</p>
+        </div>
+        <div class="scmd-surface-card min-h-[74px] p-3">
+            <p class="text-[10px] font-black tracking-[0.12em] text-slate-500">Đã check-in</p>
+            <p id="stat-online" class="mt-1 text-2xl font-black leading-none text-green-600">0</p>
+        </div>
+        <div class="scmd-surface-card min-h-[74px] p-3">
+            <p class="text-[10px] font-black tracking-[0.12em] text-slate-500">Chưa có mặt</p>
+            <p id="stat-missing" class="mt-1 text-2xl font-black leading-none text-amber-600">0</p>
+        </div>
+        <div class="scmd-surface-card min-h-[74px] p-3">
+            <p class="text-[10px] font-black tracking-[0.12em] text-slate-500">Phủ ca</p>
+            <p id="stat-rate" class="mt-1 text-2xl font-black leading-none text-slate-900">0%</p>
+        </div>
+        <div class="scmd-surface-card min-h-[74px] p-3">
+            <p class="text-[10px] font-black tracking-[0.12em] text-slate-500">Sự cố mở</p>
+            <p id="stat-incident" class="mt-1 text-2xl font-black leading-none text-red-600">0</p>
+        </div>
+        <div class="scmd-surface-card min-h-[74px] p-3">
+            <p class="text-[10px] font-black tracking-[0.12em] text-slate-500">Mục tiêu</p>
+            <p id="stat-target" class="mt-1 text-2xl font-black leading-none text-slate-900">0</p>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(520px,0.75fr)] 2xl:grid-cols-[minmax(0,1.15fr)_minmax(620px,0.85fr)]">
+        <div class="space-y-3">
+            <div class="scmd-surface-card p-3 md:p-4">
+                <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                        <p class="text-[10px] font-black tracking-[0.14em] text-slate-500">Bản đồ hiện trường</p>
+                        <h2 class="mt-0.5 text-base font-black text-slate-900">Nhân sự đang trực và điểm phát sinh sự cố</h2>
+                    </div>
+                    <div class="flex flex-wrap gap-2 text-xs font-bold">
+                        <span class="scmd-tone scmd-tone--info">Nhân sự đang trực</span>
+                        <span class="scmd-tone scmd-tone--danger">Sự cố đang mở</span>
+                    </div>
+                </div>
+                <div class="ops-map-shell">
+                    <div id="ops-map" class="ops-map" data-ops-map></div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
+                <div class="scmd-surface-card ops-action-summary p-3">
+                    <div class="flex flex-wrap items-start justify-between gap-2">
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-black tracking-[0.14em] text-slate-500">Trạng thái theo dõi</p>
+                            <h3 class="mt-0.5 text-sm font-black text-slate-900">Tóm tắt tức thời</h3>
+                        </div>
+                        <div class="ops-summary-actions">
+                            <span id="ops-status-tone" class="scmd-tone scmd-tone--neutral ops-mini-badge">Đang tải</span>
+                            {% if incident_report_url %}<a href="{{ incident_report_url }}" class="ops-incident-action">Xem sự cố</a>{% endif %}
+                            {% if schedule_url %}<a href="{{ schedule_url }}" class="ops-incident-action">Điều phối</a>{% endif %}
+                            <button type="button" data-scroll-to-map class="ops-incident-action">Mở bản đồ</button>
+                        </div>
+                    </div>
+                    <p id="ops-status-copy" class="mt-2 text-xs leading-snug text-slate-600">
+                        Chờ dữ liệu từ hệ thống vận hành.
+                    </p>
+                    <div class="ops-last-activity mt-2">
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-black tracking-[0.12em] text-slate-500">Hoạt động gần nhất</p>
+                            <p id="last-activity" class="mt-0.5 truncate text-xs font-semibold text-slate-700">Chưa có cập nhật</p>
+                        </div>
+                        <div id="last-activity-actions" class="ops-inline-actions" aria-label="Thao tác hoạt động gần nhất"></div>
+                    </div>
+                </div>
+
+                <div class="scmd-surface-card p-3">
+                    <div class="flex flex-wrap items-center justify-between gap-2">
+                        <div class="min-w-0">
+                            <p class="text-[10px] font-black tracking-[0.14em] text-slate-500">Nhịp vận hành</p>
+                            <h3 class="mt-0.5 text-sm font-black text-slate-900">Check-in gần nhất</h3>
+                        </div>
+                        <div class="flex flex-none items-center gap-2">
+                            <span class="scmd-tone scmd-tone--info ops-mini-badge">6 lượt mới nhất</span>
+                            {% if attendance_report_url %}<a href="{{ attendance_report_url }}" class="ops-incident-action hidden sm:inline-flex">Xem tất cả</a>{% endif %}
+                        </div>
+                    </div>
+                    <div id="activity-log" class="ops-activity-feed custom-scrollbar mt-2 max-h-[320px] overflow-y-auto"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <div class="scmd-surface-card p-3">
+                <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-[10px] font-black tracking-[0.14em] text-slate-500">Sự cố cần xử lý</p>
+                        <h3 class="mt-0.5 text-sm font-black text-slate-900">Danh sách ưu tiên hiện trường</h3>
+                    </div>
+                    <div class="flex flex-none items-center gap-2">
+                        {% if incident_report_url %}<a href="{{ incident_report_url }}" class="ops-incident-action hidden sm:inline-flex">Xem tất cả</a>{% endif %}
+                        <span id="incident-count" class="scmd-tone scmd-tone--danger ops-mini-badge">0 hồ sơ</span>
+                    </div>
+                </div>
+                <div id="incident-list" class="ops-incident-grid custom-scrollbar mt-2 max-h-[420px] overflow-y-auto"></div>
+            </div>
+
+            <div class="scmd-surface-card p-3">
+                <div class="flex items-center justify-between gap-3">
+                    <div>
+                        <p class="text-[10px] font-black tracking-[0.14em] text-slate-500">Lối tắt điều phối</p>
+                        <h3 class="mt-0.5 text-base font-black text-slate-900">Chuyển nhanh</h3>
+                    </div>
+                </div>
+                <div class="mt-3 grid grid-cols-2 gap-2">
+                    {% if target_list_url %}<a href="{{ target_list_url }}" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-center text-xs font-bold text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700">
+                        Mục tiêu
+                    </a>{% endif %}
+                    {% if schedule_url %}<a href="{{ schedule_url }}" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-center text-xs font-bold text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700">
+                        Xếp lịch
+                    </a>{% endif %}
+                    {% if incident_report_url %}<a href="{{ incident_report_url }}" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-center text-xs font-bold text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700">
+                        Sự cố
+                    </a>{% endif %}
+                    {% if presentation_url %}<a href="{{ presentation_url }}" class="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-center text-xs font-bold text-slate-700 transition hover:border-blue-500 hover:bg-blue-50 hover:text-blue-700">
+                        Trình chiếu
+                    </a>{% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'vendor/leaflet/leaflet.js' %}?v=20260612b"></script>
+<script src="{% static 'js/operations_dashboard_live.js' %}?v=20260613c"></script>
+{% endblock %}

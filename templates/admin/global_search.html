@@ -1,0 +1,78 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">Trang chủ</a>
+  &rsaquo; Tìm kiếm toàn hệ thống
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="scmd-global-search-page scmd-compact-list-page">
+  <header class="scmd-compact-page-head scmd-global-search-page__head">
+    <div>
+      <p class="scmd-compact-kicker">Tìm kiếm nhanh</p>
+      <h1>Tìm kiếm toàn hệ thống</h1>
+      <p class="scmd-compact-subtitle">Tìm nhân viên, mục tiêu, hợp đồng, khách hàng, sự cố và vật tư trong một nơi.</p>
+    </div>
+    <form class="scmd-global-search-page__form" action="{% url 'admin_global_search' %}" method="get" role="search">
+      <label class="sr-only" for="scmd-global-search-page-input">Từ khóa</label>
+      <input id="scmd-global-search-page-input" type="search" name="q" value="{{ query }}" placeholder="Nhập tối thiểu 2 ký tự..." autocomplete="off" autofocus>
+      <button type="submit">Tìm kiếm</button>
+    </form>
+  </header>
+
+  {% if too_short %}
+    <div class="scmd-admin-notice scmd-admin-notice--muted">Nhập ít nhất 2 ký tự để tìm kiếm.</div>
+  {% elif query %}
+    <div class="scmd-global-search-page__meta" aria-live="polite">
+      <strong>{{ total_count }}</strong> kết quả phù hợp cho “{{ query }}”.
+    </div>
+  {% endif %}
+
+
+  {% if has_failed_sources %}
+    <div class="scmd-admin-notice scmd-admin-notice--warning">
+      {% if show_failed_sources and failed_sources %}
+        Một số nhóm dữ liệu chưa tải được: {{ failed_sources|join:", " }}. Kết quả bên dưới chỉ gồm các nguồn đã tải thành công.
+      {% else %}
+        Một số nhóm dữ liệu đang cập nhật. Kết quả bên dưới có thể chưa đầy đủ, vui lòng thử lại sau.
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if groups %}
+    <div class="scmd-global-search-groups" aria-live="polite" aria-atomic="false">
+      {% for group in groups %}
+        <section class="scmd-global-search-group" aria-label="{{ group.label }}">
+          <div class="scmd-global-search-group__head">
+            <h2>{{ group.label }}</h2>
+            <span>{{ group.shown_count }}{% if group.has_more %}+{% endif %}</span>
+          </div>
+          <div class="scmd-global-search-results">
+            {% for item in group.items %}
+              <a class="scmd-global-search-result" href="{{ item.url }}">
+                <strong>{{ item.title }}</strong>
+                {% if item.subtitle %}<span>{{ item.subtitle }}</span>{% endif %}
+              </a>
+            {% endfor %}
+          </div>
+        </section>
+      {% endfor %}
+    </div>
+  {% elif query and not too_short %}
+    <div class="scmd-empty-state">
+      <strong>Không tìm thấy kết quả phù hợp.</strong>
+      <span>Kiểm tra lại mã nhân viên, tên mục tiêu, số hợp đồng, mã sự cố hoặc tên vật tư.</span>
+    </div>
+  {% else %}
+    <div class="scmd-empty-state">
+      <strong>Nhập từ khóa để bắt đầu.</strong>
+      <span>Global search chỉ có một ô tìm kiếm duy nhất trên topbar để tránh nhiễu khi làm việc.</span>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

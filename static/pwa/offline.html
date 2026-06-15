@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <title>SCMD Pro — Ngoại tuyến</title>
+  <style>
+    :root{color-scheme:light;--bg:#f8fafc;--card:#fff;--ink:#0f172a;--muted:#64748b;--brand:#0f172a;--danger:#dc2626;--border:#e2e8f0}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;padding:32px 18px;padding-top:calc(32px + env(safe-area-inset-top));padding-bottom:calc(32px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 20% 20%,#e0f2fe 0,#f8fafc 34%,#f1f5f9 100%);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:var(--ink)}
+    main{width:min(440px,100%);border:1px solid var(--border);border-radius:28px;background:rgba(255,255,255,.92);box-shadow:0 24px 80px rgba(15,23,42,.12);padding:28px}.logo{width:56px;height:56px;border-radius:18px;background:#0f172a;display:flex;align-items:center;justify-content:center;margin-bottom:18px}.logo img{width:36px;height:36px}h1{font-size:24px;line-height:1.15;margin:0 0 12px;font-weight:800}p{margin:0 0 16px;color:var(--muted);font-size:15px;line-height:1.55}.status{display:flex;gap:10px;align-items:flex-start;padding:14px;border-radius:18px;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa;font-size:14px;line-height:1.45}.actions{display:grid;gap:10px;margin-top:20px}button,a{min-height:44px;border:0;border-radius:14px;font-weight:700;font-size:14px;text-decoration:none;display:flex;align-items:center;justify-content:center;cursor:pointer}.primary{background:var(--brand);color:#fff}.secondary{background:#f1f5f9;color:#0f172a}.hint{margin-top:18px;font-size:12px;color:#94a3b8}.dot{margin-top:5px;width:9px;height:9px;border-radius:50%;background:var(--danger);box-shadow:0 0 0 5px rgba(220,38,38,.12);flex:0 0 auto}
+  </style>
+</head>
+<body>
+  <main role="main" aria-labelledby="offline-title">
+    <div class="logo" aria-hidden="true"><img src="/static/img/brand/logo-symbol-white.svg" alt=""></div>
+    <h1 id="offline-title">Bạn đang ngoại tuyến</h1>
+    <p>SCMD Pro đã lưu phần giao diện cốt lõi để ứng dụng vẫn mở được khi mạng yếu hoặc mất mạng. Dữ liệu nghiệp vụ mới sẽ được đồng bộ khi kết nối trở lại.</p>
+    <div class="status"><span class="dot"></span><span>Không thể tải nội dung mới lúc này. Vui lòng kiểm tra kết nối, sau đó thử lại.</span></div>
+    <div class="actions">
+      <button class="primary" type="button" onclick="window.location.reload()">Thử tải lại</button>
+      <a class="secondary" href="/operations/mobile/dashboard/">Về trang chủ mobile</a>
+    </div>
+    <p class="hint">Không lưu JWT, refresh token hoặc dữ liệu xác thực trong Service Worker cache.</p>
+  </main>
+</body>
+</html>

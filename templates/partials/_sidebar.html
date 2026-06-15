@@ -1,0 +1,95 @@
+{% load static %}
+<div class="relative z-50 flex h-full select-none flex-col scmd-sidebar-shell transition-all duration-300" id="sidebar-content">
+    <div class="scmd-sidebar-brand relative z-20 flex h-16 shrink-0 items-center overflow-hidden px-5">
+        <a href="{% url 'dashboard:main' %}" class="relative z-10 flex w-full items-center gap-3 rounded-xl no-underline outline-none scmd-focus-ring">
+            <img
+                src="{% static 'img/brand/logo-symbol-white.png' %}"
+                alt=""
+                class="scmd-sidebar-logo scmd-sidebar-logo-symbol h-8 w-8 shrink-0 rounded-xl object-contain"
+                aria-hidden="true"
+            >
+            <span class="sidebar-text shrink-0 text-base font-black tracking-tight text-white">SCMD Pro</span>
+        </a>
+    </div>
+
+    <nav class="scmd-sidebar-nav relative z-10 flex-1 space-y-1.5 overflow-x-hidden overflow-y-auto px-3 py-5" id="sidebar-nav">
+        {% include "partials/sidebar_menu_items.html" %}
+
+        {% if user.is_staff %}
+        <div class="sidebar-text mt-6 border-t border-white/10 px-1 pb-4 pt-5">
+            <p class="scmd-sidebar-section mb-3 px-2 text-[9px] font-black uppercase opacity-80">
+                Hệ thống lõi
+            </p>
+            <a href="{% url 'admin:index' %}" class="scmd-sidebar-admin-link scmd-focus-ring group flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-[11px] font-black transition-all duration-300">
+                <div class="flex h-6 w-6 items-center justify-center rounded-lg bg-white/10 transition-colors">
+                    <i class="fas fa-shield-alt transition-transform group-hover:scale-110"></i>
+                </div>
+                <span class="tracking-wide">Bảng quản trị kỹ thuật</span>
+                <i class="fas fa-external-link-alt ml-auto text-[10px] opacity-0 transition-opacity group-hover:opacity-100"></i>
+            </a>
+        </div>
+        {% endif %}
+    </nav>
+
+    {% if user.is_authenticated %}
+    <div class="scmd-sidebar-user z-30 p-3.5">
+        <a
+            href="{% if '/mobile/' in request.path %}{% url 'users:mobile_profile' %}{% else %}{% url 'users:profile' %}{% endif %}"
+            class="scmd-user-card scmd-focus-ring group flex w-full items-center gap-2.5 rounded-xl p-2 text-left outline-none transition-all duration-300"
+        >
+            <div class="scmd-user-card-avatar flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl font-black text-white">
+                <span class="text-base transition-transform group-hover:scale-110">{{ user.username|slice:":1"|upper }}</span>
+            </div>
+
+            <div class="sidebar-text flex-1 overflow-hidden">
+                <p class="truncate text-[13px] font-black tracking-wide text-slate-100">
+                    {{ user.username }}
+                </p>
+                <div class="mt-0.5 flex items-center gap-1.5">
+                    <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                    <p class="text-[9px] font-bold tracking-[0.04em] text-emerald-400">Sẵn sàng</p>
+                </div>
+            </div>
+
+            <i class="fas fa-chevron-right sidebar-text text-[10px] text-slate-500 transition-all group-hover:translate-x-1 group-hover:text-white"></i>
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleMenu(menuId, el = null) {
+        const menu = document.getElementById(menuId);
+        if (!menu) {
+            console.warn(`[SCMD Sidebar] Menu ID "${menuId}" không tồn tại.`);
+            return;
+        }
+
+        const arrow = document.getElementById("arrow-" + menuId);
+        const isHidden = menu.classList.contains("hidden");
+
+        if (isHidden) {
+            menu.classList.remove("hidden");
+            menu.style.opacity = "0";
+            requestAnimationFrame(() => {
+                menu.style.transition = "opacity 0.3s ease-in-out";
+                menu.style.opacity = "1";
+            });
+
+            if (arrow) arrow.classList.add("rotate-90");
+
+            setTimeout(() => {
+                let target = el;
+                if (!target && menu.previousElementSibling) {
+                    target = menu.previousElementSibling;
+                }
+                if (target) {
+                    target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+                }
+            }, 200);
+        } else {
+            menu.classList.add("hidden");
+            if (arrow) arrow.classList.remove("rotate-90");
+        }
+    }
+</script>

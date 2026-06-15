@@ -1,0 +1,60 @@
+name: SCMD Pro CI - Test & Integrity Check
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    # Thiết lập các biến môi trường cần thiết cho quá trình test
+    env:
+      SCMD_ORGANIZATION_ID: "00000000-0000-0000-0000-000000000001"
+      DEBUG: "False"
+      SECRET_KEY: "ci-test-key-not-for-production"
+
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Thiết lập Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Khởi tạo hệ thống (Build & Up)
+        run: |
+          # Tạo file .env giả lập cho CI
+          echo "SCMD_ORGANIZATION_ID=${{ env.SCMD_ORGANIZATION_ID }}" > .env
+          echo "POSTGRES_DB=scmd_db" >> .env
+          echo "POSTGRES_USER=postgres" >> .env
+          echo "POSTGRES_PASSWORD=postgres" >> .env
+          
+          # Sử dụng docker-compose để dựng môi trường giống hệt local/production
+          docker compose up -d --build
+
+      - name: Chờ Database sẵn sàng
+        run: |
+          # Đảm bảo PostgreSQL đã sẵn sàng trước khi chạy test
+          docker compose exec -T web sh -c "until pg_isready -h db -U postgres; do sleep 1; done"
+
+      - name: Chạy bộ Test toàn hệ thống (Regression Coverage)
+        run: |
+          # Chạy toàn bộ test của các app theo thứ tự ưu tiên
+          docker compose exec -T web python manage.py test main clients operations accounting
+
+      - name: Kiểm tra tính toàn vẹn dữ liệu (Integrity Check)
+        run: |
+          # Chạy command kiểm tra tenant_id chúng ta vừa tạo
+          docker compose exec -T web python manage.py check_tenant_integrity
+
+      - name: Kiểm tra Release Contract (Hardening Check)
+        run: |
+          # Chạy script kiểm tra ranh giới kiến trúc và bảo mật P0/P1/P2
+          docker compose exec -T web python release_contract_check.py
+
+      - name: Dọn dẹp tài nguyên
+        if: always()
+        run: |
+          docker compose down

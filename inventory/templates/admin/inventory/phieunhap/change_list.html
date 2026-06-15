@@ -1,0 +1,40 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+
+{% block object-tools %}{% endblock %}
+
+{% block content_title %}
+<div class="scmd-inventory-hero">
+  <div class="scmd-inventory-hero__top">
+    <div>
+      <p class="scmd-inventory-eyebrow">SCMD Pro · Quản trị kho</p>
+      <h1 class="scmd-inventory-title">Phiếu nhập kho</h1>
+      <p class="scmd-inventory-subtitle">
+        Theo dõi chứng từ nhập vật tư, đồng phục và công cụ hỗ trợ. Thủ kho cần kiểm tra đủ dòng vật tư trước khi ghi sổ; phiếu đã ghi sổ hoặc đã hủy không sửa trực tiếp để bảo toàn lịch sử tồn kho.
+      </p>
+    </div>
+    <div class="scmd-inventory-actions">
+      <a class="scmd-inventory-btn primary" href="{{ receipt_links.add }}">Thêm phiếu nhập</a>
+      <a class="scmd-inventory-btn" href="{{ receipt_export_url }}">Xuất CSV</a>
+      <a class="scmd-inventory-btn" href="{{ receipt_links.materials }}">Vật tư</a>
+      <a class="scmd-inventory-btn" href="{{ receipt_links.issues }}">Phiếu xuất</a>
+      <a class="scmd-inventory-btn" href="{{ receipt_links.stock_report }}">Báo cáo tồn</a>
+      <a class="scmd-inventory-btn" href="{{ receipt_links.dashboard }}">Dashboard kho</a>
+    </div>
+  </div>
+
+  <div class="scmd-inventory-grid">
+    <a class="scmd-inventory-card" href="."><span>Tổng phiếu</span><strong>{{ receipt_summary.total_receipts|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?receipt_issue=draft"><span>Phiếu nháp</span><strong>{{ receipt_summary.draft_receipts|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?receipt_issue=posted"><span>Đã ghi sổ</span><strong>{{ receipt_summary.posted_receipts|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?receipt_issue=today"><span>Nhập hôm nay</span><strong>{{ receipt_summary.today_receipts|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?receipt_issue=no_lines"><span>Chưa có dòng</span><strong>{{ receipt_summary.no_lines|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?receipt_issue=missing_keeper"><span>Thiếu thủ kho</span><strong>{{ receipt_summary.missing_keeper|default:0 }}</strong></a>
+  </div>
+
+  <div class="scmd-inventory-note">
+    Phiếu nhập là chứng từ làm tăng tồn kho. CTA trên màn này đều trỏ tới chức năng thật; thao tác xuất CSV, ghi sổ, hủy và xóa dữ liệu đều được ghi AuditLog để phục vụ đối soát.
+  </div>
+</div>
+{% endblock %}

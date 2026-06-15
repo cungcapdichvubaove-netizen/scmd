@@ -1,0 +1,48 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-shift-console">
+    <div class="scmd-shift-head">
+        <div>
+            <div class="scmd-shift-eyebrow">Thanh tra & Tuần tra</div>
+            <h1 class="scmd-shift-title">Nhật ký quét QR tuần tra</h1>
+            <p class="scmd-shift-subtitle">
+                Đối soát từng điểm quét QR/GPS, bằng chứng ảnh và cảnh báo sai lệch vị trí. Đây là dữ liệu kiểm toán cho lượt tuần tra, vi phạm hiện trường và đánh giá tuân thủ.
+            </p>
+        </div>
+        <div class="scmd-shift-actions">
+            <a class="scmd-shift-btn" href="{{ scmd_patrol_scan_links.add }}">+ Thêm ghi nhận</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_scan_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_scan_links.sessions }}">Lượt tuần tra</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_scan_links.routes }}">Tuyến</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_scan_links.points }}">Điểm QR</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_scan_links.violations }}">Vi phạm</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_scan_links.dashboard }}">Bảng điều hành</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_scan_links.mobile }}">Mobile</a>
+        </div>
+    </div>
+
+    <div class="scmd-shift-grid">
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.list }}"><span>Tổng ghi nhận</span><strong>{{ scmd_patrol_scan_stats.total }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.today }}"><span>Hôm nay</span><strong>{{ scmd_patrol_scan_stats.today }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.valid }}"><span>Hợp lệ</span><strong>{{ scmd_patrol_scan_stats.valid }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.warning }}"><span>Cảnh báo GPS</span><strong>{{ scmd_patrol_scan_stats.warning }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.fraud }}"><span>Nghi gian lận</span><strong>{{ scmd_patrol_scan_stats.fraud }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.missing_photo }}"><span>Thiếu ảnh</span><strong>{{ scmd_patrol_scan_stats.missing_photo }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.month }}"><span>Tháng này</span><strong>{{ scmd_patrol_scan_stats.month }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.lost_gps }}"><span>Mất GPS</span><strong>{{ scmd_patrol_scan_stats.lost_gps }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.missing_actual_gps }}"><span>Thiếu tọa độ</span><strong>{{ scmd_patrol_scan_stats.missing_actual_gps }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_scan_links.distance_over_100 }}"><span>Lệch trên 100m</span><strong>{{ scmd_patrol_scan_stats.distance_over_100 }}</strong></a>
+    </div>
+
+    <div class="scmd-shift-note">
+        Gợi ý kiểm soát: bản ghi nghi gian lận, mất GPS hoặc thiếu ảnh cần được đối soát với lượt tuần tra và biên bản vi phạm trước khi dùng làm căn cứ kỷ luật/khấu trừ.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

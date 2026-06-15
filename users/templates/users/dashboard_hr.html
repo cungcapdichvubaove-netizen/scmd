@@ -1,0 +1,361 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Hành chính Nhân sự | SCMD Pro{% endblock %}
+{% block header_title %}Hành chính Nhân sự{% endblock %}
+
+{% block content %}
+<style>
+    .hr-dashboard {
+        color: var(--scmd-text);
+        width: 100%;
+    }
+    .hr-dashboard * { box-sizing: border-box; }
+    .hr-command {
+        background: var(--scmd-surface);
+        border: 1px solid var(--scmd-border);
+        border-radius: 16px;
+        box-shadow: var(--scmd-shadow-sm);
+        margin-bottom: 12px;
+        overflow: hidden;
+    }
+    .hr-command-main {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: start;
+        padding: 14px 16px 12px;
+    }
+    .hr-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 5px 10px;
+        border: 1px solid color-mix(in srgb, var(--scmd-info) 16%, white);
+        background: var(--scmd-info-soft);
+        color: var(--scmd-brand-950);
+        border-radius: 999px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: .06em;
+        text-transform: none;
+        margin-bottom: 6px;
+    }
+    .hr-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: clamp(24px, 2vw, 30px);
+        line-height: 1.1;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--scmd-brand-950);
+        margin: 0;
+    }
+    .hr-title-icon {
+        width: 36px;
+        height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        background: var(--scmd-brand-950);
+        color: var(--scmd-on-brand);
+        flex: 0 0 auto;
+    }
+    .hr-subtitle {
+        max-width: 800px;
+        color: var(--scmd-text-soft);
+        font-size: 13px;
+        line-height: 1.45;
+        margin: 6px 0 0;
+    }
+    .hr-actions { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; align-self:center; }
+    .hr-btn {
+        display:inline-flex; align-items:center; justify-content:center; gap:7px;
+        min-height:36px; padding:7px 11px; border-radius:10px; font-size:12px; font-weight:800;
+        border:1px solid transparent; text-decoration:none !important; color:var(--scmd-on-brand) !important;
+        box-shadow:0 8px 18px rgba(15,23,42,.10); white-space:nowrap;
+    }
+    .hr-btn:hover { transform: translateY(-1px); box-shadow:0 10px 20px rgba(15,23,42,.14); }
+    .hr-btn-primary { background: var(--scmd-brand-950); }
+    .hr-btn-success { background: var(--scmd-success); }
+    .hr-btn-amber { background: var(--scmd-warning); }
+    .hr-btn-ghost { color:var(--scmd-brand-950) !important; background:var(--scmd-surface); border-color:var(--scmd-border); box-shadow:none; }
+    .hr-toolbar {
+        display:grid; grid-template-columns:minmax(0, 1fr) auto; gap:10px; align-items:center;
+        padding:10px 16px 12px; border-top:1px solid var(--scmd-border); background:var(--scmd-bg-soft);
+    }
+    .hr-filter { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+    .hr-filter a, .hr-chip {
+        display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px;
+        background:var(--scmd-surface); color:var(--scmd-text-soft); border:1px solid var(--scmd-border); text-decoration:none !important;
+        font-size:12px; font-weight:800;
+    }
+    .hr-filter a.is-active { background:var(--scmd-brand-950); color:var(--scmd-on-brand); border-color:var(--scmd-brand-950); }
+    .hr-status-strip { display:flex; flex-wrap:wrap; justify-content:flex-end; gap:8px; }
+    .hr-metrics { display:grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap:10px; margin-bottom:12px; }
+    .hr-card {
+        display:block; min-height:112px; padding:13px; background:var(--scmd-surface); border:1px solid var(--scmd-border);
+        border-radius:14px; box-shadow:var(--scmd-shadow-sm); text-decoration:none !important; color:inherit !important;
+    }
+    .hr-card-top { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .hr-card-label { color:var(--scmd-text-muted); font-size:11px; text-transform:none; letter-spacing:.055em; font-weight:800; margin:0; }
+    .hr-card-value { font-size:24px; line-height:1; font-weight: 800; letter-spacing:-.035em; margin:9px 0 6px; color:var(--scmd-brand-950); }
+    .hr-card-note { color:var(--scmd-text-muted); font-size:11px; line-height:1.35; margin:0; }
+    .hr-card-icon { width:38px; height:38px; display:flex; align-items:center; justify-content:center; border-radius:12px; color:var(--scmd-on-brand); flex:0 0 auto; }
+    .hr-tone-blue .hr-card-icon { background:var(--scmd-info); } .hr-tone-green .hr-card-icon { background:var(--scmd-success); }
+    .hr-tone-amber .hr-card-icon { background:var(--scmd-warning); } .hr-tone-danger .hr-card-icon { background:var(--scmd-danger); }
+    .hr-tone-slate .hr-card-icon { background:var(--scmd-text-soft); } .hr-tone-purple .hr-card-icon { background:var(--scmd-accent); }
+    .hr-main-grid { display:grid; grid-template-columns:minmax(0,1.55fr) minmax(300px,.7fr); gap:12px; margin-bottom:12px; }
+    .hr-secondary-grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap:12px; }
+    .hr-panel { background:var(--scmd-surface); border:1px solid var(--scmd-border); border-radius:16px; box-shadow:var(--scmd-shadow-sm); overflow:hidden; }
+    .hr-panel-header { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; padding:12px 14px; background:var(--scmd-surface-muted); border-bottom:1px solid var(--scmd-border); }
+    .hr-panel-title { display:flex; align-items:center; gap:9px; font-size:16px; font-weight:800; color:var(--scmd-text); margin:0; }
+    .hr-panel-subtitle { color:var(--scmd-text-muted); font-size:12px; margin:5px 0 0; }
+    .hr-panel-link { font-size:12px; font-weight:800; color:var(--scmd-info) !important; text-decoration:none !important; white-space:nowrap; }
+    .hr-table-wrap { overflow-x:auto; max-width:100%; -webkit-overflow-scrolling: touch; }
+    .hr-table { width:100%; min-width:720px; table-layout:fixed; border-collapse:collapse; font-size:13px; }
+    .hr-table th { text-align:left; padding:10px 12px; color:var(--scmd-text-muted); font-size:11px; text-transform:none; letter-spacing:.05em; border-bottom:1px solid var(--scmd-border); background:var(--scmd-surface); white-space:nowrap; }
+    .hr-table td { padding:10px 12px; border-bottom:1px solid var(--scmd-neutral-200); vertical-align:top; color:var(--scmd-text-soft); }
+    .hr-table tr:hover td { background:var(--scmd-surface-strong); }
+    .hr-row-title { color:var(--scmd-text); font-weight:800; }
+    .hr-row-sub { color:var(--scmd-text-muted); font-size:12px; margin-top:3px; }
+    .hr-badge { display:inline-flex; align-items:center; gap:5px; padding:5px 8px; border-radius:999px; font-size:11px; font-weight:800; white-space:nowrap; }
+    .hr-badge-danger { background:var(--scmd-danger-soft); color:var(--scmd-danger); } .hr-badge-warning { background:var(--scmd-warning-soft); color:var(--scmd-warning); }
+    .hr-badge-info { background:var(--scmd-info-soft); color:var(--scmd-info); } .hr-badge-success { background:var(--scmd-success-soft); color:var(--scmd-success); }
+    .hr-mini-cta { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:6px 10px; border-radius:10px; background:var(--scmd-brand-950); color:var(--scmd-on-brand) !important; text-decoration:none !important; font-size:12px; font-weight:800; white-space:nowrap; }
+    .hr-avatar { width:34px; height:34px; border-radius:999px; object-fit:cover; border:1px solid var(--scmd-border); }
+    .hr-avatar-fallback { width:34px; height:34px; border-radius:999px; background:var(--scmd-neutral-200); color:var(--scmd-text-soft); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; }
+    .hr-side-list { display:grid; gap:8px; padding:12px; }
+    .hr-side-item { display:block; padding:10px 11px; border:1px solid var(--scmd-border); border-radius:12px; background:var(--scmd-surface); color:inherit !important; text-decoration:none !important; }
+    .hr-side-item:hover { background:var(--scmd-surface-strong); }
+    .hr-side-head { display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .hr-side-title { font-size:13px; font-weight:800; color:var(--scmd-text); line-height:1.35; }
+    .hr-side-meta { font-size:12px; color:var(--scmd-text-muted); margin-top:4px; line-height:1.4; }
+    .hr-bars { display:grid; gap:8px; padding:12px; }
+    .hr-bar-row { display:grid; grid-template-columns:minmax(0,1fr) 42px; gap:10px; align-items:center; }
+    .hr-bar-label { font-size:12px; font-weight:800; color:var(--scmd-text-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .hr-bar-track { height:9px; border-radius:999px; background:var(--scmd-neutral-200); overflow:hidden; margin-top:5px; }
+    .hr-bar-fill { height:100%; border-radius:999px; background:var(--scmd-brand-950); min-width:4px; }
+    .hr-empty { padding:22px 16px; text-align:center; color:var(--scmd-text-muted); }
+    .hr-empty i { display:block; font-size:26px; margin-bottom:8px; opacity:.7; }
+    @media (max-width:1280px) { .hr-metrics { grid-template-columns:repeat(3,minmax(0,1fr)); } .hr-secondary-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:980px) { .hr-command-main, .hr-toolbar, .hr-main-grid { grid-template-columns:1fr; } .hr-actions,.hr-status-strip { justify-content:flex-start; } .hr-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:640px) { .hr-metrics,.hr-secondary-grid { grid-template-columns:1fr; } .hr-btn { width:100%; } .hr-title { font-size:24px; align-items:flex-start; } }
+</style>
+
+<div class="hr-dashboard">
+    <section class="hr-command">
+        <div class="hr-command-main">
+            <div>
+                <div class="hr-eyebrow"><i class="fas fa-user-tie"></i> Phòng Hành chính Nhân sự</div>
+                <h1 class="hr-title"><span class="hr-title-icon"><i class="fas fa-id-card-alt"></i></span>Hành chính Nhân sự</h1>
+                <p class="hr-subtitle">Màn hình tác nghiệp cho HR: kiểm soát hồ sơ nhân sự, thử việc, chứng chỉ, cơ cấu phòng ban, phân công hiện hành và các việc cần xử lý ngay.</p>
+            </div>
+            <div class="hr-actions" aria-label="Thao tác nhanh">
+                {% if urls.add_employee %}<a href="{{ urls.add_employee }}" class="hr-btn hr-btn-primary"><i class="fas fa-user-plus"></i> Thêm nhân viên</a>{% endif %}
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-btn hr-btn-success"><i class="fas fa-users-cog"></i> Hồ sơ</a>{% endif %}
+                {% if urls.leave_requests %}<a href="{{ urls.leave_requests }}" class="hr-btn hr-btn-amber"><i class="fas fa-calendar-check"></i> Nghỉ phép</a>{% endif %}
+                {% if urls.labor_contracts %}<a href="{{ urls.labor_contracts }}" class="hr-btn hr-btn-ghost"><i class="fas fa-file-contract"></i> HĐLĐ</a>{% endif %}
+                {% if urls.download_template %}<a href="{{ urls.download_template }}" class="hr-btn hr-btn-ghost"><i class="fas fa-file-excel"></i> Mẫu nhập liệu</a>{% endif %}
+            </div>
+        </div>
+        <section class="hr-toolbar" aria-label="Bộ lọc dashboard nhân sự">
+            <div class="hr-filter">
+                <a href="?period=today" class="{% if period == 'today' %}is-active{% endif %}"><i class="fas fa-calendar-day"></i> Hôm nay</a>
+                <a href="?period=7d" class="{% if period == '7d' %}is-active{% endif %}"><i class="fas fa-calendar-week"></i> 7 ngày</a>
+                <a href="?period=month" class="{% if period == 'month' %}is-active{% endif %}"><i class="fas fa-calendar-alt"></i> Tháng này</a>
+            </div>
+            <div class="hr-status-strip">
+                <span class="hr-chip"><i class="fas fa-clock"></i> {{ period_label }}</span>
+                <span class="hr-chip"><i class="fas fa-user-check"></i> {{ official_staff_count }} chính thức</span>
+                <span class="hr-chip"><i class="fas fa-map-marker-alt"></i> {{ assigned_staff_count }} có mục tiêu</span>
+                <span class="hr-chip"><i class="fas fa-user-slash"></i> {{ unassigned_staff_count }} chờ bố trí</span>
+                <span class="hr-chip"><i class="fas fa-user-minus"></i> {{ left_this_month_count }} rời việc trong tháng</span>
+                <span class="hr-chip"><i class="fas fa-calendar-check"></i> {{ shifts_today_count }} ca hôm nay</span>
+            </div>
+        </section>
+    </section>
+
+    <section class="hr-metrics" aria-label="Chỉ số nhân sự chính">
+        {% for card in health_cards %}
+        {% if card.url %}<a href="{{ card.url }}" class="hr-card hr-tone-{{ card.tone }}">{% else %}<div class="hr-card hr-tone-{{ card.tone }}">{% endif %}
+            <div class="hr-card-top">
+                <p class="hr-card-label">{{ card.label }}</p>
+                <span class="hr-card-icon"><i class="fas {{ card.icon }}"></i></span>
+            </div>
+            <div class="hr-card-value">{{ card.value|intcomma }}</div>
+            <p class="hr-card-note">{{ card.note }}</p>
+        {% if card.url %}</a>{% else %}</div>{% endif %}
+        {% endfor %}
+    </section>
+
+    <section class="hr-main-grid">
+        <div class="hr-panel">
+            <div class="hr-panel-header">
+                <div>
+                    <h2 class="hr-panel-title"><i class="fas fa-tasks"></i> Việc cần xử lý</h2>
+                    <p class="hr-panel-subtitle">Ưu tiên HĐLĐ hết hạn/sắp hết hạn, chứng chỉ quá hạn/sắp hết hạn và hồ sơ thiếu thông tin vận hành.</p>
+                </div>
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-panel-link">Mở danh sách <i class="fas fa-arrow-right"></i></a>{% endif %}
+            </div>
+            <div class="hr-table-wrap">
+                <table class="hr-table">
+                    <thead>
+                        <tr>
+                            <th>Mức</th>
+                            <th>Loại việc</th>
+                            <th>Nhân sự</th>
+                            <th>Nội dung</th>
+                            <th>Ngày</th>
+                            <th class="text-right">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in action_items %}
+                        <tr>
+                            <td><span class="hr-badge {% if item.tone == 'danger' %}hr-badge-danger{% elif item.tone == 'warning' %}hr-badge-warning{% else %}hr-badge-info{% endif %}">{{ item.priority }}</span></td>
+                            <td><div class="hr-row-title">{{ item.type }}</div><div class="hr-row-sub">{{ item.meta }}</div></td>
+                            <td><div class="hr-row-title">{{ item.subject }}</div></td>
+                            <td><div class="hr-row-title">{{ item.title }}</div></td>
+                            <td class="whitespace-nowrap">{% if item.date %}{{ item.date|date:"d/m/Y" }}{% else %}-{% endif %}</td>
+                            <td class="text-right">{% if item.url %}<a href="{{ item.url }}" class="hr-mini-cta">{{ item.cta }}</a>{% else %}-{% endif %}</td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="6"><div class="hr-empty"><i class="fas fa-check-circle"></i>Chưa có việc cần xử lý ngay.</div></td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="hr-panel">
+            <div class="hr-panel-header">
+                <div>
+                    <h2 class="hr-panel-title"><i class="fas fa-shield-alt"></i> Kiểm soát hồ sơ HR</h2>
+                    <p class="hr-panel-subtitle">Mỗi nhóm kiểm soát chỉ xuất hiện một nơi, có CTA đi thẳng vào danh sách xử lý.</p>
+                </div>
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-panel-link">Mở hồ sơ</a>{% endif %}
+            </div>
+            <div class="hr-side-list">
+                {% for item in control_checks %}
+                <a href="{{ item.url }}" class="hr-side-item">
+                    <div class="hr-side-head">
+                        <div>
+                            <div class="hr-side-title">{{ item.label }}</div>
+                            <div class="hr-side-meta">{{ item.note }}</div>
+                        </div>
+                        <span class="hr-badge {% if item.badge_tone == 'danger' %}hr-badge-danger{% elif item.badge_tone == 'warning' %}hr-badge-warning{% else %}hr-badge-info{% endif %}">{{ item.count }}</span>
+                    </div>
+                    <div class="hr-side-meta">{{ item.cta }}</div>
+                </a>
+                {% empty %}
+                <div class="hr-empty"><i class="fas fa-check-circle"></i>Không còn hồ sơ HR cần kiểm soát riêng.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="hr-secondary-grid">
+        <div class="hr-panel">
+            <div class="hr-panel-header">
+                <div><h2 class="hr-panel-title"><i class="fas fa-user-plus"></i> Nhân sự mới</h2><p class="hr-panel-subtitle">Theo dõi onboarding và hoàn thiện hồ sơ.</p></div>
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-panel-link">Xem tất cả</a>{% endif %}
+            </div>
+            <div class="hr-side-list">
+                {% for nv in recent_staff %}
+                {% if nv.dashboard_export_url %}<a href="{{ nv.dashboard_export_url }}" class="hr-side-item">{% else %}<div class="hr-side-item">{% endif %}
+                    <div class="hr-side-head">
+                        <div class="flex items-center gap-3">
+                            {% if nv.anh_the %}<img src="{{ nv.anh_the.url }}" class="hr-avatar" alt="{{ nv.ho_ten }}">{% else %}<span class="hr-avatar-fallback">{{ nv.ho_ten|slice:":1" }}</span>{% endif %}
+                            <div><div class="hr-side-title">{{ nv.ho_ten }}</div><div class="hr-side-meta">{{ nv.ma_nhan_vien }} · {{ nv.ngay_vao_lam|date:"d/m/Y" }}</div></div>
+                        </div>
+                        <span class="hr-badge {% if nv.trang_thai_lam_viec == 'THUVIEC' %}hr-badge-warning{% else %}hr-badge-success{% endif %}">{{ nv.get_trang_thai_lam_viec_display }}</span>
+                    </div>
+                    <div class="hr-side-meta">{{ nv.chuc_danh.ten_chuc_danh|default:"Chưa chức danh" }} · {{ nv.phong_ban.ten_phong_ban|default:"Chưa phòng ban" }}</div>
+                {% if nv.dashboard_export_url %}</a>{% else %}</div>{% endif %}
+                {% empty %}<div class="hr-empty"><i class="fas fa-user-check"></i>Chưa có nhân sự mới trong kỳ.</div>{% endfor %}
+            </div>
+        </div>
+
+        <div class="hr-panel">
+            <div class="hr-panel-header">
+                <div><h2 class="hr-panel-title"><i class="fas fa-certificate"></i> Chứng chỉ cần theo dõi</h2><p class="hr-panel-subtitle">Hết hạn hoặc sẽ hết hạn trong 30 ngày.</p></div>
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-panel-link">Hồ sơ</a>{% endif %}
+            </div>
+            <div class="hr-side-list">
+                {% for cc in expired_certs %}
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-side-item">{% else %}<div class="hr-side-item">{% endif %}
+                    <div class="hr-side-head"><div><div class="hr-side-title">{{ cc.ten_bang_cap }}</div><div class="hr-side-meta">{{ cc.nhan_vien.ho_ten }} · {{ cc.nhan_vien.ma_nhan_vien }}</div></div><span class="hr-badge hr-badge-danger">Quá hạn</span></div>
+                    <div class="hr-side-meta">Hết hạn: {{ cc.ngay_het_han|date:"d/m/Y" }}</div>
+                {% if urls.employees %}</a>{% else %}</div>{% endif %}
+                {% endfor %}
+                {% for cc in expiring_certs %}
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-side-item">{% else %}<div class="hr-side-item">{% endif %}
+                    <div class="hr-side-head"><div><div class="hr-side-title">{{ cc.ten_bang_cap }}</div><div class="hr-side-meta">{{ cc.nhan_vien.ho_ten }} · {{ cc.nhan_vien.ma_nhan_vien }}</div></div><span class="hr-badge hr-badge-warning">Sắp hết hạn</span></div>
+                    <div class="hr-side-meta">Hết hạn: {{ cc.ngay_het_han|date:"d/m/Y" }}</div>
+                {% if urls.employees %}</a>{% else %}</div>{% endif %}
+                {% empty %}{% if not expired_certs %}<div class="hr-empty"><i class="fas fa-check-circle"></i>Không có chứng chỉ cần cảnh báo.</div>{% endif %}{% endfor %}
+            </div>
+        </div>
+
+        <div class="hr-panel">
+            <div class="hr-panel-header">
+                <div><h2 class="hr-panel-title"><i class="fas fa-chart-pie"></i> Cơ cấu phòng ban</h2><p class="hr-panel-subtitle">Giữ một điểm nhìn duy nhất cho phân bổ nhân sự theo phòng ban.</p></div>
+                {% if urls.departments %}<a href="{{ urls.departments }}" class="hr-panel-link">Cấu hình</a>{% endif %}
+            </div>
+            <div class="hr-bars">
+                {% for dept in dept_stats %}
+                <div class="hr-bar-row">
+                    <div>
+                        <div class="hr-bar-label">{{ dept.name }}</div>
+                        <div class="hr-bar-track"><div class="hr-bar-fill" style="width: {{ dept.percent }}%"></div></div>
+                    </div>
+                    <div class="text-right text-sm font-black text-slate-700">{{ dept.total }}</div>
+                </div>
+                {% empty %}
+                <div class="hr-empty"><i class="fas fa-sitemap"></i>Chưa có dữ liệu phòng ban.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <section class="hr-secondary-grid" style="margin-top:16px;">
+        <div class="hr-panel">
+            <div class="hr-panel-header"><div><h2 class="hr-panel-title"><i class="fas fa-user-clock"></i> Nhân sự thử việc</h2><p class="hr-panel-subtitle">Cần theo dõi đánh giá, chuyển chính thức hoặc kết thúc thử việc.</p></div>{% if urls.employees %}<a href="{{ urls.employees }}" class="hr-panel-link">Xử lý</a>{% endif %}</div>
+            <div class="hr-side-list">
+                {% for nv in probation_staff_list %}
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-side-item">{% else %}<div class="hr-side-item">{% endif %}<div class="hr-side-title">{{ nv.ho_ten }}</div><div class="hr-side-meta">{{ nv.ma_nhan_vien }} · Vào làm {{ nv.ngay_vao_lam|date:"d/m/Y" }} · {{ nv.phong_ban.ten_phong_ban|default:"Chưa phòng ban" }}</div>{% if urls.employees %}</a>{% else %}</div>{% endif %}
+                {% empty %}<div class="hr-empty"><i class="fas fa-check-circle"></i>Không còn hồ sơ thử việc đang mở.</div>{% endfor %}
+            </div>
+        </div>
+        <div class="hr-panel">
+            <div class="hr-panel-header"><div><h2 class="hr-panel-title"><i class="fas fa-map-marker-alt"></i> Công tác hiện hành</h2><p class="hr-panel-subtitle">Nhân sự đang có lịch sử công tác/mục tiêu hiện hành.</p></div>{% if urls.employees %}<a href="{{ urls.employees }}" class="hr-panel-link">Hồ sơ</a>{% endif %}</div>
+            <div class="hr-side-list">
+                {% for item in current_assignments %}
+                {% if urls.employees %}<a href="{{ urls.employees }}" class="hr-side-item">{% else %}<div class="hr-side-item">{% endif %}<div class="hr-side-title">{{ item.nhan_vien.ho_ten }}</div><div class="hr-side-meta">{{ item.muc_tieu.ten_muc_tieu|default:"Chưa gắn mục tiêu" }} · từ {{ item.ngay_bat_dau|date:"d/m/Y" }}</div>{% if urls.employees %}</a>{% else %}</div>{% endif %}
+                {% empty %}<div class="hr-empty"><i class="fas fa-map"></i>Chưa có lịch sử công tác hiện hành.</div>{% endfor %}
+            </div>
+        </div>
+        <div class="hr-panel">
+            <div class="hr-panel-header"><div><h2 class="hr-panel-title"><i class="fas fa-file-contract"></i> HĐLĐ cần theo dõi</h2><p class="hr-panel-subtitle">Giữ một khối riêng cho các hợp đồng lao động đến hạn hoặc thiếu active.</p></div>{% if urls.labor_contracts %}<a href="{{ urls.labor_contracts }}" class="hr-panel-link">HĐLĐ</a>{% endif %}</div>
+            <div class="hr-side-list">
+                {% for contract in expired_active_labor_contracts %}
+                {% if urls.labor_contracts %}<a href="{{ urls.labor_contracts }}" class="hr-side-item">{% else %}<div class="hr-side-item">{% endif %}
+                    <div class="hr-side-head"><div><div class="hr-side-title">{{ contract.nhan_vien.ho_ten }}</div><div class="hr-side-meta">{{ contract.so_hop_dong }} · {{ contract.nhan_vien.ma_nhan_vien }}</div></div><span class="hr-badge hr-badge-danger">Hết hạn</span></div>
+                    <div class="hr-side-meta">Đến hạn {{ contract.ngay_het_han|date:"d/m/Y" }}</div>
+                {% if urls.labor_contracts %}</a>{% else %}</div>{% endif %}
+                {% endfor %}
+                {% for contract in expiring_labor_contracts %}
+                {% if urls.labor_contracts %}<a href="{{ urls.labor_contracts }}" class="hr-side-item">{% else %}<div class="hr-side-item">{% endif %}
+                    <div class="hr-side-head"><div><div class="hr-side-title">{{ contract.nhan_vien.ho_ten }}</div><div class="hr-side-meta">{{ contract.so_hop_dong }} · {{ contract.nhan_vien.ma_nhan_vien }}</div></div><span class="hr-badge hr-badge-warning">Sắp hết hạn</span></div>
+                    <div class="hr-side-meta">Đến hạn {{ contract.ngay_het_han|date:"d/m/Y" }}</div>
+                {% if urls.labor_contracts %}</a>{% else %}</div>{% endif %}
+                {% empty %}{% if not expired_active_labor_contracts %}<div class="hr-empty"><i class="fas fa-check-circle"></i>Không còn HĐLĐ cần cảnh báo.</div>{% endif %}{% endfor %}
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-violation-console">
+    <div class="scmd-violation-head">
+        <div>
+            <div class="scmd-violation-eyebrow">Thanh tra hiện trường</div>
+            <h1 class="scmd-violation-title">Biên bản vi phạm</h1>
+            <p class="scmd-violation-subtitle">
+                Hồ sơ vi phạm là dữ liệu đối soát kỷ luật và lương. Mỗi biên bản cần rõ nhân sự, mục tiêu, bằng chứng, hình thức xử lý và trạng thái duyệt.
+            </p>
+        </div>
+        <div class="scmd-violation-actions">
+            <a class="scmd-violation-btn" href="{{ scmd_violation_links.add }}">+ Thêm biên bản</a>
+            <a class="scmd-violation-btn secondary" href="{{ scmd_violation_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-violation-btn secondary" href="{{ scmd_violation_links.pending }}">Chờ duyệt</a>
+            <a class="scmd-violation-btn secondary" href="{{ scmd_violation_links.money_penalty }}">Phạt tiền</a>
+            <a class="scmd-violation-btn secondary" href="{{ scmd_violation_links.inspection_runs }}">Đợt thanh tra</a>
+            <a class="scmd-violation-btn secondary" href="{{ scmd_violation_links.payroll }}">Lương</a>
+        </div>
+    </div>
+
+    <div class="scmd-violation-grid">
+        <a class="scmd-violation-stat" href="?"><span>Tổng hồ sơ</span><strong>{{ scmd_violation_stats.total }}</strong></a>
+        <a class="scmd-violation-stat" href="{{ scmd_violation_links.today }}"><span>Lập hôm nay</span><strong>{{ scmd_violation_stats.today }}</strong></a>
+        <a class="scmd-violation-stat" href="{{ scmd_violation_links.month }}"><span>Tháng này</span><strong>{{ scmd_violation_stats.month }}</strong></a>
+        <a class="scmd-violation-stat warning" href="{{ scmd_violation_links.pending }}"><span>Chờ duyệt</span><strong>{{ scmd_violation_stats.pending }}</strong></a>
+        <a class="scmd-violation-stat" href="{{ scmd_violation_links.approved }}"><span>Đã duyệt</span><strong>{{ scmd_violation_stats.approved }}</strong></a>
+        <a class="scmd-violation-stat danger" href="{{ scmd_violation_links.rejected }}"><span>Từ chối / hủy</span><strong>{{ scmd_violation_stats.rejected }}</strong></a>
+        <a class="scmd-violation-stat warning" href="{{ scmd_violation_links.money_penalty }}"><span>Có phạt tiền</span><strong>{{ scmd_violation_stats.money_penalty }}</strong></a>
+        <a class="scmd-violation-stat danger" href="{{ scmd_violation_links.missing_evidence }}"><span>Thiếu ảnh</span><strong>{{ scmd_violation_stats.missing_evidence }}</strong></a>
+        <a class="scmd-violation-stat warning" href="{{ scmd_violation_links.missing_target }}"><span>Chưa gắn mục tiêu</span><strong>{{ scmd_violation_stats.missing_target }}</strong></a>
+        <a class="scmd-violation-stat warning" href="{{ scmd_violation_links.missing_offender }}"><span>Chưa gắn nhân viên</span><strong>{{ scmd_violation_stats.missing_offender }}</strong></a>
+        <a class="scmd-violation-stat" href="{{ scmd_violation_links.money_penalty }}"><span>Tổng phạt dự kiến</span><strong class="scmd-stat-compact">{{ scmd_violation_stats.total_penalty }}</strong></a>
+    </div>
+
+    <div class="scmd-violation-note">
+        Gợi ý kiểm soát: ưu tiên xử lý hồ sơ thiếu ảnh, thiếu mục tiêu hoặc chưa gắn nhân viên trước khi duyệt; hồ sơ phạt tiền cần được đối soát với bảng lương.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-shift-console">
+    <div class="scmd-shift-head">
+        <div>
+            <div class="scmd-shift-eyebrow">Thanh tra · cấu hình checklist</div>
+            <h1 class="scmd-shift-title">Hạng mục kiểm tra</h1>
+            <p class="scmd-shift-subtitle">
+                Chuẩn hóa tiêu chí thanh tra để biên bản được chấm nhất quán, dễ đối soát và có thể truy vết các điểm không đạt trong vận hành bảo vệ.
+            </p>
+        </div>
+        <div class="scmd-shift-actions">
+            <a class="scmd-shift-btn" href="{{ scmd_check_item_links.add }}">+ Thêm hạng mục</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_check_item_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_check_item_links.inspection_reports }}">Biên bản TT</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_check_item_links.inspection_runs }}">Đợt TT</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_check_item_links.violations }}">Vi phạm</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_check_item_links.targets }}">Mục tiêu</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_check_item_links.dashboard }}">Bảng điều hành</a>
+        </div>
+    </div>
+
+    <div class="scmd-shift-grid">
+        <a class="scmd-shift-stat" href="{{ scmd_check_item_links.list }}"><span>Tổng hạng mục</span><strong>{{ scmd_check_item_stats.total }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_check_item_links.missing_description }}"><span>Thiếu tiêu chuẩn</span><strong>{{ scmd_check_item_stats.missing_description }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_check_item_links.used }}"><span>Đã dùng</span><strong>{{ scmd_check_item_stats.used }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_check_item_links.unused }}"><span>Chưa dùng</span><strong>{{ scmd_check_item_stats.unused }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_check_item_links.has_failures }}"><span>Có lần không đạt</span><strong>{{ scmd_check_item_stats.has_failures }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_check_item_links.only_passed }}"><span>Chưa phát sinh lỗi</span><strong>{{ scmd_check_item_stats.only_passed }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_check_item_links.many_reports }}"><span>Dùng nhiều</span><strong>{{ scmd_check_item_stats.many_reports }}</strong></a>
+    </div>
+
+    <div class="scmd-shift-note">
+        Gợi ý kiểm soát: hạng mục chưa có tiêu chuẩn đánh giá hoặc chưa từng được dùng cần được rà soát trước khi áp dụng rộng rãi vào biên bản thanh tra.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

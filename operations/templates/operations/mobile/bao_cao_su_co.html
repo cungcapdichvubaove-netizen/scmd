@@ -1,0 +1,238 @@
+{% extends "mobile/base.html" %}
+{% load static %}
+
+{% block title %}Báo cáo Sự cố{% endblock %}
+
+{% block content %}
+<div class="flex items-center gap-3 mb-4">
+    <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-circle btn-ghost btn-sm">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+    <h1 class="text-xl font-bold">Gửi Báo Cáo</h1>
+</div>
+
+{% if ca_truc %}
+    <div id="smart-alert" class="hidden alert alert-error shadow-lg mb-4 animate-bounce text-sm py-2">
+        <i class="fas fa-exclamation-triangle"></i>
+        <span class="font-bold">Đã chuyển mức độ: NGUY HIỂM!</span>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-5" id="report-form">
+        {% csrf_token %}
+
+        <div class="form-control">
+            <label class="label pt-0">
+                <span class="label-text font-bold text-xs uppercase opacity-70">Chọn nhanh sự cố (1 chạm)</span>
+            </label>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="quickFill('Phát hiện Đám cháy', 'NGUY_HIEM')" class="btn btn-xs btn-outline btn-error">
+                    <i class="fas fa-fire mr-1"></i> Cháy nổ
+                </button>
+                <button type="button" onclick="quickFill('Mất cắp tài sản', 'CAO')" class="btn btn-xs btn-outline btn-warning">
+                    <i class="fas fa-mask mr-1"></i> Mất trộm
+                </button>
+                <button type="button" onclick="quickFill('Người lạ đột nhập', 'CAO')" class="btn btn-xs btn-outline btn-warning">
+                    <i class="fas fa-user-ninja mr-1"></i> Đột nhập
+                </button>
+                <button type="button" onclick="quickFill('Tai nạn lao động', 'NGUY_HIEM')" class="btn btn-xs btn-outline btn-error">
+                    <i class="fas fa-ambulance mr-1"></i> Tai nạn
+                </button>
+                <button type="button" onclick="quickFill('Cửa không khóa', 'TB')" class="btn btn-xs btn-outline btn-info">
+                    <i class="fas fa-door-open mr-1"></i> Cửa mở
+                </button>
+                <button type="button" onclick="quickFill('Ngủ gật trong ca', 'TB')" class="btn btn-xs btn-outline">
+                    <i class="fas fa-bed mr-1"></i> Ngủ gật
+                </button>
+            </div>
+        </div>
+
+        <div class="form-control w-full">
+            <input type="text" name="tieu_de" class="input input-bordered w-full font-bold text-primary" placeholder="Tiêu đề sẽ tự hiện ở đây..." id="id_tieu_de">
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+             <div class="form-control w-full">
+                <select name="muc_do" id="id_muc_do" class="select select-bordered w-full select-sm">
+                    <option value="THAP">Thấp</option>
+                    <option value="TB" selected>Trung bình</option>
+                    <option value="CAO">Cao</option>
+                    <option value="NGUY_HIEM">⚠️ Nguy hiểm</option>
+                </select>
+            </div>
+             <div class="form-control w-full">
+                <input type="text" value="{{ ca_truc.vi_tri_chot.muc_tieu.ten_muc_tieu|truncatechars:15 }}" class="input input-bordered input-sm w-full bg-base-200" disabled>
+             </div>
+        </div>
+
+        <div class="relative w-full aspect-[21/9] border-2 border-dashed border-base-content/20 rounded-xl bg-base-100 flex flex-col items-center justify-center overflow-hidden cursor-pointer hover:bg-base-200">
+            <input type="file" name="hinh_anh_1" id="id_hinh_anh_1" class="absolute inset-0 w-full h-full opacity-0 z-20" accept="image/*" capture="environment" onchange="previewImage(this)">
+            <div id="upload-placeholder" class="flex flex-row items-center gap-2 opacity-60">
+                <i class="fas fa-camera text-2xl"></i>
+                <span class="text-sm font-bold">Chụp ảnh</span>
+            </div>
+            <img id="img-preview" src="#" class="absolute inset-0 w-full h-full object-cover hidden z-10" />
+            <button type="button" id="remove-image-btn" onclick="removeImage()" class="absolute top-2 right-2 btn btn-circle btn-xs btn-error z-30 hidden text-white"><i class="fas fa-times"></i></button>
+        </div>
+
+        <div class="form-control relative">
+            <textarea name="mo_ta_chi_tiet" id="id_mo_ta_chi_tiet" class="textarea textarea-bordered h-32 w-full pr-16 text-base leading-relaxed" placeholder="Mô tả chi tiết..."></textarea>
+            
+            <button type="button" id="btn-record" class="absolute right-2 bottom-2 btn btn-circle btn-lg bg-base-100 text-primary border-2 border-base-300 shadow-xl hover:scale-105 transition-transform z-10" onclick="toggleRecording()">
+                <i class="fas fa-microphone-alt text-2xl" id="mic-icon"></i>
+            </button>
+        </div>
+        
+        <input type="file" name="file_ghi_am" id="id_file_ghi_am" class="hidden" accept="audio/*">
+        <div id="audio-preview-zone" class="hidden mt-2 p-2 bg-base-200 rounded-lg text-xs flex justify-between items-center border border-base-300">
+            <div class="flex items-center gap-2 text-success font-bold"><i class="fas fa-check-circle"></i> Đã lưu ghi âm</div>
+            <button type="button" onclick="resetAudio()" class="text-error hover:underline font-bold">Xóa & Ghi lại</button>
+        </div>
+
+        <div class="pt-2 pb-20">
+            <button type="submit" class="btn btn-error w-full shadow-lg text-white font-bold text-lg">
+                <i class="fas fa-paper-plane mr-2"></i> GỬI BÁO CÁO
+            </button>
+        </div>
+    </form>
+
+{% else %}
+    <div class="text-center p-10 opacity-60">
+        Cần check-in trước.
+    </div>
+{% endif %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // --- 1. QUICK FILL ---
+    function quickFill(title, level) {
+        document.getElementById('id_tieu_de').value = title;
+        document.getElementById('id_muc_do').value = level;
+        const titleInput = document.getElementById('id_tieu_de');
+        titleInput.classList.add('bg-yellow-100');
+        setTimeout(() => titleInput.classList.remove('bg-yellow-100'), 500);
+        if (level === 'NGUY_HIEM') document.getElementById('smart-alert').classList.remove('hidden');
+        else document.getElementById('smart-alert').classList.add('hidden');
+    }
+
+    // --- 2. AUTO EXTRACT TITLE ---
+    function autoExtractTitle(text) {
+        const titleInput = document.getElementById('id_tieu_de');
+        if (titleInput.value.trim() === "") {
+            let summary = text.split('.')[0]; 
+            if (summary.length > 50) summary = summary.substring(0, 50) + "...";
+            summary = summary.charAt(0).toUpperCase() + summary.slice(1);
+            titleInput.value = summary;
+        }
+    }
+
+    // --- 3. IMAGE LOGIC ---
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('img-preview').src = e.target.result;
+                document.getElementById('img-preview').classList.remove('hidden');
+                document.getElementById('upload-placeholder').classList.add('opacity-0');
+                document.getElementById('remove-image-btn').classList.remove('hidden');
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+    function removeImage() {
+        document.getElementById('id_hinh_anh_1').value = "";
+        document.getElementById('img-preview').classList.add('hidden');
+        document.getElementById('upload-placeholder').classList.remove('opacity-0');
+        document.getElementById('remove-image-btn').classList.add('hidden');
+    }
+
+    // --- 4. VOICE LOGIC (UPDATED UI) ---
+    let recognition;
+    let isRecording = false;
+    let mediaRecorder;
+    let audioChunks = [];
+    const DANGER_KEYWORDS = ['cháy', 'lửa', 'nổ', 'cướp', 'trộm', 'đánh nhau', 'máu'];
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = 'vi-VN'; 
+        recognition.continuous = true; 
+        recognition.interimResults = false;
+
+        recognition.onresult = function(event) {
+            const textarea = document.getElementById('id_mo_ta_chi_tiet');
+            const last = event.results.length - 1;
+            const transcript = event.results[last][0].transcript;
+            
+            textarea.value += (textarea.value ? " " : "") + transcript;
+            textarea.scrollTop = textarea.scrollHeight;
+            
+            autoExtractTitle(transcript);
+            
+            if (DANGER_KEYWORDS.some(k => transcript.toLowerCase().includes(k))) {
+                document.getElementById('id_muc_do').value = 'NGUY_HIEM';
+                document.getElementById('smart-alert').classList.remove('hidden');
+            }
+        };
+        recognition.onerror = function(event) { console.error(event); stopRecording(); };
+    }
+
+    async function toggleRecording() {
+        if (!isRecording) startRecording();
+        else stopRecording();
+    }
+
+    async function startRecording() {
+        try {
+            if (recognition) recognition.start();
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+            audioChunks = [];
+            mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+            mediaRecorder.onstop = () => {
+                const blob = new Blob(audioChunks, { type: 'audio/wav' });
+                const file = new File([blob], "voice.wav", { type: "audio/wav" });
+                const container = new DataTransfer(); container.items.add(file);
+                document.getElementById('id_file_ghi_am').files = container.files;
+                document.getElementById('audio-preview-zone').classList.remove('hidden');
+            };
+            mediaRecorder.start();
+            isRecording = true;
+            updateUI(true);
+        } catch (err) { alert("Lỗi Micro: " + err.message); }
+    }
+
+    function stopRecording() {
+        if (recognition) recognition.stop();
+        if (mediaRecorder) mediaRecorder.stop();
+        isRecording = false;
+        updateUI(false);
+    }
+    
+    function resetAudio() {
+        document.getElementById('id_file_ghi_am').value = "";
+        document.getElementById('audio-preview-zone').classList.add('hidden');
+    }
+
+    function updateUI(recording) {
+        const btn = document.getElementById('btn-record');
+        const icon = document.getElementById('mic-icon');
+        
+        if (recording) {
+            // Khi ghi âm: Nút đỏ, rung, phóng to
+            btn.classList.remove('bg-base-100', 'text-primary');
+            btn.classList.add('btn-error', 'text-white', 'animate-pulse', 'scale-110');
+            icon.classList.remove('fa-microphone-alt');
+            icon.classList.add('fa-stop-circle');
+        } else {
+            // Khi dừng: Trở về bình thường
+            btn.classList.add('bg-base-100', 'text-primary');
+            btn.classList.remove('btn-error', 'text-white', 'animate-pulse', 'scale-110');
+            icon.classList.add('fa-microphone-alt');
+            icon.classList.remove('fa-stop-circle');
+        }
+    }
+</script>
+{% endblock %}

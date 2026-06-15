@@ -1,0 +1,22 @@
+[flake8]
+# Cấu hình tuân thủ chuẩn PEP 8 và tương thích với Black
+max-line-length = 88
+
+# E203: Whitespace before ':' (Không tương thích với Black)
+# W503: Line break occurred before a binary operator (Black ưu tiên ngắt trước operator)
+# E501: Line too long (Đã được kiểm soát bởi max-line-length, nhưng đôi khi để Black xử lý)
+extend-ignore = E203, W503
+
+# Loại trừ các thư mục rác và file tự động sinh ra (Migrations)
+exclude =
+    .git,
+    __pycache__,
+    venv,
+    .venv,
+    */migrations/*,
+    manage.py,
+    theme/*,
+    static/*,
+    media/*
+
+max-complexity = 10

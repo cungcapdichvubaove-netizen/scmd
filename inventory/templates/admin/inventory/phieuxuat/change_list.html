@@ -1,0 +1,40 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+
+{% block object-tools %}{% endblock %}
+
+{% block content_title %}
+<div class="scmd-inventory-hero">
+  <div class="scmd-inventory-hero__top">
+    <div>
+      <p class="scmd-inventory-eyebrow">SCMD Pro · Quản trị kho</p>
+      <h1 class="scmd-inventory-title">Phiếu xuất kho</h1>
+      <p class="scmd-inventory-subtitle">
+        Kiểm soát chứng từ xuất đồng phục, vật tư và công cụ hỗ trợ. Phiếu xuất làm giảm tồn kho; riêng phiếu bán trừ lương và CCHT tại mục tiêu cần đối soát được với payroll, nhân sự và mục tiêu nhận.
+      </p>
+    </div>
+    <div class="scmd-inventory-actions">
+      <a class="scmd-inventory-btn primary" href="{{ issue_links.add }}">Thêm phiếu xuất</a>
+      <a class="scmd-inventory-btn" href="{{ issue_export_url }}">Xuất CSV</a>
+      <a class="scmd-inventory-btn" href="{{ issue_links.materials }}">Vật tư</a>
+      <a class="scmd-inventory-btn" href="{{ issue_links.receipts }}">Phiếu nhập</a>
+      <a class="scmd-inventory-btn" href="{{ issue_links.stock_report }}">Báo cáo tồn</a>
+      <a class="scmd-inventory-btn" href="{{ issue_links.dashboard }}">Dashboard kho</a>
+    </div>
+  </div>
+
+  <div class="scmd-inventory-grid">
+    <a class="scmd-inventory-card" href="."><span>Tổng phiếu</span><strong>{{ issue_summary.total_issues|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?issue_status=draft"><span>Phiếu nháp</span><strong>{{ issue_summary.draft_issues|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?issue_status=posted"><span>Đã ghi sổ</span><strong>{{ issue_summary.posted_issues|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?issue_status=today"><span>Xuất hôm nay</span><strong>{{ issue_summary.today_issues|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?issue_status=target_issue"><span>CCHT mục tiêu</span><strong>{{ issue_summary.target_issues|default:0 }}</strong></a>
+    <a class="scmd-inventory-card" href="?issue_status=payroll_deduction"><span>Chờ khấu trừ</span><strong>{{ issue_summary.pending_payroll|default:0 }}</strong></a>
+  </div>
+
+  <div class="scmd-inventory-note">
+    CTA trên màn này đều trỏ tới chức năng thật. Ghi sổ/hủy phiếu xuất dùng use case hiện có, có khóa giao dịch và AuditLog; tránh trừ tồn kho hai lần hoặc sửa trực tiếp chứng từ đã ghi sổ.
+  </div>
+</div>
+{% endblock %}

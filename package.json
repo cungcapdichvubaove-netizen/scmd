@@ -1,0 +1,32 @@
+{
+  "name": "scmd-erp-ui-build",
+  "private": true,
+  "description": "SCMD ERP frontend asset pipeline for Tailwind and PostCSS",
+  "scripts": {
+    "vendor:sync": "python scripts/sync_vendor_assets.py"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.2",
+    "@tailwindcss/postcss": "^4.1.13",
+    "alpinejs": "^3.14.1",
+    "bootstrap": "^4.6.2",
+    "chart.js": "^4.4.3",
+    "cross-env": "^10.0.0",
+    "dexie": "^4.0.8",
+    "html5-qrcode": "^2.3.8",
+    "htmx.org": "^1.9.12",
+    "jquery": "^3.7.1",
+    "leaflet": "^1.9.4",
+    "nprogress": "^0.2.0",
+    "postcss-nested": "^7.0.2",
+    "postcss-simple-vars": "^7.0.1",
+    "select2": "^4.1.0-rc.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "daisyui": "^5.1.7",
+    "postcss": "^8.5.6",
+    "postcss-cli": "^11.0.1",
+    "tailwindcss": "^4.1.13"
+  }
+}

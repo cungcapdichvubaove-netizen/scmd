@@ -1,0 +1,48 @@
+{# file: accounting/templates/accounting/mobile/phieu_luong_list.html #}
+{% extends "mobile/base.html" %}
+{% load static humanize %}
+
+{% block title %}Bảng lương của tôi{% endblock %}
+
+{% block content %}
+<div class="space-y-4 fade-in">
+    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-circle btn-ghost btn-sm"><i class="fas fa-arrow-left"></i></a>
+            <h1 class="text-lg font-bold text-slate-800">Thu nhập</h1>
+        </div>
+        <div class="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600">
+            <i class="fas fa-wallet text-lg"></i>
+        </div>
+    </div>
+
+    <div class="space-y-3">
+        {% for p in phieu_luongs %}
+        <a href="{% url 'accounting:mobile_phieu_luong_detail' p.id %}" class="block card bg-white shadow-sm border border-slate-100 active:scale-[0.98] transition-transform">
+            <div class="card-body p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="text-sm font-bold text-slate-500 uppercase">Tháng {{ p.bang_luong.thang }}/{{ p.bang_luong.nam }}</span>
+                    <i class="fas fa-chevron-right text-slate-300 text-xs"></i>
+                </div>
+                
+                <div class="flex justify-between items-end">
+                    <div>
+                        <div class="text-xs text-slate-400 mb-0.5">Thực lãnh</div>
+                        <div class="text-xl font-black text-emerald-600 font-mono">{{ p.thuc_lanh|intcomma }} đ</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-xs text-slate-400 mb-0.5">Công</div>
+                        <div class="text-sm font-bold text-slate-700">{{ p.tong_gio_lam }}h</div>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% empty %}
+        <div class="text-center py-12 opacity-50">
+            <i class="fas fa-file-invoice-dollar text-4xl mb-3 text-slate-300"></i>
+            <p class="text-sm font-medium">Chưa có phiếu lương.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

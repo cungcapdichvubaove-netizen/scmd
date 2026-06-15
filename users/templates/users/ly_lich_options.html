@@ -1,0 +1,75 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+{% load django_bootstrap5 %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="card-title">Tùy chọn Xuất Lý lịch</h3>
+                </div>
+                <div class="card-body">
+                    <p class="lead">Tùy chỉnh các thông tin sẽ được bao gồm trong file PDF cho nhân viên: <strong>{{ nhan_vien.ho_ten }}</strong></p>
+                    <hr>
+                    <form id="export-options-form" action="{% url 'users:export-ly-lich' nhan_vien.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <div class="form-check fs-5">
+                                <input type="checkbox" class="form-check-input export-option" name="bao_gom_anh_the" id="id_bao_gom_anh_the" checked>
+                                <label class="form-check-label" for="id_bao_gom_anh_the">Bao gồm Ảnh thẻ</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check fs-5">
+                                <input type="checkbox" class="form-check-input export-option" name="bao_gom_thong_tin_ca_nhan" id="id_bao_gom_thong_tin_ca_nhan" checked>
+                                <label class="form-check-label" for="id_bao_gom_thong_tin_ca_nhan">Bao gồm Thông tin Cá nhân</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check fs-5">
+                                <input type="checkbox" class="form-check-input export-option" name="bao_gom_bang_cap" id="id_bao_gom_bang_cap" checked>
+                                <label class="form-check-label" for="id_bao_gom_bang_cap">Bao gồm Bằng cấp & Chứng chỉ</label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check fs-5">
+                                <input type="checkbox" class="form-check-input export-option" name="bao_gom_lich_su_cong_tac" id="id_bao_gom_lich_su_cong_tac" checked>
+                                <label class="form-check-label" for="id_bao_gom_lich_su_cong_tac">Bao gồm Lịch sử Công tác</label>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <div>
+                                <button type="button" class="btn btn-secondary" id="select-all">Chọn tất cả</button>
+                                <button type="button" class="btn btn-secondary" id="deselect-all">Bỏ chọn tất cả</button>
+                            </div>
+                            {% bootstrap_button button_type="submit" content="Tạo và Tải về PDF" button_class="btn-primary btn-lg" %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extrajs %}
+{{ block.super }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('select-all').addEventListener('click', function() {
+        document.querySelectorAll('.export-option').forEach(function(checkbox) {
+            checkbox.checked = true;
+        });
+    });
+
+    document.getElementById('deselect-all').addEventListener('click', function() {
+        document.querySelectorAll('.export-option').forEach(function(checkbox) {
+            checkbox.checked = false;
+        });
+    });
+});
+</script>
+{% endblock %}

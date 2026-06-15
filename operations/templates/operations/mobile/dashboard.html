@@ -1,0 +1,434 @@
+{# file: operations/templates/operations/mobile/dashboard.html #}
+{% extends "mobile/base.html" %}
+{% load static %}
+
+{% block title %}Trang chủ{% endblock %}
+
+{% block extra_css %}
+<style>
+    .scmd-mobile-loading-overlay { background: rgb(15 23 42 / 0.6); color: var(--scmd-on-brand); }
+    .scmd-mobile-loading-spinner {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 999px;
+        border: 3px solid rgb(255 255 255 / 0.25);
+        border-top-color: var(--scmd-on-brand);
+        animation: scmd-mobile-spin 0.8s linear infinite;
+    }
+    .scmd-mobile-avatar-link { display: block; transition: transform 160ms ease; }
+    .scmd-mobile-avatar-link:active { transform: scale(0.95); }
+    .scmd-mobile-shift-card,
+    .scmd-mobile-cta-card {
+        width: 100%;
+        overflow: hidden;
+        border: 1px solid var(--scmd-border);
+        border-radius: 1rem;
+        background: var(--scmd-surface);
+        box-shadow: var(--scmd-shadow-sm);
+    }
+    .scmd-mobile-shift-card { margin-bottom: 1rem; }
+    .scmd-mobile-card-body { padding: 1.25rem; }
+    .scmd-mobile-card-body--empty { padding: 1.5rem; text-align: center; opacity: 0.6; }
+    .scmd-mobile-status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        min-height: 2rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-size: 0.75rem;
+        line-height: 1;
+        white-space: nowrap;
+    }
+    .scmd-mobile-status-badge--active {
+        background: var(--scmd-success-soft);
+        color: var(--scmd-success);
+        border-color: color-mix(in srgb, var(--scmd-success) 16%, white);
+        font-weight: 700;
+    }
+    .scmd-mobile-status-badge--done {
+        background: var(--scmd-neutral-200);
+        color: var(--scmd-text-muted);
+        font-weight: 500;
+    }
+    .scmd-mobile-status-badge--pending {
+        background: var(--scmd-warning-soft);
+        color: var(--scmd-warning);
+        border-color: color-mix(in srgb, var(--scmd-warning) 16%, white);
+        font-weight: 500;
+    }
+    .scmd-mobile-action-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        min-height: 3rem;
+        padding: 0.85rem 1rem;
+        border-radius: 0.75rem;
+        border: 1px solid transparent;
+        font-size: 0.875rem;
+        font-weight: 700;
+        box-shadow: var(--scmd-shadow-sm);
+        transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+    }
+    .scmd-mobile-action-btn--danger-soft {
+        background: var(--scmd-surface);
+        color: var(--scmd-danger);
+        border-width: 2px;
+        border-color: color-mix(in srgb, var(--scmd-danger) 14%, white);
+    }
+    .scmd-mobile-action-btn--danger-soft:hover {
+        background: var(--scmd-danger-soft);
+        border-color: color-mix(in srgb, var(--scmd-danger) 24%, white);
+    }
+    .scmd-mobile-action-btn--danger-solid {
+        background: var(--scmd-danger);
+        color: var(--scmd-on-brand);
+        border-color: transparent;
+        box-shadow: 0 10px 24px color-mix(in srgb, var(--scmd-danger) 22%, white);
+    }
+    .scmd-mobile-action-btn--danger-solid:hover { background: #b91c1c; }
+    .scmd-mobile-dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+    }
+    .scmd-mobile-cta-card {
+        display: grid;
+        gap: 0.7rem;
+        min-height: 9.5rem;
+        padding: 1rem;
+        color: inherit;
+        text-decoration: none;
+        transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+    }
+    .scmd-mobile-cta-card:active { transform: scale(0.98); }
+    .scmd-mobile-cta-card--disabled {
+        opacity: 0.62;
+        background: var(--scmd-surface-strong);
+        box-shadow: none;
+    }
+    .scmd-mobile-cta-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 0.85rem;
+        border: 1px solid var(--scmd-border);
+        background: var(--scmd-surface-strong);
+        font-size: 1rem;
+    }
+    .scmd-mobile-cta-card h3 {
+        margin: 0;
+        font-size: 0.95rem;
+        line-height: 1.25;
+        font-weight: 800;
+        color: var(--scmd-text);
+    }
+    .scmd-mobile-cta-card p {
+        margin: 0;
+        font-size: 0.75rem;
+        line-height: 1.45;
+        color: var(--scmd-text-muted);
+    }
+    .scmd-mobile-cta-meta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: var(--scmd-brand-700);
+    }
+    .scmd-mobile-cta-meta--muted { color: var(--scmd-text-muted); }
+    .scmd-mobile-user-hero {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.9rem;
+        margin-bottom: 1rem;
+        padding: 1rem 1rem 0;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        border: 1px solid var(--scmd-border);
+        border-radius: 1rem;
+        box-shadow: var(--scmd-shadow-sm);
+    }
+    .scmd-mobile-user-identity {
+        min-width: 0;
+        display: grid;
+        gap: 0.2rem;
+        text-align: left;
+    }
+    .scmd-mobile-user-greeting {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: var(--scmd-text-muted);
+    }
+    .scmd-mobile-user-name {
+        margin: 0;
+        font-size: 1.25rem;
+        line-height: 1.08;
+        font-weight: 900;
+        color: var(--scmd-text);
+    }
+    .scmd-mobile-user-meta {
+        display: inline-flex;
+        width: fit-content;
+        align-items: center;
+        gap: 0.35rem;
+        margin-top: 0.2rem;
+        border-radius: 999px;
+        border: 1px solid #fee2e2;
+        background: #fff1f2;
+        padding: 0.22rem 0.55rem;
+        font-size: 0.65rem;
+        font-weight: 800;
+        color: #e11d48;
+    }
+    .scmd-mobile-sos-disabled {
+        margin-bottom: 6rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.75rem;
+        padding: 0.95rem 1rem;
+        border: 1px dashed color-mix(in srgb, var(--scmd-danger) 22%, white);
+        border-radius: 1rem;
+        background: color-mix(in srgb, var(--scmd-danger-soft) 40%, white);
+        color: var(--scmd-text-soft);
+    }
+    .scmd-mobile-sos-disabled strong {
+        display: block;
+        margin-bottom: 0.2rem;
+        color: var(--scmd-text);
+        font-size: 0.8rem;
+    }
+    .scmd-mobile-sos-disabled i { color: var(--scmd-danger); font-size: 1.25rem; }
+    @keyframes scmd-mobile-spin { to { transform: rotate(360deg); } }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="loading-overlay" class="scmd-mobile-loading-overlay fixed inset-0 z-[100] hidden flex flex-col items-center justify-center backdrop-blur-sm transition-opacity duration-300" role="status" aria-live="polite" aria-atomic="true">
+    <div class="scmd-mobile-loading-spinner" aria-hidden="true"></div>
+    <p id="loading-text" class="mt-4 text-sm font-medium tracking-wide">Đang xử lý dữ liệu...</p>
+</div>
+
+<div class="scmd-mobile-user-hero fade-in">
+    <div class="scmd-mobile-user-identity">
+        <span class="scmd-mobile-user-greeting">{{ greeting }},</span>
+        <h1 class="scmd-mobile-user-name">{{ nhan_vien.ho_ten }}</h1>
+        <span class="scmd-mobile-user-meta">ID: {{ nhan_vien.ma_nhan_vien }}</span>
+    </div>
+    <a href="{% url 'users:mobile_profile' %}" class="scmd-mobile-avatar-link">
+        <div class="h-10 w-10 overflow-hidden rounded-full bg-gray-200 ring-2 ring-white shadow-sm">
+            {% if nhan_vien.anh_the %}
+                <img src="{{ nhan_vien.anh_the.url }}" alt="{{ nhan_vien.ho_ten }}" class="h-full w-full object-cover">
+            {% else %}
+                <img src="{% static 'img/default_avatar.png' %}" alt="Ảnh mặc định" class="h-full w-full object-cover">
+            {% endif %}
+        </div>
+    </a>
+</div>
+
+<div class="scmd-mobile-shift-card fade-in">
+    {% if ca_truc_hom_nay %}
+        <div class="scmd-mobile-card-body">
+            <div class="mb-3 flex items-start justify-between gap-3">
+                <div>
+                    <span class="text-[10px] font-bold tracking-wide text-gray-400">Ca trực hiện tại</span>
+                    <div class="text-lg font-bold text-gray-800">{{ ca_truc_hom_nay.ca_lam_viec.ten_ca }}</div>
+                </div>
+                {% if trang_thai_checkin == True %}
+                    <span class="scmd-mobile-status-badge scmd-mobile-status-badge--active"><span class="h-1.5 w-1.5 animate-pulse rounded-full bg-green-600"></span> Đang trực</span>
+                {% elif trang_thai_checkin == 'DONE' %}
+                    <span class="scmd-mobile-status-badge scmd-mobile-status-badge--done">Đã xong</span>
+                {% else %}
+                    <span class="scmd-mobile-status-badge scmd-mobile-status-badge--pending">Chưa vào ca</span>
+                {% endif %}
+            </div>
+
+            <div class="mb-5 space-y-2">
+                <div class="flex items-start gap-2.5">
+                    <i class="fas fa-map-marker-alt mt-1 w-4 text-center text-red-500"></i>
+                    <div>
+                        <p class="text-sm font-bold leading-snug text-gray-800">{{ ca_truc_hom_nay.vi_tri_chot.muc_tieu.ten_muc_tieu }}</p>
+                        <p class="text-xs text-gray-500">{{ ca_truc_hom_nay.vi_tri_chot.ten_vi_tri }}</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2.5">
+                    <i class="far fa-clock w-4 text-center text-blue-500"></i>
+                    <span class="text-sm font-medium font-mono text-gray-600">{{ ca_truc_hom_nay.ca_lam_viec.gio_bat_dau|date:"H:i" }} - {{ ca_truc_hom_nay.ca_lam_viec.gio_ket_thuc|date:"H:i" }}</span>
+                </div>
+            </div>
+
+            <div class="w-full">
+                {% if trang_thai_checkin == True %}
+                    <form id="form-checkout" action="{% url 'operations:check_out' ca_truc_hom_nay.id %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="lat" id="lat-out">
+                        <input type="hidden" name="lng" id="lng-out">
+                        <input type="hidden" name="note" id="note-out">
+                        <input type="file" name="anh_check_out" id="checkout-cam" class="hidden" accept="image/*" capture="user">
+                        <label for="checkout-cam" class="scmd-mobile-action-btn scmd-mobile-action-btn--danger-soft">
+                            <span>Kết thúc ca</span><i class="fas fa-chevron-right text-xs"></i>
+                        </label>
+                    </form>
+                {% elif trang_thai_checkin == 'DONE' %}
+                    <div class="flex h-12 w-full items-center justify-center rounded-xl border border-gray-100 bg-gray-50 text-sm font-medium text-gray-400"><i class="fas fa-check-circle mr-2"></i> Hoàn thành</div>
+                {% else %}
+                    <form id="form-checkin" action="{% url 'operations:check_in' ca_truc_hom_nay.id %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="lat" id="lat-in">
+                        <input type="hidden" name="lng" id="lng-in">
+                        <input type="hidden" name="note" id="note-in">
+                        <input type="file" name="anh_check_in" id="checkin-cam" class="hidden" accept="image/*" capture="user">
+                        <label for="checkin-cam" class="scmd-mobile-action-btn scmd-mobile-action-btn--danger-solid">
+                            <span>Bắt đầu ca</span><i class="fas fa-fingerprint text-lg opacity-80"></i>
+                        </label>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <div class="scmd-mobile-card-body scmd-mobile-card-body--empty">
+            <i class="fas fa-mug-hot mb-2 text-3xl text-gray-300"></i>
+            <p class="text-sm font-medium text-gray-500">Hôm nay không có lịch trực</p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="fade-in mb-6">
+    <div class="mb-3 flex items-center justify-between">
+        <div>
+            <h2 class="text-sm font-bold text-slate-800">Tác vụ hiện trường</h2>
+            <p class="text-xs text-slate-500">Mỗi nút đều phản ánh đúng trạng thái sẵn sàng của tài khoản và ca trực.</p>
+        </div>
+    </div>
+    <div class="scmd-mobile-dashboard-grid">
+        {% if patrol_allowed %}
+        <a href="{% url 'operations:mobile_tuan_tra_list' %}" class="scmd-mobile-cta-card">
+            <span class="scmd-mobile-cta-icon border-blue-100 bg-blue-50 text-blue-600"><i class="fas fa-person-walking"></i></span>
+            <div class="space-y-1">
+                <h3>Tuần tra mục tiêu</h3>
+                <p>{{ patrol_hint }}</p>
+            </div>
+            <span class="scmd-mobile-cta-meta"><i class="fas fa-arrow-right"></i> Mở danh sách nhiệm vụ</span>
+        </a>
+        {% else %}
+        <div class="scmd-mobile-cta-card scmd-mobile-cta-card--disabled" aria-disabled="true">
+            <span class="scmd-mobile-cta-icon border-slate-200 bg-slate-100 text-slate-500"><i class="fas fa-lock"></i></span>
+            <div class="space-y-1">
+                <h3>Tuần tra mục tiêu</h3>
+                <p>{{ patrol_hint }}</p>
+            </div>
+            <span class="scmd-mobile-cta-meta scmd-mobile-cta-meta--muted"><i class="fas fa-shield-halved"></i> Cần được cấp quyền</span>
+        </div>
+        {% endif %}
+
+        <a href="{% url 'operations:bao_cao_su_co' %}" class="scmd-mobile-cta-card">
+            <span class="scmd-mobile-cta-icon border-orange-100 bg-orange-50 text-orange-600"><i class="fas fa-triangle-exclamation"></i></span>
+            <div class="space-y-1">
+                <h3>Báo sự cố</h3>
+                <p>{{ incident_hint }}</p>
+            </div>
+            <span class="scmd-mobile-cta-meta"><i class="fas fa-clipboard-list"></i> Mở biểu mẫu sự cố</span>
+        </a>
+
+        <a href="{% url 'operations:mobile_lich_su_cham_cong' %}" class="scmd-mobile-cta-card">
+            <span class="scmd-mobile-cta-icon border-green-100 bg-green-50 text-green-600"><i class="fas fa-history"></i></span>
+            <div class="space-y-1">
+                <h3>Lịch sử chấm công</h3>
+                <p>Kiểm tra lại các lần vào ca, kết thúc ca và thời gian làm việc đã ghi nhận.</p>
+            </div>
+            <span class="scmd-mobile-cta-meta"><i class="fas fa-clock-rotate-left"></i> Xem lịch sử</span>
+        </a>
+
+        <a href="{% url 'operations:mobile_de_xuat_create' %}" class="scmd-mobile-cta-card">
+            <span class="scmd-mobile-cta-icon border-purple-100 bg-purple-50 text-purple-600"><i class="fas fa-file-pen"></i></span>
+            <div class="space-y-1">
+                <h3>Tạo đề xuất</h3>
+                <p>{{ proposal_hint }}</p>
+            </div>
+            <span class="scmd-mobile-cta-meta"><i class="fas fa-plus"></i> Soạn và gửi ngay</span>
+        </a>
+    </div>
+</div>
+
+{% if sos_ready %}
+<div class="scmd-mobile-sos" data-mobile-sos data-sos-storage-key="scmd-mobile-sos-dashboard-v1">
+    <form class="scmd-mobile-sos-form" action="{% url 'operations:trigger_sos' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="lat" data-sos-lat>
+        <input type="hidden" name="lng" data-sos-lng>
+        <div class="scmd-mobile-sos-shell" data-sos-shell>
+            <button type="button" class="scmd-mobile-sos-btn" data-sos-button aria-label="Giữ 2 giây để gửi cảnh báo SOS khẩn cấp" aria-describedby="sos-help">
+                <span class="scmd-mobile-sos-btn-text">SOS</span>
+            </button>
+            <svg class="scmd-mobile-sos-progress" width="92" height="92" viewBox="0 0 92 92" aria-hidden="true">
+                <circle class="scmd-mobile-sos-progress-track" cx="46" cy="46" r="42"></circle>
+                <circle class="scmd-mobile-sos-progress-bar" cx="46" cy="46" r="42"></circle>
+            </svg>
+            <div class="scmd-mobile-sos-ring"></div>
+        </div>
+        <p id="sos-help" class="scmd-mobile-sos-help" data-sos-help>{{ sos_hint }}</p>
+    </form>
+</div>
+{% else %}
+<div class="scmd-mobile-sos-disabled fade-in">
+    <div>
+        <strong>SOS chưa sẵn sàng</strong>
+        <span class="text-xs leading-relaxed">{{ sos_hint }}</span>
+    </div>
+    <i class="fas fa-bell-slash" aria-hidden="true"></i>
+</div>
+{% endif %}
+
+<script>
+    function stopLoading(message) {
+        document.getElementById("loading-overlay").classList.add("hidden");
+        if (message) {
+            alert(message);
+        }
+    }
+
+    function withRealGps(onSuccess, onFailureMessage) {
+        if (!navigator.geolocation) {
+            stopLoading("Thiết bị không hỗ trợ GPS. Không thể tiếp tục.");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => onSuccess(pos.coords.latitude, pos.coords.longitude),
+            () => stopLoading(onFailureMessage),
+            { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 }
+        );
+    }
+
+    function processCheck(formId, latId, lngId) {
+        document.getElementById("loading-overlay").classList.remove("hidden");
+        document.getElementById("loading-text").innerText = "Đang lấy GPS thực...";
+
+        withRealGps(
+            (lat, lng) => {
+                document.getElementById(latId).value = lat;
+                document.getElementById(lngId).value = lng;
+                document.getElementById(formId).submit();
+            },
+            "Không thể lấy GPS thực. Vui lòng bật định vị, di chuyển đến khu vực có tín hiệu tốt hơn và thử lại."
+        );
+    }
+
+    const checkinCam = document.getElementById("checkin-cam");
+    if (checkinCam) {
+        checkinCam.onchange = () => processCheck("form-checkin", "lat-in", "lng-in");
+    }
+
+    const checkoutCam = document.getElementById("checkout-cam");
+    if (checkoutCam) {
+        checkoutCam.onchange = () => processCheck("form-checkout", "lat-out", "lng-out");
+    }
+</script>
+{% endblock %}

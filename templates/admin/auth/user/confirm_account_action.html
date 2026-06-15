@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="scmd-ops-page scmd-confirm-page">
+  <section class="scmd-ops-panel scmd-confirm-panel">
+    <div class="scmd-ops-panel__head">
+      <p class="scmd-ops-kicker">SCMD Pro · Xác nhận quyền truy cập</p>
+      <h2>{{ title }}</h2>
+      <p>{{ warning }}</p>
+    </div>
+
+    <div class="scmd-confirm-summary" role="note">
+      <strong>{{ selected_count_display }}</strong>
+      <span>tài khoản sẽ được kiểm tra và cập nhật từng dòng; thao tác được ghi AuditLog theo từng tài khoản.</span>
+    </div>
+
+    <div class="scmd-confirm-list">
+      <table>
+        <thead>
+          <tr>
+            <th>Tài khoản</th>
+            <th>Email</th>
+            <th>Hoạt động</th>
+            <th>Staff</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for obj in queryset %}
+          <tr>
+            <td>{{ obj.username }}</td>
+            <td>{{ obj.email|default:"Chưa có email" }}</td>
+            <td>{% if obj.is_active %}Có{% else %}Không{% endif %}</td>
+            <td>{% if obj.is_staff %}Có{% else %}Không{% endif %}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4">Không có tài khoản nào được chọn.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if preview_has_more %}
+      <p class="scmd-ops-muted">Chỉ hiển thị trước một phần danh sách. Toàn bộ tài khoản đã chọn sẽ được xử lý sau khi xác nhận.</p>
+      {% endif %}
+    </div>
+
+    <form method="post" class="scmd-confirm-actions">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="{{ action_name }}">
+      <input type="hidden" name="confirm_account_action" value="1">
+      <input type="hidden" name="select_across" value="{{ select_across }}">
+      {% for object_id in selected_ids %}
+      <input type="hidden" name="{{ action_checkbox_name }}" value="{{ object_id }}">
+      {% endfor %}
+      <button type="submit" class="scmd-ops-button scmd-ops-button--primary">Xác nhận cập nhật</button>
+      <a href="{{ changelist_url }}" class="scmd-ops-button">Hủy và quay lại danh sách</a>
+    </form>
+  </section>
+</div>
+{% endblock %}

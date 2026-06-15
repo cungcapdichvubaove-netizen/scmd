@@ -1,0 +1,44 @@
+{% extends "base_public.html" %}
+{% load static %}
+{% block title %}Không có quyền truy cập | SCMD Pro{% endblock %}
+{% block body_class %}access-denied-page scmd-public-shell{% endblock %}
+{% block public_shell_class %}access-denied-shell animate-enter{% endblock %}
+{% block public_main_class %}access-denied-card{% endblock %}
+{% block public_header %}{% endblock %}
+{% block public_footer %}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'common/css/access_denied.css' %}">
+{% endblock %}
+{% block content %}
+<section class="access-denied-state" aria-labelledby="access-denied-title">
+    <div class="access-denied-state__badge">TRUY CẬP BỊ GIỚI HẠN</div>
+
+    <h1 id="access-denied-title" class="access-denied-state__title">Không có quyền truy cập</h1>
+
+    <p class="access-denied-state__body">
+        Tài khoản của bạn chưa được cấp quyền vào khu vực này. Vui lòng quay lại khu vực làm việc phù hợp
+        hoặc liên hệ quản trị viên nếu cần điều chỉnh quyền.
+    </p>
+
+    <div class="access-denied-state__actions" aria-label="Thao tác tiếp theo">
+        <a href="{% url return_route %}" class="access-denied-state__button access-denied-state__button--primary">
+            Quay về khu vực làm việc
+        </a>
+        <a href="{% url 'main:logout' %}" class="access-denied-state__button access-denied-state__button--secondary">
+            Đăng xuất
+        </a>
+    </div>
+
+    <p class="access-denied-state__note">
+        Mỗi tài khoản chỉ truy cập các chức năng thuộc vai trò được phân công.
+        <span class="access-denied-state__code">Mã lỗi 403</span>
+    </p>
+
+    {% if show_technical_detail and detail_message %}
+    <details class="access-denied-state__debug">
+        <summary>Chi tiết kỹ thuật</summary>
+        <p>{{ detail_message }}</p>
+    </details>
+    {% endif %}
+</section>
+{% endblock %}

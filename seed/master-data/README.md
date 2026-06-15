@@ -1,0 +1,1 @@
+This directory is kept to match the user-facing dataset architecture tree. Python importable code lives in the underscore package next to it because hyphenated directories are not valid Python package names.

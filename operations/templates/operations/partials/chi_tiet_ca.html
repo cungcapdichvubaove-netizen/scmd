@@ -1,0 +1,27 @@
+{% comment %} file: operations/templates/operations/partials/chi_tiet_ca.html {% endcomment %}
+
+<div id="chi-tiet-ca-content">
+    <h5>Chi tiết Ca trực</h5>
+    <p><strong>NV:</strong> {{ phan_cong.nhan_vien.ho_ten }}</p>
+    <p><strong>Vị trí:</strong> {{ phan_cong.vi_tri_chot.ten_vi_tri }}</p>
+    <p><strong>Ca:</strong> {{ phan_cong.ca_lam_viec.ten_ca }}</p>
+    <p><strong>Ngày:</strong> {{ phan_cong.ngay_truc|date:"d/m/Y" }}</p>
+    <hr>
+
+    {# --- NÚT SỬA --- #}
+    <button class="btn btn-sm btn-warning"
+            hx-get="{% url 'operations:sua_ca_form' phan_cong.id %}"
+            hx-target="#chi-tiet-ca-content"
+            hx-swap="innerHTML">
+        Sửa
+    </button>
+
+    {# --- NÚT XÓA --- #}
+    <button class="btn btn-sm btn-danger"
+            hx-post="{% url 'operations:xoa_ca' phan_cong.id %}"
+            hx-target="closest td"
+            hx-swap="innerHTML"
+            hx-confirm="Bạn có chắc chắn muốn xóa ca trực này?">
+        Xóa
+    </button>
+</div>

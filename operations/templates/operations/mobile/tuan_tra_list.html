@@ -1,0 +1,120 @@
+﻿{# file: operations/templates/operations/mobile/tuan_tra_list.html #}
+{% extends "mobile/base.html" %}
+{% load static %}
+
+{% block title %}Tuần tra mục tiêu{% endblock %}
+
+{% block content %}
+<div class="space-y-4 fade-in">
+    <div class="flex items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3">
+            <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-circle btn-ghost btn-sm"><i class="fas fa-arrow-left"></i></a>
+            <div>
+                <h1 class="text-lg font-bold text-slate-800">Tuần tra mục tiêu</h1>
+                
+            </div>
+        </div>
+        <div class="w-10 h-10 bg-slate-50 rounded-lg p-1 border border-slate-100 flex items-center justify-center">
+            <img src="{% static 'img/brand/logo-symbol-blue.png' %}" alt="SCMD Pro" class="w-full h-full object-contain">
+        </div>
+    </div>
+
+    {% if ca_hien_tai %}
+    <div class="rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+        <div class="font-bold text-slate-800">Ca trực hiện tại</div>
+        <div>{{ ca_hien_tai.vi_tri_chot.ten_vi_tri }} · {{ ca_hien_tai.ca_lam_viec.ten_ca }} · {{ ca_hien_tai.ngay_truc|date:"d/m/Y" }}</div>
+    </div>
+    {% else %}
+    <div class="alert alert-info shadow-sm">
+        <i class="fas fa-circle-info"></i>
+        <span>Chưa có nhiệm vụ tuần tra.</span>
+    </div>
+    {% endif %}
+
+    {% if luot_dang_di %}
+    <div class="alert alert-warning shadow-md flex items-center gap-4">
+        <i class="fas fa-person-walking text-2xl"></i>
+        <div>
+            <h3 class="font-bold text-sm">Đang tuần tra</h3>
+            <div class="text-xs">Tuyến: {{ luot_dang_di.loai_tuan_tra.ten_loai }}</div>
+        </div>
+        <a href="{% url 'operations:thuc_hien_tuan_tra' luot_dang_di.id %}" class="btn btn-sm btn-ghost border-slate-800">Tiếp tục</a>
+    </div>
+    {% endif %}
+
+    <div class="space-y-2">
+        <h3 class="font-bold text-slate-500 text-xs uppercase pl-2">Nhiệm vụ tuần tra theo ca</h3>
+        {% for task in nhiem_vu_tuan_tra %}
+        <div class="card bg-white shadow-sm border border-slate-100">
+            <div class="card-body p-4 flex-row items-center justify-between gap-3">
+                <div class="min-w-0">
+                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                        <h2 class="card-title text-base font-bold text-slate-800">{{ task.tuyen_tuan_tra.ten_loai }}</h2>
+                        <span class="badge badge-outline text-[11px]">Lượt {{ task.thu_tu_luot }}</span>
+                        {% if task.trang_thai == 'COMPLETED_VALID' %}
+                            <span class="badge badge-success text-[11px]">Hợp lệ</span>
+                        {% elif task.trang_thai == 'COMPLETED_WITH_WARNINGS' %}
+                            <span class="badge badge-warning text-[11px]">Có cảnh báo</span>
+                        {% elif task.trang_thai == 'MISSED' %}
+                            <span class="badge badge-error text-[11px]">Bỏ lượt</span>
+                        {% elif task.trang_thai == 'IN_PROGRESS' %}
+                            <span class="badge badge-info text-[11px]">Đang thực hiện</span>
+                        {% else %}
+                            <span class="badge badge-ghost text-[11px]">Đã lên lịch</span>
+                        {% endif %}
+                    </div>
+                    <p class="text-xs text-slate-500">
+                        {{ task.so_diem_bat_buoc }} điểm bắt buộc
+                        {% if task.thoi_gian_bat_dau_du_kien %} · từ {{ task.thoi_gian_bat_dau_du_kien|date:"H:i" }}{% endif %}
+                        {% if task.thoi_gian_ket_thuc_du_kien %} đến {{ task.thoi_gian_ket_thuc_du_kien|date:"H:i" }}{% endif %}
+                    </p>
+                    <p class="text-xs text-slate-400 mt-1">Trạng thái: {{ task.get_trang_thai_display }}</p>
+                </div>
+                {% if not luot_dang_di and task.trang_thai == 'PLANNED' or not luot_dang_di and task.trang_thai == 'IN_PROGRESS' %}
+                <a href="{% url 'operations:bat_dau_tuan_tra' task.id %}" class="btn btn-primary btn-sm rounded-full gap-2 shadow-lg shadow-blue-200">
+                    <i class="fas fa-play"></i> Bắt đầu
+                </a>
+                {% else %}
+                <span class="text-xs text-slate-400 whitespace-nowrap">Không mở legacy</span>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+            {% if legacy_fallback_allowed %}
+            <div class="alert alert-warning shadow-sm text-xs">
+                <i class="fas fa-triangle-exclamation"></i>
+                <span>Ch?a c? l?ch.</span>
+            </div>
+            {% for lt in lo_trinhs %}
+            <div class="card bg-white shadow-sm border border-amber-100">
+                <div class="card-body p-4 flex-row items-center justify-between">
+                    <div>
+                        <h2 class="card-title text-base font-bold text-slate-800">{{ lt.ten_loai }}</h2>
+                        <p class="text-xs text-slate-400">{{ lt.cac_diem.count }} điểm check • {{ lt.thoi_gian_quy_dinh }} phút</p>
+                    </div>
+                    {% if not luot_dang_di %}
+                    <a href="{% url 'operations:bat_dau_tuan_tra' lt.id %}" class="btn btn-outline btn-sm rounded-full gap-2">
+                        <i class="fas fa-play"></i> Bắt đầu legacy
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="text-center py-8 opacity-50">
+                <p class="text-sm">Không có nhiệm vụ tuần tra mở cho ca hiện tại.</p>
+                {% if uses_operations_schedule %}{% endif %}
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}
+
+
+
+
+
+
+

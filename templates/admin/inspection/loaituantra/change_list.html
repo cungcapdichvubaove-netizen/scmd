@@ -1,0 +1,43 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+{% block content_title %}{% endblock %}
+
+{% block content %}
+
+<div class="scmd-shift-console">
+    <div class="scmd-shift-head">
+        <div>
+            <div class="scmd-shift-eyebrow">Thanh tra & tuần tra</div>
+            <h1 class="scmd-shift-title">Cấu hình tuyến tuần tra</h1>
+            <p class="scmd-shift-subtitle">
+                Tuyến tuần tra là dữ liệu nền cho lượt tuần tra, điểm QR/GPS, bằng chứng hiện trường và đối soát vận hành. Ưu tiên tuyến có mục tiêu rõ, tối thiểu 2 điểm kiểm soát và thời gian chuẩn hợp lý.
+            </p>
+        </div>
+        <div class="scmd-shift-actions">
+            <a class="scmd-shift-btn" href="{{ scmd_patrol_route_links.add }}">+ Thêm tuyến</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_route_links.export_csv }}">Xuất CSV</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_route_links.points }}">Điểm QR</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_route_links.sessions }}">Lượt tuần tra</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_route_links.targets }}">Mục tiêu</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_route_links.dashboard }}">Bảng điều hành</a>
+            <a class="scmd-shift-btn secondary" href="{{ scmd_patrol_route_links.mobile }}">Mobile</a>
+        </div>
+    </div>
+
+    <div class="scmd-shift-grid">
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_route_links.list }}"><span>Tổng tuyến</span><strong>{{ scmd_patrol_route_stats.total }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_route_links.with_site }}"><span>Có mục tiêu</span><strong>{{ scmd_patrol_route_stats.with_site }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_route_links.missing_site }}"><span>Thiếu mục tiêu</span><strong>{{ scmd_patrol_route_stats.missing_site }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_route_links.no_points }}"><span>Chưa có QR</span><strong>{{ scmd_patrol_route_stats.no_points }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_route_links.one_point }}"><span>Chỉ 1 điểm</span><strong>{{ scmd_patrol_route_stats.one_point }}</strong></a>
+        <a class="scmd-shift-stat" href="{{ scmd_patrol_route_links.today }}"><span>Có lượt hôm nay</span><strong>{{ scmd_patrol_route_stats.today }}</strong></a>
+    </div>
+
+    <div class="scmd-shift-note">
+        Gợi ý kiểm soát: tuyến thiếu mục tiêu hoặc chưa có điểm QR/GPS không nên đưa vào vận hành; khi thay đổi tuyến đã phát sinh lượt tuần tra, cần đối soát lại bằng chứng và báo cáo liên quan.
+    </div>
+</div>
+
+{{ block.super }}
+{% endblock %}

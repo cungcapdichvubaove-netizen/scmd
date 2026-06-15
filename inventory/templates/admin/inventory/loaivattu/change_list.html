@@ -1,0 +1,36 @@
+{% extends "admin/change_list.html" %}
+{% load i18n humanize %}
+
+{% block content_title %}
+<div class="scmd-admin-hero inventory">
+    <div>
+        <p class="scmd-admin-eyebrow">Kho vật tư</p>
+        <h1>Phân loại vật tư</h1>
+        <p class="scmd-admin-note">Chuẩn hóa nhóm đồng phục, công cụ hỗ trợ và thiết bị để thủ kho kiểm soát tồn kho, nhập xuất và cấp phát nhất quán.</p>
+    </div>
+    <div class="scmd-admin-actions">
+        <a href="add/" class="scmd-admin-btn primary">Thêm loại vật tư</a>
+        <a href="{{ inventory_category_export_url }}" class="scmd-admin-btn secondary">Xuất CSV</a>
+        <a href="{{ inventory_quick_links.items }}" class="scmd-admin-btn ghost">Vật tư</a>
+        <a href="{{ inventory_quick_links.stock_report }}" class="scmd-admin-btn ghost">Báo cáo tồn</a>
+        <a href="{{ inventory_quick_links.dashboard }}" class="scmd-admin-btn ghost">Dashboard kho</a>
+    </div>
+</div>
+{% if inventory_category_summary %}
+<div class="scmd-admin-kpis inventory">
+    <a class="scmd-admin-kpi" href="."><span>Tổng danh mục</span><strong>{{ inventory_category_summary.total_categories|default:0 }}</strong><small>{{ inventory_category_summary.total_items|default:0|intcomma }} vật tư đang quản lý</small></a>
+    <a class="scmd-admin-kpi" href="?category_issue=empty"><span>Chưa có vật tư</span><strong class="warning">{{ inventory_category_summary.empty_categories|default:0 }}</strong><small>Cần rà soát hoặc gộp nhóm</small></a>
+    <a class="scmd-admin-kpi" href="?category_issue=low_stock"><span>Có cảnh báo tồn</span><strong class="danger">{{ inventory_category_summary.low_stock_categories|default:0 }}</strong><small>{{ inventory_category_summary.out_of_stock_categories|default:0 }} nhóm có vật tư hết tồn</small></a>
+    <a class="scmd-admin-kpi" href="?category_issue=no_description"><span>Thiếu mô tả</span><strong>{{ inventory_category_summary.no_description|default:0 }}</strong><small>Giúp người mới nhập kho đúng nhóm</small></a>
+    <a class="scmd-admin-kpi" href="?category_issue=target_tools"><span>CCHT tại mục tiêu</span><strong class="success">{{ inventory_category_summary.target_tool_categories|default:0 }}</strong><small>Nhóm có công cụ đang bàn giao</small></a>
+</div>
+{% endif %}
+<div class="scmd-admin-note-card inventory">
+    <strong>Nguyên tắc thủ kho:</strong> Loại vật tư là cấu hình nền. Khi đã phát sinh vật tư, nhập/xuất hoặc bàn giao cho mục tiêu, hãy đổi tên/mô tả có kiểm soát để tránh sai lệch báo cáo tồn kho và lịch sử cấp phát.
+    <span>
+        <a href="{{ inventory_quick_links.receipts }}">Phiếu nhập</a>
+        <a href="{{ inventory_quick_links.issues }}">Phiếu xuất</a>
+        <a href="{{ inventory_quick_links.target_tools }}">CCHT tại mục tiêu</a>
+    </span>
+</div>
+{% endblock %}

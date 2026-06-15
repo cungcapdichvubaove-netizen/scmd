@@ -1,0 +1,40 @@
+{% extends "admin/change_list.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{# Ẩn tiêu đề mặc định của Django Admin để tránh lặp tên model. #}
+{% block content_title %}{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+<div class="scmd-target-console">
+  <section class="scmd-target-head">
+    <div>
+      <div class="scmd-target-kicker">CRM / Mục tiêu bảo vệ</div>
+      <h1 class="scmd-target-title">Quản trị mục tiêu</h1>
+      <p class="scmd-target-subtitle">Mục tiêu là điểm chuyển giao từ hợp đồng sang vận hành: chốt trực, phân công ca, GPS/check-in, tuần tra, kho cấp phát và dữ liệu lương. Ưu tiên rà soát mục tiêu thiếu GPS, thiếu chốt, thiếu tuyến hoặc chưa có chỉ huy trưởng.</p>
+    </div>
+    <div class="scmd-target-actions">
+      <a class="scmd-target-btn primary" href="{{ scmd_target_links.add_target }}"><i class="fas fa-plus-circle"></i> Thêm mục tiêu</a>
+      <a class="scmd-target-btn" href="{{ scmd_target_links.contract_list }}"><i class="fas fa-file-contract"></i> Hợp đồng</a>
+      <a class="scmd-target-btn" href="{{ scmd_target_links.post_list }}"><i class="fas fa-map-pin"></i> Chốt trực</a>
+      <a class="scmd-target-btn" href="{{ scmd_target_links.route_list }}"><i class="fas fa-route"></i> Tuần tra</a>
+      <a class="scmd-target-btn" href="{{ scmd_target_links.inventory_target_tools }}"><i class="fas fa-boxes-stacked"></i> CCHT mục tiêu</a>
+    </div>
+  </section>
+
+  <section class="scmd-target-metrics" aria-label="Chỉ số mục tiêu">
+    <div class="scmd-target-metric"><strong>{{ scmd_target_stats.total }}</strong><span>Tổng mục tiêu</span></div>
+    <div class="scmd-target-metric"><strong>{{ scmd_target_stats.with_gps }}</strong><span>Đã có GPS</span></div>
+    <div class="scmd-target-metric"><strong>{{ scmd_target_stats.missing_gps }}</strong><span>Thiếu GPS</span></div>
+    <div class="scmd-target-metric"><strong>{{ scmd_target_stats.no_posts }}</strong><span>Chưa có chốt</span></div>
+    <div class="scmd-target-metric"><strong>{{ scmd_target_stats.no_routes }}</strong><span>Chưa có tuyến</span></div>
+    <div class="scmd-target-metric"><strong>{{ scmd_target_stats.monthly_payroll|floatformat:0|intcomma }}</strong><span>Lương khoán/tháng</span></div>
+  </section>
+  <p class="scmd-target-hint">Bộ lọc “Chất lượng mục tiêu” giúp tìm nhanh mục tiêu thiếu GPS, thiếu đầu mối, chưa có chốt trực hoặc chưa có tuyến tuần tra. Các nút thao tác đều mở đúng khu vực admin/không gian làm việc hiện có.</p>
+</div>
+{{ block.super }}
+{% endblock %}

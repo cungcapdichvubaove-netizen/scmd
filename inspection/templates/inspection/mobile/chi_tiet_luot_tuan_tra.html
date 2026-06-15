@@ -1,0 +1,55 @@
+{% extends "mobile/base.html" %}
+{% block title %}Chi tiết Tuần tra{% endblock %}
+
+{% block content %}
+<div class="sticky top-0 z-30 bg-base-100 pb-4 pt-2 border-b border-base-200 mb-4">
+    <div class="flex justify-between items-center">
+        <h2 class="font-bold text-lg truncate pr-4">{{ luot.loai_tuan_tra.ten_loai }}</h2>
+        <div class="badge badge-primary font-mono">{{ luot.tien_do }}%</div>
+    </div>
+    <div class="w-full bg-slate-100 rounded-full h-2 mt-2">
+        <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: {{ luot.tien_do }}%"></div>
+    </div>
+</div>
+
+<div class="space-y-4 pb-24">
+    {% for diem in cac_diem %}
+    <div class="card bg-base-100 shadow-sm border {% if diem.id in da_quet_ids %}border-green-500 bg-green-50{% else %}border-base-200{% endif %}">
+        <div class="card-body p-4 flex flex-row items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm
+                    {% if diem.id in da_quet_ids %}bg-green-500 text-white{% else %}bg-slate-200 text-slate-600{% endif %}">
+                    {{ diem.thu_tu }}
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm">{{ diem.ten_diem }}</h3>
+                    {% if diem.id in da_quet_ids %}
+                        <span class="text-xs text-green-600 font-medium">Đã quét</span>
+                    {% else %}
+                        <span class="text-xs text-slate-400">Chưa quét</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if diem.id not in da_quet_ids %}
+            <a href="{% url 'inspection:mobile_quet_qr' luot.id diem.id %}" class="btn btn-sm btn-ghost text-primary">
+                <i class="fas fa-qrcode text-xl"></i>
+            </a>
+            {% else %}
+            <i class="fas fa-check-circle text-green-500 text-xl"></i>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-base-200 z-40">
+    <form method="POST">
+        {% csrf_token %}
+        <button type="submit" name="ket_thuc" class="btn btn-success w-full text-white font-bold text-lg" 
+            {% if luot.tien_do < 100 %}disabled{% endif %}>
+            HOÀN THÀNH NHIỆM VỤ
+        </button>
+    </form>
+</div>
+{% endblock %}
