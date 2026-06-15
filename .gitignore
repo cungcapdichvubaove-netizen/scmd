@@ -58,7 +58,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
-<<<<<<< HEAD
 htmlcov/
 coverage.xml
 
@@ -74,25 +73,11 @@ pip-delete-this-directory.txt
 local_settings.py
 settings_local.py
 
-# Node / frontend cache
-=======
-
-# Local Environment & Secrets
-.env
-.env.local
-.env.*
-db.sqlite3
-*.sqlite3
-dump.rdb
-celerybeat-schedule*
-
-# Node.js
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
+# Node / frontend / environment
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-<<<<<<< HEAD
 .pnpm-store/
 .cache/
 
