@@ -1,31 +1,20 @@
-<<<<<<< HEAD
 FROM python:3.11-slim-bookworm
-=======
-FROM python:3.11-slim
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-<<<<<<< HEAD
 # Pin Debian family explicitly and force HTTPS mirrors so local deploys are
 # less sensitive to network/proxy environments that break plain HTTP APT.
 RUN sed -i 's|http://deb.debian.org|https://deb.debian.org|g' /etc/apt/sources.list.d/debian.sources \
     && apt-get update && apt-get install -y --no-install-recommends \
-=======
-RUN apt-get update && apt-get install -y --no-install-recommends \
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     build-essential \
     libpq-dev \
     gettext \
     binutils \
-<<<<<<< HEAD
     fontconfig \
     fonts-dejavu-core \
-=======
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     libcairo2 \
     libgdk-pixbuf-2.0-0 \
     libglib2.0-0 \
@@ -42,11 +31,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
-<<<<<<< HEAD
     pip install --no-cache-dir -r requirements.txt watchdog
-=======
-    pip install --no-cache-dir -r requirements.txt
->>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 COPY . .
 
