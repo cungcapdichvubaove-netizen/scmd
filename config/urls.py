@@ -3,6 +3,7 @@
 Root URL configuration for SCMD Pro.
 """
 
+<<<<<<< HEAD
 from types import MethodType
 
 from django.conf import settings
@@ -15,6 +16,14 @@ from django.views.generic import RedirectView
 from main import views as main_views
 from main.pwa_views import service_worker
 from main.admin_views import admin_global_search_view
+=======
+from django.conf import settings
+from django.conf.urls.static import static
+from django.contrib import admin
+from django.shortcuts import redirect
+from django.urls import include, path
+from django.views.generic import TemplateView
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from drf_spectacular.views import (
     SpectacularAPIView,
     SpectacularRedocView,
@@ -22,6 +31,7 @@ from drf_spectacular.views import (
 )
 
 
+<<<<<<< HEAD
 def _scmd_admin_has_permission(self, request):
     return main_views.DashboardRouter.user_can_access_admin_console(request.user)
 
@@ -29,6 +39,8 @@ def _scmd_admin_has_permission(self, request):
 admin.site.has_permission = MethodType(_scmd_admin_has_permission, admin.site)
 
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 def logout_redirect_handler(request):
     """Handle admin logout safely for GET requests."""
     from django.contrib.auth import logout
@@ -39,6 +51,7 @@ def logout_redirect_handler(request):
 
 
 urlpatterns = [
+<<<<<<< HEAD
     path(
         "favicon.ico",
         RedirectView.as_view(
@@ -63,6 +76,21 @@ urlpatterns = [
         staff_member_required(SpectacularRedocView.as_view(url_name="schema")),
         name="redoc",
     ),
+=======
+    path("admin/logout/", logout_redirect_handler, name="admin_logout_fix"),
+    path("admin/", admin.site.urls),
+    path(
+        "sw.js",
+        TemplateView.as_view(
+            template_name="sw.js",
+            content_type="application/javascript",
+        ),
+        name="sw.js",
+    ),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     path("", include("main.urls")),
     path("users/", include("users.urls")),
     path("clients/", include("clients.urls")),
@@ -84,10 +112,18 @@ if settings.DEBUG:
 
         urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
 
+<<<<<<< HEAD
 admin.site.site_header = "Quản trị kỹ thuật SCMD"
 admin.site.site_title = "Quản trị kỹ thuật SCMD"
 admin.site.index_title = "Không gian quản trị kỹ thuật nội bộ"
 
 handler404 = "main.views.handler404" if "main" in settings.INSTALLED_APPS else None
 handler403 = "main.views.handler403" if "main" in settings.INSTALLED_APPS else None
+=======
+admin.site.site_header = "SCMD Admin"
+admin.site.site_title = "SCMD Technical Console"
+admin.site.index_title = "Không gian quản trị kỹ thuật nội bộ"
+
+handler404 = "main.views.handler404" if "main" in settings.INSTALLED_APPS else None
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 handler500 = "main.views.handler500" if "main" in settings.INSTALLED_APPS else None

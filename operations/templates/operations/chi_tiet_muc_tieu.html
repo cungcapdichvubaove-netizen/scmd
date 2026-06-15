@@ -40,11 +40,17 @@
                     <a href="{% url 'operations:xep_lich' %}?muc_tieu={{ muc_tieu.id }}" class="btn btn-sm bg-indigo-600 hover:bg-indigo-700 text-white px-4 rounded-lg shadow-md transition-all">
                         <i class="fas fa-calendar-alt mr-2"></i> Lịch trực
                     </a>
+<<<<<<< HEAD
                     {% if add_vi_tri_chot_admin_url %}
                     <a href="{{ add_vi_tri_chot_admin_url }}" class="btn btn-sm bg-white border border-slate-300 hover:bg-slate-50 text-slate-700">
                         <i class="fas fa-map-pin mr-2"></i> Thêm Vị trí
                     </a>
                     {% endif %}
+=======
+                    <a href="/admin/operations/vitrichot/add/?muc_tieu={{ muc_tieu.id }}" class="btn btn-sm bg-white border border-slate-300 hover:bg-slate-50 text-slate-700">
+                        <i class="fas fa-map-pin mr-2"></i> Thêm Vị trí
+                    </a>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 </div>
             </div>
         </div>
@@ -142,9 +148,13 @@
                             <span class="text-[10px] {% if sc.trang_thai == 'DA_XU_LY' %}text-green-600{% else %}text-orange-600{% endif %} font-bold">
                                 {{ sc.get_trang_thai_display }}
                             </span>
+<<<<<<< HEAD
                             {% if sc.admin_change_url %}
                             <a href="{{ sc.admin_change_url }}" class="text-blue-600 hover:underline text-xs">Xem &rarr;</a>
                             {% endif %}
+=======
+                            <a href="/admin/operations/baocaosuco/{{ sc.id }}/change/" class="text-blue-600 hover:underline text-xs">Xem &rarr;</a>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                         </div>
                     </div>
                     {% empty %}

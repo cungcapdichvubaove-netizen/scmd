@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+<<<<<<< HEAD
 PROJECT_ROOT="${SCMDPRO_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 COMPOSE_FILE="$PROJECT_ROOT/docker-compose.yml"
 APP_URL="${SCMDPRO_APP_URL:-http://localhost:8000}"
@@ -9,6 +10,17 @@ INFRA_SERVICES=(db redis)
 APP_SERVICES=(web celery_worker celery_beat)
 ADMIN_USERNAME="${SCMD_ADMIN_USERNAME:-${DJANGO_SUPERUSER_USERNAME:-admin}}"
 HEALTH_URLS=("$APP_URL/" "$APP_URL/admin/login/")
+=======
+PROJECT_ROOT="${SCMDERP_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
+COMPOSE_FILE="$PROJECT_ROOT/docker-compose.yml"
+APP_URL="${SCMDERP_APP_URL:-http://localhost:8000}"
+LOG_FILE="$(cd "$(dirname "$0")" && pwd)/reset-scmderp.log"
+INFRA_SERVICES=(db redis)
+APP_SERVICES=(web celery_worker celery_beat)
+ADMIN_USERNAME="${SCMD_ADMIN_USERNAME:-${DJANGO_SUPERUSER_USERNAME:-admin}}"
+ADMIN_PASSWORD="${SCMD_ADMIN_PASSWORD:-${DJANGO_SUPERUSER_PASSWORD:-ScmdAdmin2026!}}"
+HEALTH_URLS=("$APP_URL/" "$APP_URL/admin/login/" "$APP_URL/api/docs/")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 log() {
   printf '%s\n' "$1" | tee -a "$LOG_FILE"
@@ -41,7 +53,11 @@ wait_app_health() {
 
     sleep 5
     elapsed=$((elapsed + 5))
+<<<<<<< HEAD
     log "INFO Dang cho SCMD Pro san sang $elapsed/$timeout giay"
+=======
+    log "INFO Dang cho SCMDERP san sang $elapsed/$timeout giay"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
   done
 
   log "ERR Health check timeout sau $timeout giay."
@@ -50,7 +66,11 @@ wait_app_health() {
 
 : > "$LOG_FILE"
 log "========================================================="
+<<<<<<< HEAD
 log "  SCMD Pro - Factory reset"
+=======
+log "  SCMDERP - FACTORY RESET"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 log "========================================================="
 log "INFO Project root: $PROJECT_ROOT"
 log "INFO Compose file: $COMPOSE_FILE"
@@ -65,7 +85,11 @@ read -r backup_choice
 
 if [[ "$backup_choice" =~ ^[Yy]$ ]]; then
   timestamp="$(date +%Y%m%d_%H%M%S)"
+<<<<<<< HEAD
   backup_file="$(cd "$(dirname "$0")" && pwd)/scmdpro-backup-$timestamp.sql"
+=======
+  backup_file="$(cd "$(dirname "$0")" && pwd)/scmderp-backup-$timestamp.sql"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
   run_compose up -d db
   docker compose --project-directory "$PROJECT_ROOT" -f "$COMPOSE_FILE" exec -T db pg_dump -U scmd_user scmd_db >"$backup_file"
   log "OK Backup thanh cong: $backup_file"
@@ -89,6 +113,12 @@ fi
 
 wait_app_health 300
 
+<<<<<<< HEAD
 log "OK SCMD Pro san sang tai $APP_URL"
 log "OK Tai khoan admin: $ADMIN_USERNAME"
 log "OK Mat khau admin : da dong bo tu cau hinh moi truong"
+=======
+log "OK SCMDERP san sang tai $APP_URL"
+log "OK Tai khoan admin: $ADMIN_USERNAME"
+log "OK Mat khau admin : $ADMIN_PASSWORD"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 {% load static %}
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -14,7 +17,10 @@
             line-height: 1.6; 
             color: #333;
         }
+<<<<<<< HEAD
         .report-logo { max-height: 52px; max-width: 190px; object-fit: contain; margin-bottom: 8px; }
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         .header { 
             text-align: center; 
             border-bottom: 2px solid #0056b3; 
@@ -105,9 +111,14 @@
 </head>
 <body>
     <div class="header">
+<<<<<<< HEAD
         {% if COMPANY.logo %}<img src="{{ COMPANY.logo.url }}" class="report-logo" alt="{{ COMPANY.display_name }}">{% else %}<img src="{% static 'img/brand/report-header-logo.png' %}" class="report-logo" alt="SCMD Pro">{% endif %}
         <h2>{{ COMPANY.display_name|default:"CÔNG TY DỊCH VỤ BẢO VỆ SCMD" }}</h2>
         <p>Địa chỉ: {{ COMPANY.dia_chi|default:"Chưa cấu hình địa chỉ công ty" }} | SĐT: {{ COMPANY.contact_phone|default:"Chưa cấu hình số điện thoại" }}</p>
+=======
+        <h2>CÔNG TY TNHH DỊCH VỤ BẢO VỆ XYZ</h2>
+        <p>Địa chỉ: Số 1, Đường ABC, Quận Ba Đình, Hà Nội | SĐT: 0123.456.789</p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     </div>
 
     <p class="title">LÝ LỊCH TRÍCH NGANG NHÂN VIÊN</p>

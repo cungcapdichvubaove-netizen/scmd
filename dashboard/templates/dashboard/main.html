@@ -1,9 +1,14 @@
 {% extends "base.html" %}
+<<<<<<< HEAD
 {% load static %}
+=======
+{% load humanize %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 {% block title %}Tổng quan vận hành | SCMD Pro{% endblock %}
 {% block header_title %}Tổng quan vận hành{% endblock %}
 
+<<<<<<< HEAD
 {% block extra_css %}
 <style>
     .exec-density {
@@ -422,10 +427,42 @@
                 <p class="exec-density__meta-label">Độ phủ ca hôm nay</p>
                 <div class="exec-density__meta-value">{{ coverage_rate_display }}</div>
                 <p class="exec-density__subtitle">{{ da_checkin }} / {{ total_shifts_today }} ca đã check-in</p>
+=======
+{% block content %}
+<div class="w-full space-y-6">
+    <section class="rounded-[28px] border border-slate-200 bg-gradient-to-r from-slate-950 via-slate-900 to-blue-950 px-6 py-6 text-white shadow-xl md:px-8">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div class="max-w-3xl">
+                <span class="inline-flex rounded-full border border-white/10 bg-white/8 px-3 py-1 text-[11px] font-extrabold uppercase tracking-[0.18em] text-blue-100">
+                    SCMD Pro | Bảng điều hành vận hành
+                </span>
+                <h1 class="mt-4 text-3xl font-black tracking-tight md:text-4xl">
+                    Điều hành nội bộ theo dữ liệu vận hành thật
+                </h1>
+                <p class="mt-3 max-w-2xl text-sm font-medium leading-relaxed text-slate-300">
+                    Dashboard ưu tiên nhân sự, ca trực, chấm công, sự cố, đối soát lương và cảnh báo kho.
+                    Màu sắc chỉ phân biệt thương hiệu và trạng thái nghiệp vụ, không dùng màu trang trí theo module.
+                </p>
+            </div>
+
+            <div class="flex flex-wrap gap-3">
+                <div class="rounded-2xl border border-white/10 bg-white/6 px-4 py-3">
+                    <p class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-300">Ngày</p>
+                    <p class="mt-1 text-sm font-bold">{% now "d/m/Y" %}</p>
+                </div>
+                <div class="rounded-2xl border border-white/10 bg-white/6 px-4 py-3">
+                    <p class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-300">Trạng thái</p>
+                    <p class="mt-1 text-sm font-bold">{{ tinh_trang_van_hanh }}</p>
+                </div>
+                <button type="button" onclick="window.location.reload()" class="rounded-2xl border border-white/15 bg-white/8 px-4 py-3 text-sm font-bold transition hover:bg-white/14">
+                    <i class="fas fa-rotate-right mr-2"></i> Làm mới
+                </button>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             </div>
         </div>
     </section>
 
+<<<<<<< HEAD
     <section class="exec-kpi-strip" aria-label="KPI tổng quan vận hành">
         {% for item in executive_kpis %}
         <div class="exec-kpi-card exec-kpi-card--{{ item.tone|default:'neutral' }}">
@@ -613,10 +650,197 @@
                     </div>
                     {% empty %}
                     <div class="exec-empty">Không có sự cố mở trong phạm vi tổng quan hiện tại.</div>
+=======
+    <section class="scmd-surface-card p-5">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Data readiness</p>
+                <h2 class="mt-2 text-lg font-black text-slate-900">Trạng thái vận hành hôm nay</h2>
+                <p class="mt-1 text-sm text-slate-600">{{ tinh_trang_van_hanh_detail }}</p>
+            </div>
+            <div>
+                <span class="scmd-tone {% if tinh_trang_van_hanh_tone == 'success' %}scmd-tone--success{% elif tinh_trang_van_hanh_tone == 'warning' %}scmd-tone--warning{% elif tinh_trang_van_hanh_tone == 'danger' %}scmd-tone--danger{% elif tinh_trang_van_hanh_tone == 'info' %}scmd-tone--info{% else %}scmd-tone--neutral{% endif %}">
+                    {{ tinh_trang_van_hanh }}
+                </span>
+            </div>
+        </div>
+
+        <div class="mt-4 flex flex-wrap gap-2">
+            {% if canh_bao_nhanh %}
+                {% for item in canh_bao_nhanh %}
+                <span class="scmd-tone scmd-tone--warning">{{ item }}</span>
+                {% endfor %}
+            {% else %}
+                <span class="scmd-tone scmd-tone--neutral">Không có cảnh báo nhanh đang mở</span>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div class="scmd-surface-card p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Nhân sự hoạt động</p>
+                    <h3 class="mt-3 text-3xl font-black text-slate-900">{{ nhan_su_hoat_dong|default:0 }}</h3>
+                    <p class="mt-2 text-xs text-slate-500">{{ nv_chinh_thuc|default:0 }} chính thức • {{ nv_thu_viec|default:0 }} thử việc</p>
+                </div>
+                <div class="rounded-2xl bg-blue-50 p-3 text-blue-700">
+                    <i class="fas fa-users text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="scmd-surface-card p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Ca trực hôm nay</p>
+                    <h3 class="mt-3 text-3xl font-black text-slate-900">{{ tong_ca|default:0 }}</h3>
+                    <p class="mt-2 text-xs text-slate-500">{{ da_checkin|default:0 }} đã check-in • {{ ca_chua_checkin|default:0 }} chưa check-in</p>
+                </div>
+                <div class="rounded-2xl bg-blue-50 p-3 text-blue-700">
+                    <i class="fas fa-user-check text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="scmd-surface-card p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Chấm công bất thường</p>
+                    <h3 class="mt-3 text-3xl font-black {% if luot_chamcong_bat_thuong > 0 %}text-amber-600{% else %}text-slate-900{% endif %}">{{ luot_chamcong_bat_thuong|default:0 }}</h3>
+                    <p class="mt-2 text-xs text-slate-500">{{ luot_di_muon|default:0 }} lượt đi muộn hôm nay</p>
+                </div>
+                <div class="rounded-2xl {% if luot_chamcong_bat_thuong > 0 %}bg-amber-50 text-amber-700{% else %}bg-blue-50 text-blue-700{% endif %} p-3">
+                    <i class="fas fa-id-card text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="scmd-surface-card p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Sự cố đang mở</p>
+                    <h3 class="mt-3 text-3xl font-black {% if count_su_co > 0 %}text-red-600{% else %}text-slate-900{% endif %}">{{ count_su_co|default:0 }}</h3>
+                    <p class="mt-2 text-xs text-slate-500">{{ su_co_nghiem_trong|default:0 }} mức nghiêm trọng • {{ su_co_moi|default:0 }} mới</p>
+                </div>
+                <div class="rounded-2xl {% if count_su_co > 0 %}bg-red-50 text-red-700{% else %}bg-blue-50 text-blue-700{% endif %} p-3">
+                    <i class="fas fa-triangle-exclamation text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="scmd-surface-card p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Đối soát lương</p>
+                    <h3 class="mt-3 text-3xl font-black {% if luot_can_doi_soat_luong > 0 %}text-amber-600{% else %}text-slate-900{% endif %}">{{ luot_can_doi_soat_luong|default:0 }}</h3>
+                    <p class="mt-2 text-xs text-slate-500">{{ can_duyet|default:0 }} đề xuất đang chờ phê duyệt</p>
+                </div>
+                <div class="rounded-2xl {% if luot_can_doi_soat_luong > 0 %}bg-amber-50 text-amber-700{% else %}bg-blue-50 text-blue-700{% endif %} p-3">
+                    <i class="fas fa-file-invoice-dollar text-xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="scmd-surface-card p-5">
+            <div class="flex items-start justify-between">
+                <div>
+                    <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Cảnh báo kho</p>
+                    <h3 class="mt-3 text-3xl font-black {% if canh_bao_kho > 0 %}text-amber-600{% else %}text-slate-900{% endif %}">{{ canh_bao_kho|default:0 }}</h3>
+                    <p class="mt-2 text-xs text-slate-500">{{ muc_tieu_dang_hoat_dong|default:0 }} mục tiêu đang hoạt động</p>
+                </div>
+                <div class="rounded-2xl {% if canh_bao_kho > 0 %}bg-amber-50 text-amber-700{% else %}bg-blue-50 text-blue-700{% endif %} p-3">
+                    <i class="fas fa-boxes-stacked text-xl"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-6 xl:grid-cols-3">
+        <div class="xl:col-span-2 space-y-6">
+            <div class="scmd-surface-card p-6">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Việc cần xử lý</p>
+                        <h3 class="mt-2 text-lg font-black text-slate-900">Danh sách ưu tiên hôm nay</h3>
+                    </div>
+                    <span class="scmd-tone {% if cong_viec_can_xu_ly %}scmd-tone--warning{% else %}scmd-tone--success{% endif %}">
+                        {% if cong_viec_can_xu_ly %}Cần xử lý{% else %}Không có việc tồn{% endif %}
+                    </span>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    {% if cong_viec_can_xu_ly %}
+                        {% for item in cong_viec_can_xu_ly %}
+                        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm font-medium text-slate-700">
+                            {{ item }}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="rounded-2xl border border-green-100 bg-green-50 px-4 py-3 text-sm font-medium text-green-700">
+                            Không có việc nghiệp vụ cần xử lý ngay trong ngày hôm nay.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="scmd-surface-card p-6">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Xu hướng 7 ngày</p>
+                        <h3 class="mt-2 text-lg font-black text-slate-900">Doanh thu dự kiến và sự cố</h3>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="scmd-tone scmd-tone--info">Doanh thu</span>
+                        <span class="scmd-tone scmd-tone--danger">Sự cố</span>
+                    </div>
+                </div>
+
+                {% if has_chart_data %}
+                <div class="relative mt-6 h-80 w-full">
+                    <canvas id="ceoChart"></canvas>
+                </div>
+                {% else %}
+                <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 px-6 py-10 text-center">
+                    <p class="text-sm font-semibold text-slate-600">Chưa đủ dữ liệu để hiển thị xu hướng 7 ngày.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="scmd-surface-card p-6">
+                <div class="flex items-center justify-between gap-4">
+                    <div>
+                        <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Mục tiêu</p>
+                        <h3 class="mt-2 text-lg font-black text-slate-900">Trạng thái mục tiêu</h3>
+                    </div>
+                    <span class="scmd-tone scmd-tone--info">{{ muc_tieu_dang_hoat_dong|default:0 }} đang hoạt động</span>
+                </div>
+
+                <div class="mt-4 space-y-3">
+                    {% for muc_tieu in trang_thai_muc_tieu %}
+                    <div class="rounded-2xl border border-slate-200 bg-white px-4 py-4">
+                        <div class="flex items-center justify-between gap-3">
+                            <div>
+                                <p class="text-sm font-bold text-slate-900">{{ muc_tieu.ten_muc_tieu }}</p>
+                                <p class="mt-1 text-xs text-slate-500">{{ muc_tieu.ca_da_checkin }}/{{ muc_tieu.ca_hom_nay }} ca đã check-in</p>
+                            </div>
+                            <span class="scmd-tone {% if muc_tieu.dashboard_status_tone == 'success' %}scmd-tone--success{% elif muc_tieu.dashboard_status_tone == 'warning' %}scmd-tone--warning{% elif muc_tieu.dashboard_status_tone == 'danger' %}scmd-tone--danger{% else %}scmd-tone--neutral{% endif %}">
+                                {{ muc_tieu.dashboard_status_label }}
+                            </span>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-600">
+                        Chưa có mục tiêu hiệu lực để tổng hợp trạng thái.
+                    </div>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                     {% endfor %}
                 </div>
             </div>
 
+<<<<<<< HEAD
             <div class="scmd-surface-card exec-panel">
                 <div class="exec-panel__head">
                     <div>
@@ -639,6 +863,66 @@
                         <div class="exec-panel__label">Cảnh báo kho</div>
                         <div class="exec-finance-item__value">{{ inventory_alerts }}</div>
                         {% if executive_cta_urls.inventory %}<div class="exec-risk-item__meta"><a href="{{ executive_cta_urls.inventory }}" class="exec-cta">Mở kho</a></div>{% endif %}
+=======
+            <div class="scmd-surface-card overflow-hidden">
+                <div class="border-b border-slate-100 bg-slate-50/80 px-5 py-4">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Hiện trường</p>
+                            <h3 class="mt-2 text-lg font-black text-slate-900">Sự cố đang mở</h3>
+                        </div>
+                        <span class="scmd-tone {% if count_su_co > 0 %}scmd-tone--danger{% else %}scmd-tone--success{% endif %}">
+                            {% if count_su_co > 0 %}Cần theo dõi{% else %}Ổn định{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="max-h-[420px] divide-y divide-slate-100 overflow-y-auto">
+                    {% for sc in su_co_nong %}
+                    <div class="border-l-4 border-transparent px-5 py-4 transition hover:border-blue-500 hover:bg-slate-50">
+                        <div class="flex items-start justify-between gap-3">
+                            <span class="scmd-tone {% if sc.muc_do == 'CAO' %}scmd-tone--danger{% elif sc.muc_do == 'TB' %}scmd-tone--warning{% else %}scmd-tone--info{% endif %}">
+                                {{ sc.get_muc_do_display }}
+                            </span>
+                            <span class="text-[10px] font-semibold text-slate-400">{{ sc.created_at|timesince }} trước</span>
+                        </div>
+                        <p class="mt-3 text-sm font-bold text-slate-900">{{ sc.tieu_de }}</p>
+                        <p class="mt-1 text-xs text-slate-500">{{ sc.muc_tieu.ten_muc_tieu|default:"Mục tiêu chưa xác định" }}</p>
+                    </div>
+                    {% empty %}
+                    <div class="px-6 py-10 text-center">
+                        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-50 text-green-600">
+                            <i class="fas fa-check text-xl"></i>
+                        </div>
+                        <p class="mt-4 text-sm font-semibold text-slate-700">Không có sự cố đang mở trên tổng quan hiện tại.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="border-t border-slate-100 bg-slate-50 px-5 py-4">
+                    <a href="{% url 'operations:dashboard_vanhanh' %}" class="block rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-xs font-black uppercase tracking-[0.12em] text-slate-700 transition hover:border-blue-500 hover:bg-blue-600 hover:text-white">
+                        Xem dashboard vận hành hiện trường
+                    </a>
+                </div>
+            </div>
+
+            <div class="scmd-surface-card p-6">
+                <p class="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Tài chính & đối soát</p>
+                <div class="mt-4 space-y-4">
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Doanh thu dự kiến tháng này</p>
+                        <p class="mt-2 text-2xl font-black text-slate-900">{{ doanh_thu_du_kien|default:0|intcomma }} <span class="text-xs font-bold text-slate-400">VND</span></p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Lợi nhuận thực thu</p>
+                        <p class="mt-2 text-2xl font-black {% if loi_nhuan_thuc > 0 %}text-green-600{% elif loi_nhuan_thuc < 0 %}text-red-600{% else %}text-slate-900{% endif %}">
+                            {{ loi_nhuan_thuc|default:0|intcomma }} <span class="text-xs font-bold text-slate-400">VND</span>
+                        </p>
+                    </div>
+                    <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4">
+                        <p class="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">Công việc của tôi</p>
+                        <p class="mt-2 text-2xl font-black text-slate-900">{{ cong_viec_cua_toi|default:0 }}</p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                     </div>
                 </div>
             </div>
@@ -646,6 +930,7 @@
     </section>
 </div>
 
+<<<<<<< HEAD
 <script src="{% static 'vendor/chartjs/chart.umd.min.js' %}"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -746,6 +1031,104 @@
                 }
             }
         });
+=======
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('ceoChart');
+        if (ctx) {
+            try {
+                const chartData = {
+                    labels: {{ chart_labels|safe|default:"[]" }},
+                    datasets: [
+                        {
+                            label: 'Doanh thu',
+                            data: {{ data_doanh_thu|safe|default:"[]" }},
+                            borderColor: '#2563eb',
+                            backgroundColor: 'rgba(37, 99, 235, 0.10)',
+                            borderWidth: 3,
+                            type: 'line',
+                            yAxisID: 'y',
+                            tension: 0.38,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#2563eb',
+                            pointBorderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: 'Sự cố',
+                            data: {{ data_su_co|safe|default:"[]" }},
+                            backgroundColor: '#dc2626',
+                            borderRadius: 8,
+                            barPercentage: 0.42,
+                            type: 'bar',
+                            yAxisID: 'y1'
+                        }
+                    ]
+                };
+
+                new Chart(ctx.getContext('2d'), {
+                    type: 'bar',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#0f172a',
+                                padding: 15,
+                                titleFont: { size: 14, weight: 'bold' },
+                                bodyFont: { size: 13 },
+                                cornerRadius: 12,
+                                displayColors: true
+                            }
+                        },
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                grid: { borderDash: [5, 5], color: '#e7eef5', drawBorder: false },
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString('vi-VN') + ' đ';
+                                    },
+                                    color: '#64748b',
+                                    font: { size: 10, weight: '600' }
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: { display: false },
+                                ticks: {
+                                    stepSize: 1,
+                                    color: '#dc2626',
+                                    font: { size: 10, weight: 'bold' }
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'SỰ CỐ',
+                                    font: { size: 9, weight: '900' },
+                                    color: '#dc2626'
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#64748b', font: { size: 11, weight: '600' } }
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error("Lỗi khi khởi tạo biểu đồ SCMD:", e);
+            }
+        }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     });
 </script>
 {% endblock %}

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -12,6 +16,7 @@ Description: Cấu hình Admin Vận hành (Operations).
              UPGRADE: Tối ưu hóa QuerySet & Nâng cấp UI Badge.
 """
 
+<<<<<<< HEAD
 from datetime import timedelta
 
 from django import forms
@@ -43,6 +48,14 @@ from users.access_policies import StaffVisibilityPolicy
 from .models import (
     ViTriChot, CaLamViec, PhanCongCaTruc, LichTuanTraVanHanh, NhiemVuTuanTraCa,
     ShiftChangeRequest, ChamCong, ChamCongAdjustment, BaoCaoSuCo, BaoCaoDeXuat, KiemTraQuanSo
+=======
+from django.contrib import admin
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+from .models import (
+    ViTriChot, CaLamViec, PhanCongCaTruc, ChamCong, 
+    BaoCaoSuCo, BaoCaoDeXuat, KiemTraQuanSo
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 )
 
 # --- HELPER: MÀU SẮC TRẠNG THÁI CAO CẤP ---
@@ -53,6 +66,7 @@ STATUS_COLORS = {
     'LOI': '#ef4444',            # Red 500
 }
 
+<<<<<<< HEAD
 
 def _safe_reverse(viewname, *, args=None, kwargs=None, fallback='#'):
     """Reverse URL an toàn cho CTA admin/workspace.
@@ -111,6 +125,8 @@ def _admin_badge(label, tone='neutral'):
         bg, color, label
     )
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 def is_operation_manager(user):
     """Kiểm tra quyền quản lý vận hành của người dùng."""
     if user.is_superuser: 
@@ -149,6 +165,7 @@ class TrangThaiPhanCongFilter(admin.SimpleListFilter):
             )
         return queryset
 
+<<<<<<< HEAD
 
 
 @admin.register(LichTuanTraVanHanh)
@@ -583,6 +600,37 @@ class CaLamViecAdmin(admin.ModelAdmin):
     def is_night_shift_display(self, obj):
         return obj.is_night_shift
     
+=======
+# --- 1. CẤU HÌNH VỊ TRÍ & CA TRỰC ---
+@admin.register(ViTriChot)
+class ViTriChotAdmin(admin.ModelAdmin):
+    list_display = ('ten_vi_tri', 'get_muc_tieu', 'get_dia_chi')
+    list_filter = ('muc_tieu',)
+    search_fields = ('ten_vi_tri', 'muc_tieu__ten_muc_tieu') 
+    autocomplete_fields = ['muc_tieu']
+
+    @admin.display(description='Mục tiêu', ordering='muc_tieu__ten_muc_tieu')
+    def get_muc_tieu(self, obj):
+        return obj.muc_tieu.ten_muc_tieu if obj.muc_tieu else "-"
+
+    @admin.display(description='Địa chỉ')
+    def get_dia_chi(self, obj):
+        return obj.muc_tieu.dia_chi if obj.muc_tieu else "-"
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('muc_tieu')
+
+@admin.register(CaLamViec)
+class CaLamViecAdmin(admin.ModelAdmin):
+    list_display = ('ten_ca', 'gio_bat_dau', 'gio_ket_thuc', 'is_night_shift_display')
+    search_fields = ('ten_ca',)
+    ordering = ('gio_bat_dau',)
+
+    @admin.display(description='Ca đêm?', boolean=True)
+    def is_night_shift_display(self, obj):
+        return obj.is_night_shift
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 # --- 2. PHÂN CÔNG CA TRỰC ---
 class ChamCongInline(admin.StackedInline):
     model = ChamCong
@@ -597,7 +645,11 @@ class ChamCongInline(admin.StackedInline):
     )
     
     fieldsets = (
+<<<<<<< HEAD
         ('🕒 Thông tin check-in/out', {
+=======
+        ('🕒 THÔNG TIN CHECK-IN/OUT', {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 ('thoi_gian_check_in', 'thoi_gian_check_out'),
                 ('preview_check_in', 'preview_check_out'),
@@ -643,6 +695,7 @@ class ChamCongInline(admin.StackedInline):
         return format_html('<span style="color:#ef4444; font-weight:bold;">Chưa có tọa độ GPS</span>')
     map_view.short_description = "Định vị thực tế"
 
+<<<<<<< HEAD
 class ChamCongAdminForm(forms.ModelForm):
     adjustment_reason = forms.CharField(
         required=False,
@@ -862,12 +915,35 @@ class PhanCongCaTrucAdmin(admin.ModelAdmin):
         'vi_tri_chot__muc_tieu__dia_chi',
         'vi_tri_chot__muc_tieu__hop_dong__so_hop_dong',
     )
+=======
+@admin.register(PhanCongCaTruc)
+class PhanCongCaTrucAdmin(admin.ModelAdmin):
+    list_display = (
+        'nhan_vien_info',
+        'muc_tieu_info',
+        'thoi_gian_truc_vn',
+        'status_badge',
+        'checkin_thuc_te'
+    )
+    
+    list_filter = (
+        ('ngay_truc', admin.DateFieldListFilter),
+        TrangThaiPhanCongFilter,
+        'ca_lam_viec', 
+        'vi_tri_chot__muc_tieu'
+    )
+    
+    search_fields = ('nhan_vien__ho_ten', 'nhan_vien__ma_nhan_vien', 'vi_tri_chot__ten_vi_tri')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     date_hierarchy = 'ngay_truc'
     inlines = [ChamCongInline]
     autocomplete_fields = ['nhan_vien', 'vi_tri_chot', 'ca_lam_viec']
     save_on_top = True
+<<<<<<< HEAD
     list_per_page = 50
     ordering = ('-ngay_truc', 'ca_lam_viec__gio_bat_dau', 'vi_tri_chot__muc_tieu__ten_muc_tieu')
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     fieldsets = (
         ("📝 THÔNG TIN PHÂN CÔNG", {
@@ -878,6 +954,7 @@ class PhanCongCaTrucAdmin(admin.ModelAdmin):
         }),
     )
 
+<<<<<<< HEAD
     def changelist_view(self, request, extra_context=None):
         today = timezone.localdate()
         tomorrow = today + timedelta(days=1)
@@ -1213,22 +1290,152 @@ class ChamCongAdmin(admin.ModelAdmin):
     date_hierarchy = 'thoi_gian_check_in'
     save_on_top = True
 
+=======
+    # --- CUSTOM DISPLAY ---
+    def nhan_vien_info(self, obj):
+        if obj.nhan_vien:
+            return format_html(
+                '<div style="min-width:150px;">'
+                '<b style="color:#1e293b; font-size:13px;">{}</b><br>'
+                '<span style="color:#64748b; font-size:11px; letter-spacing:0.5px;">🆔 {}</span>'
+                '</div>',
+                obj.nhan_vien.ho_ten, obj.nhan_vien.ma_nhan_vien
+            )
+        return "-"
+    nhan_vien_info.short_description = "Nhân sự"
+    nhan_vien_info.admin_order_field = 'nhan_vien__ho_ten'
+
+    def muc_tieu_info(self, obj):
+        if obj.vi_tri_chot:
+            return format_html(
+                '<div style="min-width:180px;">'
+                '<span style="color:#2563eb; font-weight:700; font-size:12px;">🏢 {}</span><br>'
+                '<span style="color:#475569; font-size:11px;">📍 {}</span>'
+                '</div>',
+                obj.vi_tri_chot.muc_tieu.ten_muc_tieu,
+                obj.vi_tri_chot.ten_vi_tri
+            )
+        return "-"
+    muc_tieu_info.short_description = "Địa điểm trực"
+
+    def thoi_gian_truc_vn(self, obj):
+        vn_date = obj.ngay_truc.strftime('%d/%m/%Y')
+        ca = obj.ca_lam_viec.ten_ca if obj.ca_lam_viec else "N/A"
+        return format_html(
+            '<div style="text-align:center; min-width:100px;">'
+            '<b style="font-size:13px; color:#334155;">{}</b><br>'
+            '<span style="background:#f1f5f9; color:#475569; padding:2px 8px; border-radius:12px; font-size:10px; font-weight:700; border:1px solid #e2e8f0;">{}</span>'
+            '</div>',
+            vn_date, ca
+        )
+    thoi_gian_truc_vn.short_description = "Lịch trực"
+    thoi_gian_truc_vn.admin_order_field = 'ngay_truc'
+
+    def status_badge(self, obj):
+        status = 'CHUA_TRUC'
+        label = '⚪ CHƯA TRỰC'
+        
+        if hasattr(obj, 'chamcong'):
+            cc = obj.chamcong
+            if cc.thoi_gian_check_in and cc.thoi_gian_check_out:
+                status = 'HOAN_THANH'
+                label = '✔ HOÀN THÀNH'
+            elif cc.thoi_gian_check_in:
+                status = 'DANG_TRUC'
+                label = '⏳ ĐANG TRỰC'
+        
+        color = STATUS_COLORS.get(status, '#999')
+        return format_html(
+            '<span style="background-color:{}; color:white; padding:5px 10px; border-radius:6px; font-weight:800; font-size:10px; white-space:nowrap; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">{}</span>',
+            color, label
+        )
+    status_badge.short_description = "Trạng thái"
+
+    def checkin_thuc_te(self, obj):
+        in_time = "--:--"
+        out_time = "--:--"
+        style_in = "color:#94a3b8"
+        style_out = "color:#94a3b8"
+
+        if hasattr(obj, 'chamcong'):
+            cc = obj.chamcong
+            if cc.thoi_gian_check_in:
+                in_time = cc.thoi_gian_check_in.strftime('%H:%M')
+                style_in = "color:#059669; font-weight:bold;"
+            if cc.thoi_gian_check_out:
+                out_time = cc.thoi_gian_check_out.strftime('%H:%M')
+                style_out = "color:#059669; font-weight:bold;"
+
+        return format_html(
+            '<div style="font-size:11px; white-space:nowrap; line-height:1.5;">'
+            'In: <span style="{}">{}</span><br>'
+            'Out: <span style="{}">{}</span>'
+            '</div>',
+            style_in, in_time, style_out, out_time
+        )
+    checkin_thuc_te.short_description = "Giờ thực tế"
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request).select_related(
+            'nhan_vien', 
+            'vi_tri_chot__muc_tieu', 
+            'ca_lam_viec'
+        ).prefetch_related('chamcong')
+        
+        if is_operation_manager(request.user): 
+            return qs
+        
+        try:
+            nv = request.user.nhan_vien
+            muc_tieus = nv.cac_muc_tieu_quan_ly.all()
+            if muc_tieus.exists():
+                return qs.filter(vi_tri_chot__muc_tieu__in=muc_tieus)
+            return qs.filter(nhan_vien=nv)
+        except Exception: 
+            return qs.none()
+
+@admin.register(ChamCong)
+class ChamCongAdmin(admin.ModelAdmin):
+    list_display = (
+        'get_nhan_vien', 'get_muc_tieu', 
+        'thoi_gian_check_in_vn', 'thoi_gian_check_out_vn', 
+        'show_thumbnail_in', 'show_thumbnail_out',
+        'gps_status', 'khoang_cach_display'
+    )
+    list_filter = (
+        'vi_tri_hop_le', 
+        ('thoi_gian_check_in', admin.DateFieldListFilter),
+        'ca_truc__vi_tri_chot__muc_tieu'
+    )
+    search_fields = ('ca_truc__nhan_vien__ho_ten', 'ca_truc__nhan_vien__ma_nhan_vien')
+    autocomplete_fields = ['ca_truc']
+    
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     fieldsets = (
         ('📋 THÔNG TIN CA TRỰC', {
             'fields': ('ca_truc',)
         }),
+<<<<<<< HEAD
         ('📥 Check-in', {
+=======
+        ('📥 CHECK-IN', {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 ('thoi_gian_check_in', 'lat_check_in', 'long_check_in'),
                 ('anh_check_in', 'preview_in')
             )
         }),
+<<<<<<< HEAD
         ('📤 Check-out', {
+=======
+        ('📤 CHECK-OUT', {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 ('thoi_gian_check_out', 'lat_check_out', 'long_check_out'),
                 ('anh_check_out', 'preview_out')
             )
         }),
+<<<<<<< HEAD
         ('🛡️ Kiểm tra hợp lệ', {
             'fields': (
                 'vi_tri_hop_le',
@@ -1425,12 +1632,70 @@ class ChamCongAdmin(admin.ModelAdmin):
             return format_html('<img src="{}" style="max-height:300px; border-radius:8px;">', obj.anh_check_in.url)
         return ""
 
+=======
+        ('🛡️ KIỂM TRA HỢP LỆ', {
+            'fields': (
+                'vi_tri_hop_le',
+                'khoang_cach_check_in',
+                'ghi_chu'
+            )
+        }),
+    )
+    readonly_fields = ('preview_in', 'preview_out')
+
+    def thoi_gian_check_in_vn(self, obj):
+        return obj.thoi_gian_check_in.strftime('%H:%M %d/%m') if obj.thoi_gian_check_in else "-"
+    thoi_gian_check_in_vn.short_description = "Vào"
+
+    def thoi_gian_check_out_vn(self, obj):
+        return obj.thoi_gian_check_out.strftime('%H:%M %d/%m') if obj.thoi_gian_check_out else "-"
+    thoi_gian_check_out_vn.short_description = "Ra"
+
+    def get_nhan_vien(self, obj):
+        return format_html('<b>{}</b><br><small style="color:#64748b;">{}</small>', obj.ca_truc.nhan_vien.ho_ten, obj.ca_truc.nhan_vien.ma_nhan_vien)
+    get_nhan_vien.short_description = "Nhân sự"
+
+    def get_muc_tieu(self, obj):
+        return obj.ca_truc.vi_tri_chot.muc_tieu.ten_muc_tieu
+    get_muc_tieu.short_description = "Mục tiêu"
+
+    def show_thumbnail_in(self, obj):
+        if obj.anh_check_in:
+            return format_html('<a href="{}" target="_blank"><img src="{}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #e2e8f0;"></a>', obj.anh_check_in.url, obj.anh_check_in.url)
+        return "-"
+    show_thumbnail_in.short_description = "📷 Vào"
+
+    def show_thumbnail_out(self, obj):
+        if obj.anh_check_out:
+            return format_html('<a href="{}" target="_blank"><img src="{}" style="width:45px; height:45px; object-fit:cover; border-radius:6px; border:1px solid #e2e8f0;"></a>', obj.anh_check_out.url, obj.anh_check_out.url)
+        return "-"
+    show_thumbnail_out.short_description = "📷 Ra"
+
+    def gps_status(self, obj):
+        if not obj.vi_tri_hop_le:
+            return format_html('<span style="color:white; background:#ef4444; padding:3px 10px; border-radius:12px; font-size:10px; font-weight:bold;">SAI VỊ TRÍ</span>')
+        return format_html('<span style="color:white; background:#10b981; padding:3px 10px; border-radius:12px; font-size:10px; font-weight:bold;">HỢP LỆ</span>')
+    gps_status.short_description = "GPS"
+
+    def khoang_cach_display(self, obj):
+        if obj.khoang_cach_check_in > 1000:
+            return f"{round(obj.khoang_cach_check_in/1000, 2)} km"
+        return f"{int(obj.khoang_cach_check_in)} m"
+    khoang_cach_display.short_description = "Khoảng cách"
+
+    def preview_in(self, obj):
+        if obj.anh_check_in: 
+            return format_html('<img src="{}" style="max-height:300px; border-radius:8px;">', obj.anh_check_in.url)
+        return ""
+    
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def preview_out(self, obj):
         if obj.anh_check_out:
             return format_html('<img src="{}" style="max-height:300px; border-radius:8px;">', obj.anh_check_out.url)
         return ""
 
     def get_queryset(self, request):
+<<<<<<< HEAD
         return super().get_queryset(request).select_related(
             'ca_truc',
             'ca_truc__nhan_vien',
@@ -1860,6 +2125,48 @@ class BaoCaoSuCoAdmin(admin.ModelAdmin):
             )
         )
 
+=======
+        return super().get_queryset(request).select_related('ca_truc__nhan_vien', 'ca_truc__vi_tri_chot__muc_tieu')
+
+@admin.register(BaoCaoSuCo)
+class BaoCaoSuCoAdmin(admin.ModelAdmin):
+    list_display = ('ma_su_co', 'get_muc_do_badge', 'tieu_de', 'muc_tieu', 'nhan_vien_bao_cao', 'created_at_vn', 'trang_thai')
+    list_filter = ('muc_do', 'trang_thai', 'created_at')
+    search_fields = ('ma_su_co', 'tieu_de', 'nhan_vien_bao_cao__ho_ten', 'muc_tieu__ten_muc_tieu')
+    readonly_fields = ('ma_su_co', 'created_at', 'updated_at')
+    autocomplete_fields = ['nhan_vien_bao_cao', 'muc_tieu', 'ca_truc', 'nguoi_xu_ly', 'nhan_vien_co_loi']
+    
+    fieldsets = (
+        ('🚩 THÔNG TIN CHUNG', { 
+            'fields': (
+                ('ma_su_co', 'trang_thai'), 
+                ('tieu_de', 'muc_do'), 
+            ) 
+        }),
+        ('🔍 CHI TIẾT SỰ CỐ', { 
+            'fields': (
+                ('nhan_vien_bao_cao', 'muc_tieu'), 
+                ('ca_truc', 'thoi_gian_phat_hien'), 
+                'mo_ta_chi_tiet'
+            ) 
+        }),
+        ('🖼️ BẰNG CHỨNG (ẢNH/VOICE)', { 
+            'fields': (
+                ('hinh_anh_1', 'hinh_anh_2'), 
+                'file_ghi_am'
+            ) 
+        }),
+        ('💰 XỬ LÝ & THIỆT HẠI', { 
+            'fields': (
+                ('tong_thiet_hai', 'cong_ty_chi_tra'), 
+                ('nhan_vien_co_loi', 'phai_thu_nhan_vien'), 
+                ('nguoi_xu_ly', 'ghi_chu_quan_ly')
+            ),
+            'classes': ('collapse',)
+        })
+    )
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def created_at_vn(self, obj):
         return obj.created_at.strftime('%d/%m/%Y %H:%M')
     created_at_vn.short_description = "Thời gian báo cáo"
@@ -1873,6 +2180,7 @@ class BaoCaoSuCoAdmin(admin.ModelAdmin):
             obj.get_muc_do_display()
         )
 
+<<<<<<< HEAD
     def save_model(self, request, obj, form, change):
         previous_state = None
         previous_status = None
@@ -2041,30 +2349,59 @@ class BaoCaoDeXuatAdmin(admin.ModelAdmin):
         ('💡 THÔNG TIN ĐỀ XUẤT TỪ HIỆN TRƯỜNG', {
             'fields': (
                 'tenant_id',
+=======
+@admin.register(BaoCaoDeXuat)
+class BaoCaoDeXuatAdmin(admin.ModelAdmin):
+    list_display = ['tieu_de', 'loai_de_xuat', 'nhan_vien', 'muc_tieu', 'trang_thai', 'ngay_gui']
+    list_filter = ['trang_thai', 'loai_de_xuat', 'ngay_gui']
+    search_fields = ['tieu_de', 'nhan_vien__ho_ten']
+    readonly_fields = ['ngay_gui']
+    autocomplete_fields = ['nhan_vien', 'muc_tieu', 'chi_huy_duyet', 'nguoi_duyet_nghiep_vu']
+    
+    fieldsets = (
+        ('💡 THÔNG TIN ĐỀ XUẤT', {
+            'fields': (
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 ('nhan_vien', 'muc_tieu'),
                 ('loai_de_xuat', 'tieu_de'),
                 'noi_dung', 'hinh_anh', 'ngay_gui'
             )
         }),
+<<<<<<< HEAD
         ('👮 DUYỆT CẤP CHỈ HUY MỤC TIÊU', {
             'fields': (
                 'chi_huy_duyet',
                 'y_kien_chi_huy',
+=======
+        ('👮 PHÊ DUYỆT CHỈ HUY', {
+            'fields': (
+                'chi_huy_duyet', 
+                'y_kien_chi_huy', 
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 'thoi_gian_chi_huy_duyet'
             ),
             'classes': ('collapse',),
         }),
+<<<<<<< HEAD
         ('🛡️ PHÒNG NGHIỆP VỤ XỬ LÝ', {
             'description': _('Nếu vượt thẩm quyền phòng nghiệp vụ, chuyển trạng thái sang “Vượt thẩm quyền - Chuyển Văn phòng”, sau đó lập tờ trình/công việc tại Văn phòng điện tử.'),
             'fields': (
                 'trang_thai',
                 'nguoi_duyet_nghiep_vu',
                 'y_kien_nghiep_vu',
+=======
+        ('🏢 PHÊ DUYỆT NGHIỆP VỤ (VĂN PHÒNG)', {
+            'fields': (
+                'trang_thai', 
+                'nguoi_duyet_nghiep_vu', 
+                'y_kien_nghiep_vu', 
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 'thoi_gian_nghiep_vu_duyet'
             ),
         }),
     )
 
+<<<<<<< HEAD
     def get_queryset(self, request):
         return super().get_queryset(request).select_related(
             'nhan_vien',
@@ -2789,3 +3126,15 @@ class ChamCongAdjustmentAdmin(admin.ModelAdmin):
             '</tr></thead><tbody>{}</tbody></table>',
             format_html_join('', '<tr><td style="padding:8px;border-bottom:1px solid #f1f5f9;font-weight:700;">{}</td><td style="padding:8px;border-bottom:1px solid #f1f5f9;">{}</td><td style="padding:8px;border-bottom:1px solid #f1f5f9;">{}</td></tr>', rows)
         )
+=======
+@admin.register(KiemTraQuanSo)
+class KiemTraQuanSoAdmin(admin.ModelAdmin):
+    list_display = ('ca_truc', 'thoi_gian_gui_yeu_cau', 'thoi_gian_phan_hoi', 'trang_thai_badge')
+    list_filter = ('trang_thai', 'thoi_gian_gui_yeu_cau')
+    autocomplete_fields = ['ca_truc']
+
+    @admin.display(description="Trạng thái phản hồi")
+    def trang_thai_badge(self, obj):
+        color = "#10b981" if obj.trang_thai == 'DA_PHAN_HOI' else "#f59e0b"
+        return format_html('<span style="color:{}; font-weight:bold;">{}</span>', color, obj.get_trang_thai_display())
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

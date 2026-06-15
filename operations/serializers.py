@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+<<<<<<< HEAD
 from django.conf import settings
 from rest_framework import serializers
 from operations.models import PhanCongCaTruc
 from django.utils.translation import gettext_lazy as _
+=======
+from rest_framework import serializers
+from operations.models import PhanCongCaTruc
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 class MobileWeeklyScheduleSerializer(serializers.ModelSerializer):
     """
@@ -37,6 +42,7 @@ class MobileShiftSwapSerializer(serializers.Serializer):
     ly_do = serializers.CharField(required=True, min_length=10, max_length=1000)
 
     def validate_ca_truc_id(self, value):
+<<<<<<< HEAD
         """Cưỡng chế scoping ca trực theo user và organization (Rule 9)."""
         request = self.context.get('request')
         qs = PhanCongCaTruc.objects.for_tenant(settings.SCMD_ORGANIZATION_ID)
@@ -50,6 +56,10 @@ class MobileShiftSwapSerializer(serializers.Serializer):
 
         if not qs.filter(id=value).exists():
             raise serializers.ValidationError(_("Ca trực không tồn tại hoặc bạn không có quyền thao tác."))
+=======
+        if value <= 0:
+            raise serializers.ValidationError("ID ca trực không hợp lệ.")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         return value
 
 class ProcessShiftSwapSerializer(serializers.Serializer):

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
@@ -12,10 +16,15 @@ Description: Serializers chuyên dụng cho các API Check-in/Check-out mới.
 """
 
 from decimal import Decimal
+<<<<<<< HEAD
 from django.conf import settings
 from rest_framework import serializers
 from operations.application.attendance_policies import AttendancePhotoPolicy
 from operations.models import KiemTraQuanSo, PhanCongCaTruc, MucTieu
+=======
+from rest_framework import serializers
+from operations.models_alive_check import KiemTraQuanSo
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.utils.translation import gettext_lazy as _
 
 class CheckInCheckOutSerializer(serializers.Serializer):
@@ -48,6 +57,7 @@ class CheckInCheckOutSerializer(serializers.Serializer):
         help_text=_("Ghi chú thêm cho lần chấm công")
     )
 
+<<<<<<< HEAD
     def validate(self, attrs):
         phan_cong = self.context.get("phan_cong")
         attendance_action = self.context.get("attendance_action")
@@ -82,6 +92,8 @@ class CheckInCheckOutSerializer(serializers.Serializer):
             raise serializers.ValidationError(_("Ca trực không hợp lệ hoặc bạn không có quyền thao tác."))
         return value
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 class DashboardFilterSerializer(serializers.Serializer):
     """
     Serializer để validate các tham số lọc cho Dashboard.
@@ -95,6 +107,7 @@ class DashboardFilterSerializer(serializers.Serializer):
         help_text=_("Lọc theo mục tiêu cụ thể")
     )
 
+<<<<<<< HEAD
     def validate_muc_tieu_id(self, value):
         """Cưỡng chế scoping mục tiêu theo organization (Rule 9)."""
         if value:
@@ -105,6 +118,11 @@ class DashboardFilterSerializer(serializers.Serializer):
 class AliveCheckViolationSerializer(serializers.ModelSerializer):
     """
     Serializer hien thi thong tin vi pham Alive Check tren bang dieu hanh van hanh.
+=======
+class AliveCheckViolationSerializer(serializers.ModelSerializer):
+    """
+    Serializer hiển thị thông tin vi phạm Alive Check trên Dashboard War Room.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """
     nhan_vien = serializers.CharField(source='ca_truc.nhan_vien.ho_ten', read_only=True)
     ma_nv = serializers.CharField(source='ca_truc.nhan_vien.ma_nhan_vien', read_only=True)
@@ -124,7 +142,11 @@ class AliveCheckResponseSerializer(serializers.Serializer):
     """
     Serializer để validate phản hồi Alive Check từ Mobile App.
     """
+<<<<<<< HEAD
     check_id = serializers.IntegerField(
+=======
+    check_id = serializers.UUIDField(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         error_messages={'required': _("Thiếu ID yêu cầu kiểm tra.")}
     )
     lat = serializers.FloatField(
@@ -135,6 +157,7 @@ class AliveCheckResponseSerializer(serializers.Serializer):
     )
     device_id = serializers.CharField(max_length=255)
     anh_selfie = serializers.ImageField(required=False, allow_null=True)
+<<<<<<< HEAD
 
     def validate_check_id(self, value):
         """Cưỡng chế scoping yêu cầu Alive Check theo user và organization."""
@@ -154,3 +177,5 @@ class AliveCheckResponseSerializer(serializers.Serializer):
         if not qs.filter(id=value).exists():
             raise serializers.ValidationError(_("Yêu cầu kiểm tra không hợp lệ hoặc không dành cho bạn."))
         return value
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

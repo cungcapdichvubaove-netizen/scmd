@@ -7,6 +7,7 @@
     <title>{% block title %}SCMD Pro{% endblock %}</title>
 
     <link rel="manifest" href="{% static 'manifest.json' %}">
+<<<<<<< HEAD
     <link rel="icon" href="{% static 'img/brand/favicon.ico' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/favicon-16x16.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/favicon-32x32.png' %}">
@@ -26,19 +27,39 @@
 
     <link rel="stylesheet" href="{% static 'vendor/fontawesome/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'vendor/select2/select2.min.css' %}">
+=======
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/logo_moi.png' %}">
+    <meta name="theme-color" content="#0f172a">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100&display=swap" rel="stylesheet">
+
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     <style>
         [x-cloak] { display: none !important; }
 
         body, button, input, select, textarea {
+<<<<<<< HEAD
             font-family: var(--scmd-font-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif) !important;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
             text-rendering: optimizeLegibility;
+=======
+            font-family: 'Be Vietnam Pro', sans-serif !important;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         }
 
         .custom-scrollbar::-webkit-scrollbar { width: 5px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+<<<<<<< HEAD
         .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--scmd-neutral-500); border-radius: 999px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--scmd-neutral-600); }
 
@@ -52,16 +73,35 @@
 
         .select2-container--default .select2-selection--single .select2-selection__arrow {
             height: 38px !important;
+=======
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 999px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        .select2-container .select2-selection--single {
+            height: 42px !important;
+            border: 1px solid var(--scmd-border) !important;
+            border-radius: 14px !important;
+            padding-top: 6px;
+            background-color: #fff;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px !important;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         }
 
         canvas { max-width: 100%; }
 
+<<<<<<< HEAD
         .scmd-notification-badge { background: var(--scmd-danger); }
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         .sidebar-collapsed { width: 5rem !important; }
         .sidebar-collapsed .sidebar-text { display: none !important; }
         .sidebar-collapsed .menu-group button { justify-content: center; }
         .sidebar-collapsed .menu-group i.fa-chevron-right { display: none; }
+<<<<<<< HEAD
 
         .scmd-nav-link-disabled {
             opacity: 0.48;
@@ -75,10 +115,13 @@
         .scmd-nav-link-disabled .scmd-nav-icon {
             background: rgba(255, 255, 255, 0.06);
         }
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     </style>
 
     {% block extra_css %}{% endblock %}
 </head>
+<<<<<<< HEAD
 <body class="scmd-shell-body overflow-hidden font-sans antialiased" data-scmd-accounting-dashboard-url="{% url 'accounting:dashboard' %}">
     <div class="relative flex h-screen w-full">
         <aside
@@ -88,10 +131,23 @@
             {% include "partials/_sidebar.html" %}
 
             <button id="mobile-sidebar-close" type="button" class="scmd-focus-ring absolute right-4 top-4 text-white md:hidden" aria-label="Đóng menu điều hướng">
+=======
+<body class="scmd-shell-body font-sans antialiased overflow-hidden" x-data="{ sidebarCollapsed: false, mobileSidebarOpen: false }">
+    <div class="flex h-screen w-full relative">
+        <aside
+            id="main-sidebar"
+            :class="{'sidebar-collapsed': sidebarCollapsed, 'hidden md:flex': !mobileSidebarOpen, 'flex fixed inset-0 z-50 w-64': mobileSidebarOpen}"
+            class="scmd-sidebar-shell w-64 flex-shrink-0 flex-col h-full transition-all duration-300 ease-in-out z-30"
+        >
+            {% include "partials/_sidebar.html" %}
+
+            <button @click="mobileSidebarOpen = false" class="md:hidden absolute top-4 right-4 text-white scmd-focus-ring">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 <i class="fas fa-times text-2xl"></i>
             </button>
         </aside>
 
+<<<<<<< HEAD
         <div class="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden">
             <header class="scmd-shell-header z-20 flex h-16 items-center justify-between px-6">
                 <div class="flex items-center gap-4">
@@ -103,11 +159,25 @@
                     </button>
 
                     <h2 class="hidden text-lg font-bold text-slate-900 sm:block">
+=======
+        <div class="flex flex-col flex-1 h-full min-w-0 overflow-hidden relative">
+            <header class="scmd-shell-header h-16 flex items-center justify-between px-6 z-20">
+                <div class="flex items-center gap-4">
+                    <button @click="sidebarCollapsed = !sidebarCollapsed" class="scmd-header-btn scmd-focus-ring hidden md:flex p-2 rounded-xl transition-colors focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <button @click="mobileSidebarOpen = true" class="scmd-header-btn scmd-focus-ring md:hidden p-2 rounded-xl transition-colors focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+
+                    <h2 class="text-lg font-bold text-slate-900 hidden sm:block">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                         {% block header_title %}Tổng quan{% endblock %}
                     </h2>
                 </div>
 
                 <div class="flex items-center gap-4">
+<<<<<<< HEAD
                     <button class="scmd-header-btn scmd-focus-ring relative rounded-xl p-2 transition-colors focus:outline-none" type="button" aria-label="Thông báo{% if notification_count %}: {{ notification_count }} chưa đọc{% endif %}">
                         <i class="fas fa-bell text-lg"></i>
                         {% if notification_count %}
@@ -152,6 +222,50 @@
                             </a>
                             <div class="mx-2 my-1 h-px bg-slate-100"></div>
                             <a href="{% url 'admin_logout_fix' %}" class="scmd-user-link scmd-user-link-danger flex items-center px-4 py-2.5 text-sm font-bold transition-colors">
+=======
+                    <button class="scmd-header-btn scmd-focus-ring relative p-2 rounded-xl transition-colors focus:outline-none">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+                    </button>
+
+                    {% if user.is_authenticated %}
+                    <div class="relative" x-data="{ userMenu: false }">
+                        <button
+                            @click="userMenu = !userMenu"
+                            @click.away="userMenu = false"
+                            class="scmd-user-trigger scmd-focus-ring flex items-center gap-3 p-1.5 rounded-xl transition-all focus:outline-none"
+                        >
+                            <div class="text-right hidden md:block">
+                                <p class="text-xs font-bold text-slate-900 leading-none mb-1">{{ user.username }}</p>
+                                <p class="text-[10px] font-medium" style="color: var(--scmd-success);">Trực tuyến</p>
+                            </div>
+                            <div class="scmd-user-avatar w-9 h-9 rounded-full flex items-center justify-center font-bold shadow-md ring-2 ring-white">
+                                {{ user.username|slice:":1"|upper }}
+                            </div>
+                            <i class="fas fa-chevron-down text-[10px] text-slate-400 transition-transform" :class="userMenu ? 'rotate-180' : ''"></i>
+                        </button>
+
+                        <div
+                            x-show="userMenu"
+                            x-cloak
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95"
+                            x-transition:enter-end="transform opacity-100 scale-100"
+                            class="scmd-user-menu absolute right-0 mt-2 w-56 rounded-2xl py-2 z-50"
+                        >
+                            <div class="px-4 py-3 border-b border-slate-100 mb-1">
+                                <p class="text-[10px] text-slate-400 uppercase font-bold tracking-wider">Tài khoản quản trị</p>
+                                <p class="text-sm font-semibold text-slate-700 truncate">{{ user.email|default:user.username }}</p>
+                            </div>
+                            <a href="/admin/password_change/" class="scmd-user-link flex items-center px-4 py-2.5 text-sm transition-colors">
+                                <i class="fas fa-key mr-3 w-4 text-center"></i> Đổi mật khẩu
+                            </a>
+                            <a href="/admin/" class="scmd-user-link flex items-center px-4 py-2.5 text-sm transition-colors">
+                                <i class="fas fa-user-cog mr-3 w-4 text-center"></i> Quản trị Django
+                            </a>
+                            <div class="h-px bg-slate-100 my-1 mx-2"></div>
+                            <a href="/admin/logout/" class="scmd-user-link scmd-user-link-danger flex items-center px-4 py-2.5 text-sm font-bold transition-colors">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                                 <i class="fas fa-sign-out-alt mr-3 w-4 text-center"></i> Thoát tài khoản
                             </a>
                         </div>
@@ -160,7 +274,11 @@
                 </div>
             </header>
 
+<<<<<<< HEAD
             <main class="custom-scrollbar flex-1 overflow-y-auto scroll-smooth p-4 md:p-6">
+=======
+            <main class="flex-1 overflow-y-auto p-4 md:p-6 scroll-smooth custom-scrollbar">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 {% if messages %}
                 <div class="mb-6 space-y-3">
                     {% for message in messages %}
@@ -177,6 +295,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <script src="{% static 'vendor/jquery/jquery-3.7.0.min.js' %}"></script>
     <script src="{% static 'vendor/select2/select2.min.js' %}"></script>
     <script>
@@ -280,6 +399,39 @@
         });
     </script>
     <script defer src="{% static 'pwa/pwa-register.js' %}"></script>
+=======
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        function toggleMenu(menuId) {
+            const menu = document.getElementById(menuId);
+            const arrow = document.getElementById('arrow-' + menuId);
+            if (menu && menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                if (arrow) arrow.classList.add('rotate-90');
+            } else if (menu) {
+                menu.classList.add('hidden');
+                if (arrow) arrow.classList.remove('rotate-90');
+            }
+        }
+
+        $(document).ready(function() {
+            if ($('.select2').length > 0) {
+                $('.select2').select2({ width: '100%', placeholder: "Tìm kiếm...", allowClear: true });
+            }
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                if (window.location.protocol === 'https:' || window.location.hostname === 'localhost') {
+                    navigator.serviceWorker.register("/sw.js")
+                        .then(reg => console.log("SW Scope:", reg.scope))
+                        .catch(() => console.warn("SW registration skipped."));
+                }
+            });
+        }
+    </script>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     {% block extra_js %}{% endblock %}
 </body>
 </html>

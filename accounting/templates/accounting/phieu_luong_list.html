@@ -1,5 +1,9 @@
 {# file: accounting/templates/accounting/mobile/phieu_luong_list.html #}
+<<<<<<< HEAD
 {% extends "mobile/base.html" %}
+=======
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 {% load static humanize %}
 
 {% block title %}Bảng lương của tôi{% endblock %}
@@ -40,9 +44,17 @@
         {% empty %}
         <div class="text-center py-12 opacity-50">
             <i class="fas fa-file-invoice-dollar text-4xl mb-3 text-slate-300"></i>
+<<<<<<< HEAD
             <p class="text-sm font-medium">Chưa có phiếu lương.</p>
+=======
+            <p class="text-sm font-medium">Chưa có phiếu lương nào được phát hành.</p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         </div>
         {% endfor %}
     </div>
 </div>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

@@ -1,6 +1,10 @@
 {# file: operations/templates/operations/mobile/lich_truc.html #}
 {# -*- coding: utf-8 -*- #}
+<<<<<<< HEAD
 {# SCMD Pro #}
+=======
+{# Security Command (SCMD) System #}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 {# ------------------------------ #}
 {# Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved. #}
 {# File: operations/templates/operations/mobile/lich_truc.html #}
@@ -8,17 +12,27 @@
 {# Created Date: 2025-12-02 #}
 {# Description: Danh sách lịch trực sắp tới (Mobile View). #}
 
+<<<<<<< HEAD
 {% extends "mobile/base.html" %}
 {% load custom_filters %}
 
 {% block title %}Lịch trực{% endblock %}
+=======
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+
+{% block title %}Lịch trực sắp tới{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 {% block content %}
 <div class="space-y-4 fade-in"> <div class="flex items-center gap-4">
         <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-square btn-ghost hover:bg-slate-200 transition-colors">
             <i class="fas fa-arrow-left text-xl"></i>
         </a>
+<<<<<<< HEAD
         <h1 class="text-2xl font-bold text-slate-800">Lịch trực</h1>
+=======
+        <h1 class="text-2xl font-bold text-slate-800">Lịch trực sắp tới</h1>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     </div>
 
     <div class="tabs tabs-boxed bg-slate-100 p-1 mb-2">
@@ -31,7 +45,11 @@
         <div class="card-body p-4">
             <div class="flex justify-between items-start">
                 <div>
+<<<<<<< HEAD
                     <p class="font-black text-lg text-primary uppercase">{{ ca.ngay_truc|vn_weekday }}</p>
+=======
+                    <p class="font-black text-lg text-primary uppercase">{{ ca.ngay_truc|date:"l" }}</p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                     <p class="text-sm font-semibold text-slate-500">{{ ca.ngay_truc|date:"d/m/Y" }}</p>
                 </div>
                 <div class="badge {% if ca.ca_lam_viec.is_night_shift %}badge-neutral{% else %}badge-warning{% endif %} font-bold">
@@ -57,9 +75,17 @@
     {% empty %}
     <div class="flex flex-col items-center justify-center py-10 opacity-60">
         <i class="fas fa-calendar-times text-4xl mb-3 text-slate-300"></i>
+<<<<<<< HEAD
             <p class="text-sm font-medium text-slate-500">Chưa có lịch trực.</p>
+=======
+        <p class="text-sm font-medium text-slate-500">Chưa có lịch phân công mới.</p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     </div>
     {% endfor %}
     
     <div class="h-12"></div> </div>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

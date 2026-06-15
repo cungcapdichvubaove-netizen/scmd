@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 

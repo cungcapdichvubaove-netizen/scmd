@@ -1,13 +1,22 @@
 /* File: static/admin/css/scmd_jazzmin.css
+<<<<<<< HEAD
 Description: SCMD admin console theme for Jazzmin/AdminLTE.
+=======
+Description: SCMD Cyber Theme for Jazzmin/AdminLTE.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 */
 
 :root {
     --scmd-navy-900: #0A192F;
     --scmd-navy-800: #112240;
     --scmd-navy-700: #233554;
+<<<<<<< HEAD
     --scmd-blue: #2563eb;
     --scmd-warning: #d97706;
+=======
+    --scmd-cyan: #64FFDA;
+    --scmd-orange: #FF6B00;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     --scmd-slate: #8892B0;
     --scmd-white: #E6F1FF;
 }
@@ -35,6 +44,10 @@ body {
     font-family: 'Saira', sans-serif !important;
     font-weight: 800;
     letter-spacing: 1px;
+<<<<<<< HEAD
+=======
+    text-transform: uppercase;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 }
 
 /* Sidebar Menu Items */
@@ -49,15 +62,24 @@ body {
 /* Hover Effect */
 .nav-sidebar .nav-link:hover {
     background-color: rgba(100, 255, 218, 0.05) !important;
+<<<<<<< HEAD
     color: var(--scmd-blue) !important;
+=======
+    color: var(--scmd-cyan) !important;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     padding-left: 18px; /* Slide nhẹ */
 }
 
 /* ACTIVE STATE (Mục đang chọn) */
 .nav-sidebar .nav-link.active {
     background-color: rgba(100, 255, 218, 0.15) !important;
+<<<<<<< HEAD
     color: var(--scmd-blue) !important;
     border-left: 4px solid var(--scmd-blue);
+=======
+    color: var(--scmd-cyan) !important;
+    border-left: 4px solid var(--scmd-cyan);
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     box-shadow: none !important;
 }
 
@@ -74,24 +96,40 @@ body {
     color: #a0aec0 !important;
 }
 .nav-treeview > .nav-item > .nav-link.active {
+<<<<<<< HEAD
     color: var(--scmd-blue) !important;
+=======
+    color: var(--scmd-cyan) !important;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     font-weight: 700;
     background-color: transparent !important;
     border-left: none; /* Bỏ border cho cấp con */
 }
 .nav-treeview > .nav-item > .nav-link.active i {
+<<<<<<< HEAD
     color: var(--scmd-blue) !important;
+=======
+    color: var(--scmd-cyan) !important;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 }
 
 /* Icons */
 .nav-icon { color: var(--scmd-slate); }
+<<<<<<< HEAD
 .active .nav-icon { color: var(--scmd-blue) !important; }
+=======
+.active .nav-icon { color: var(--scmd-cyan) !important; }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 /* Scrollbar Sidebar */
 .sidebar::-webkit-scrollbar { width: 5px; }
 .sidebar::-webkit-scrollbar-track { background: var(--scmd-navy-900); }
 .sidebar::-webkit-scrollbar-thumb { background: var(--scmd-navy-700); border-radius: 3px; }
+<<<<<<< HEAD
 .sidebar::-webkit-scrollbar-thumb:hover { background: var(--scmd-blue); }
+=======
+.sidebar::-webkit-scrollbar-thumb:hover { background: var(--scmd-cyan); }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 /* --- 3. HEADER (NAVBAR) --- */
 .main-header {
@@ -99,7 +137,11 @@ body {
     border-bottom: 1px solid var(--scmd-navy-700) !important;
 }
 .main-header .nav-link { color: var(--scmd-slate) !important; }
+<<<<<<< HEAD
 .main-header .nav-link:hover { color: var(--scmd-blue) !important; }
+=======
+.main-header .nav-link:hover { color: var(--scmd-cyan) !important; }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 /* --- 4. CONTENT & CARDS --- */
 .content-wrapper {
@@ -119,6 +161,10 @@ body {
     font-family: 'Saira', sans-serif;
     font-weight: 700;
     color: var(--scmd-navy-800);
+<<<<<<< HEAD
+=======
+    text-transform: uppercase;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     font-size: 1rem;
 }
 
@@ -142,7 +188,11 @@ body {
     font-family: "Font Awesome 5 Free"; /* Bắt buộc */
     font-weight: 900; /* Font Awesome Solid yêu cầu weight 900 */
     margin-right: 8px; /* Khoảng cách với chữ */
+<<<<<<< HEAD
     color: var(--scmd-blue); /* Màu trạng thái đồng bộ */
+=======
+    color: var(--scmd-cyan); /* Màu Neon đồng bộ */
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     font-size: 1.1em;
     vertical-align: middle;
 }

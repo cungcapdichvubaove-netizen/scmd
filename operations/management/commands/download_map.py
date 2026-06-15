@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -57,6 +61,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"\n✅ Đã tải xong {count} ảnh bản đồ Offline!"))
 
     def download_tile(self, z, x, y):
+<<<<<<< HEAD
         tile_template = settings.SCMD_MAP_TILE_URL
         url = (
             tile_template
@@ -65,6 +70,9 @@ class Command(BaseCommand):
             .replace("{x}", str(x))
             .replace("{y}", str(y))
         )
+=======
+        url = f"https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         tile_dir = os.path.join(settings.MEDIA_ROOT, 'map_tiles', str(z), str(x))
         tile_path = os.path.join(tile_dir, f"{y}.png")
 

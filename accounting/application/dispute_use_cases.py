@@ -2,8 +2,11 @@
 from django.db import transaction
 from django.core.exceptions import PermissionDenied
 from accounting.models import ChiTietLuong, PhanHoiLuong
+<<<<<<< HEAD
 from main.decorators import application_audit_log
 from main.models import AuditLog
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 class CreateDisputeUseCase:
     """
@@ -15,12 +18,15 @@ class CreateDisputeUseCase:
     """
     
     @staticmethod
+<<<<<<< HEAD
     @application_audit_log(
         module="accounting",
         model_name="PhanHoiLuong",
         action=AuditLog.Action.CREATE,
         object_id_field="chi_tiet_luong_id"
     )
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def execute(user_nhan_vien, chi_tiet_luong_id: int, noi_dung: str, tenant_id):
         try:
             # 1. Lấy phiếu lương và kiểm tra quyền sở hữu
@@ -30,10 +36,14 @@ class CreateDisputeUseCase:
                 raise PermissionDenied("Bạn không có quyền khiếu nại phiếu lương này.")
                 
             # 2. Kiểm tra trạng thái bảng lương
+<<<<<<< HEAD
             if chi_tiet.bang_luong.trang_thai not in [
                 chi_tiet.bang_luong.TrangThai.LOCKED,
                 chi_tiet.bang_luong.TrangThai.PAID,
             ]:
+=======
+            if chi_tiet.bang_luong.trang_thai != 'DA_PHAT_HANH':
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 return False, "Bảng lương chưa được phát hành chính thức, vui lòng đợi."
 
             # 3. Kiểm tra spam (đã có phản hồi đang chờ xử lý)
@@ -59,4 +69,8 @@ class CreateDisputeUseCase:
         except ChiTietLuong.DoesNotExist:
             return False, "Không tìm thấy dữ liệu phiếu lương."
         except Exception as e:
+<<<<<<< HEAD
             return False, str(e)
+=======
+            return False, str(e)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

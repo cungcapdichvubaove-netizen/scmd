@@ -6,26 +6,47 @@
     <meta charset="UTF-8">
     <title>Hồ sơ lý lịch - SCMD Pro</title>
     {% tailwind_css %}
+<<<<<<< HEAD
     <style>
         body { font-family: "Segoe UI", Arial, sans-serif; background-color: #f1f5f9; }
 
         @page {
             size: A4;
             margin: 0;
+=======
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
+        body { font-family: 'Roboto', sans-serif; background-color: #f1f5f9; }
+
+        /* KHỐI LỆNH QUAN TRỌNG: LOẠI BỎ NGÀY GIỜ VÀ TIÊU ĐỀ TRÌNH DUYỆT */
+        @page {
+            size: A4;
+            margin: 0; /* Loại bỏ lề mặc định của trình duyệt để mất Header/Footer */
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         }
 
         @media print {
             .no-print { display: none !important; }
             body { background: white; margin: 0; padding: 0; }
+<<<<<<< HEAD
 
             .print-page {
                 margin: 0 !important;
                 box-shadow: none !important;
+=======
+            
+            /* Tạo lề giả bằng padding để nội dung không bị sát mép giấy */
+            .print-page { 
+                margin: 0 !important; 
+                box-shadow: none !important; 
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 border: none !important;
                 width: 210mm;
                 height: 297mm;
                 padding: 15mm 20mm !important;
             }
+<<<<<<< HEAD
 
             .hidden-section { display: none !important; }
         }
@@ -117,6 +138,45 @@
             <h3 class="text-xl font-bold text-blue-900">Tùy chỉnh thông tin nhân viên</h3>
             <button onclick="window.print()" class="bg-blue-800 hover:bg-blue-900 text-white px-8 py-2 rounded-full font-bold shadow-md transition-all">
                 Xác nhận in
+=======
+            .hidden-section { display: none !important; }
+        }
+
+        .print-page { 
+            width: 210mm; min-height: 297mm; padding: 15mm 20mm; 
+            margin: 20px auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+            position: relative; box-sizing: border-box; 
+        }
+
+        .section-title { 
+            font-weight: bold; text-transform: uppercase; color: #1e3a8a; 
+            font-size: 14px; border-bottom: 2px solid #1e3a8a;
+            margin-top: 25px; margin-bottom: 10px; padding-bottom: 4px;
+        }
+
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+        table, th, td { border: 1px solid #333; }
+        th { background-color: #f8fafc; padding: 8px; font-size: 11px; text-transform: uppercase; }
+        td { padding: 8px; font-size: 12px; vertical-align: middle; }
+        
+        .profile-photo { 
+            width: 3cm; height: 4cm; border: 1px solid #1e3a8a; 
+            position: absolute; top: 40mm; right: 20mm; 
+            display: flex; align-items: center; justify-content: center; 
+        }
+
+        .field-label { font-weight: bold; min-width: 160px; display: inline-block; }
+        .control-panel { max-width: 210mm; margin: 20px auto; background: white; border-radius: 8px; border-left: 6px solid #1e3a8a; }
+    </style>
+</head>
+<body>
+
+    <div class="no-print control-panel p-6 shadow-lg mb-4">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-bold text-blue-900"><i class="fas fa-sliders-h mr-2"></i> Tùy chỉnh thông tin khách hàng</h3>
+            <button onclick="window.print()" class="bg-blue-800 hover:bg-blue-900 text-white px-8 py-2 rounded-full font-bold shadow-md transition-all">
+                <i class="fas fa-print mr-2"></i> XÁC NHẬN IN
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             </button>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gray-50 p-4 rounded border">
@@ -141,25 +201,40 @@
 
     <div class="print-page">
         <div class="flex items-center gap-4 border-b-2 border-blue-900 pb-4 mb-8">
+<<<<<<< HEAD
             {% if COMPANY.logo %}<img src="{{ COMPANY.logo.url }}" class="brand-logo--report h-14 w-auto object-contain" alt="{{ COMPANY.display_name }}">{% else %}<img src="{% static 'img/brand/report-header-logo.png' %}" class="brand-logo--report h-14 w-auto object-contain" alt="SCMD Pro">{% endif %}
             <div>
                 <h2 class="text-xl font-bold text-blue-900 uppercase">{{ COMPANY.display_name|default:"CÔNG TY DỊCH VỤ BẢO VỆ SCMD" }}</h2>
                 <p class="text-xs font-bold text-gray-600">SCMD Pro | Hồ sơ nhân sự nội bộ</p>
                 {% if COMPANY.dia_chi %}<p class="text-xs text-gray-600">Trụ sở: {{ COMPANY.dia_chi }}</p>{% endif %}
                 {% if COMPANY.contact_phone %}<p class="text-xs text-gray-600">SĐT: {{ COMPANY.contact_phone }}{% if COMPANY.email %} | Email: {{ COMPANY.email }}{% endif %}</p>{% endif %}
+=======
+            <img src="{% static 'img/logo_scmd.png' %}" class="w-16 h-16 object-contain">
+            <div>
+                <h2 class="text-xl font-bold text-blue-900 uppercase">Công ty TNHH Dịch vụ Bảo vệ SCMD</h2>
+                <p class="text-xs font-bold text-gray-600">SCMD Pro | Hồ sơ nhân sự nội bộ</p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             </div>
         </div>
 
         <div class="profile-photo">
             {% if nhan_vien.anh_the %}
+<<<<<<< HEAD
                 <img src="{{ nhan_vien.anh_the.url }}" class="w-full h-full object-cover" alt="Ảnh thẻ nhân viên">
+=======
+                <img src="{{ nhan_vien.anh_the.url }}" class="w-full h-full object-cover">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             {% else %}
                 <span class="text-[10px] text-gray-400 font-bold">ẢNH 3X4</span>
             {% endif %}
         </div>
 
         <div class="text-center my-8">
+<<<<<<< HEAD
             <h1 class="text-2xl font-bold tracking-wide text-gray-900">Lý lịch trích ngang</h1>
+=======
+            <h1 class="text-2xl font-bold uppercase tracking-widest text-gray-900">Lý Lịch Trích Ngang</h1>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             <p class="text-sm font-bold text-blue-800 mt-1">Mã nhân viên: {{ nhan_vien.ma_nhan_vien }}</p>
         </div>
 
@@ -202,11 +277,19 @@
         </div>
 
         <div id="sec-cert">
+<<<<<<< HEAD
             <div class="section-title">III. Bằng cấp và chứng chỉ</div>
             <table>
                 <thead>
                     <tr>
                         <th style="width: 45%;">Tên bằng cấp / chứng chỉ</th>
+=======
+            <div class="section-title">III. Bằng cấp & Chứng chỉ</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 45%;">Tên bằng cấp / Chứng chỉ</th>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                         <th style="width: 35%;">Nơi cấp</th>
                         <th style="width: 20%;">Ngày cấp</th>
                     </tr>
@@ -231,7 +314,11 @@
                 <thead>
                     <tr>
                         <th style="width: 20%;">Thời gian</th>
+<<<<<<< HEAD
                         <th style="width: 50%;">Mục tiêu bảo vệ / nhiệm vụ</th>
+=======
+                        <th style="width: 50%;">Mục tiêu bảo vệ / Nhiệm vụ</th>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                         <th style="width: 30%;">Quản lý trực tiếp</th>
                     </tr>
                 </thead>
@@ -240,7 +327,11 @@
                     <tr>
                         <td class="text-center">{{ ct.ngay_bat_dau|date:"m/Y" }} - {{ ct.ngay_ket_thuc|date:"m/Y"|default:"Nay" }}</td>
                         <td><strong>{{ ct.muc_tieu.ten_muc_tieu|default:"Nội bộ SCMD" }}</strong></td>
+<<<<<<< HEAD
                         <td>{{ ct.quan_ly_truc_tiep.ho_ten|default:"Ban chỉ huy" }}</td>
+=======
+                        <td>{{ ct.quan_ly_truc_tiep.ho_ten|default:"Ban Chỉ huy" }}</td>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                     </tr>
                     {% empty %}
                     <tr><td colspan="3" class="text-center italic text-gray-400 py-2">Không có dữ liệu</td></tr>
@@ -264,7 +355,11 @@
     <script>
         function toggleSection(sectionId, checkbox) {
             const section = document.getElementById(sectionId);
+<<<<<<< HEAD
             section.style.display = checkbox.checked ? "block" : "none";
+=======
+            section.style.display = checkbox.checked ? 'block' : 'none';
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         }
     </script>
 </body>

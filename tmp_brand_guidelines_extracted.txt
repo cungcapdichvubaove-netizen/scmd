@@ -302,7 +302,11 @@ Kiểm soát vận hành theo thời gian thực
 Người đồng hành tin cậy
 7.3 Cụm từ cần tránh
 Phần mềm bảo vệ nếu làm người nghe hiểu là công ty bảo vệ
+<<<<<<< HEAD
 Bảng điều hành vận hành, Vận hành, Cyber Command, SCMD Pro nếu dùng trong UI chính
+=======
+War Room, Tactical, Cyber Command, Sentinel Command nếu dùng trong UI chính
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ERP nếu đứng một mình như tên sản phẩm chính
 Tối thượng, duy nhất, hoàn hảo tuyệt đối nếu không có bằng chứng
 Ngôn ngữ quân sự hóa hoặc phô diễn sức mạnh quá mức

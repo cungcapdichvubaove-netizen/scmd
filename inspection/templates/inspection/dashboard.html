@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿{% extends "base.html" %}
 {% load humanize %}
 {% load static %}
@@ -514,3 +515,154 @@
 </div>
 {% endblock %}
 
+=======
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Giám sát Tuần tra{% endblock %}
+
+{% block content %}
+<div class="w-full">
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fas fa-radar text-indigo-600"></i> GIÁM SÁT TUẦN TRA
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">Theo dõi hoạt động của đội cơ động & bảo vệ mục tiêu.</p>
+        </div>
+        <a href="/admin/inspection/loaituantra/add/" class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 transition-colors">
+            <i class="fas fa-route"></i> Thiết lập Tuyến mới
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl animate-pulse">
+                <i class="fas fa-walking"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Đang đi tuần</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ dang_di }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl">
+                <i class="fas fa-check-double"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Đã xong hôm nay</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ hoan_thanh }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl">
+                <i class="fas fa-ban"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Bỏ dở / Vi phạm</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ bo_do }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">
+                <i class="fas fa-chart-pie"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Tỷ lệ hoàn thành</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ ty_le }}%</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h3 class="font-bold text-slate-700 flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    Trực tiếp (Live Monitoring)
+                </h3>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-white text-slate-500 font-semibold border-b border-slate-100">
+                        <tr>
+                            <th class="px-5 py-3">Nhân viên</th>
+                            <th class="px-5 py-3">Tuyến / Mục tiêu</th>
+                            <th class="px-5 py-3">Bắt đầu lúc</th>
+                            <th class="px-5 py-3 text-center">Tiến độ</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for luot in live_patrols %}
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-5 py-4 font-bold text-slate-700">{{ luot.nhan_vien.ho_ten }}</td>
+                            <td class="px-5 py-4">
+                                <div class="text-slate-800 font-medium">{{ luot.loai_tuan_tra.ten_loai }}</div>
+                                <div class="text-xs text-slate-500">{{ luot.loai_tuan_tra.muc_tieu.ten_muc_tieu }}</div>
+                            </td>
+                            <td class="px-5 py-4 text-slate-600 font-mono text-xs">{{ luot.thoi_gian_bat_dau|date:"H:i" }}</td>
+                            <td class="px-5 py-4">
+                                <div class="w-full bg-slate-200 rounded-full h-2.5 mb-1">
+                                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: {{ luot.tien_do }}%"></div>
+                                </div>
+                                <div class="text-center text-xs font-bold text-blue-600">{{ luot.tien_do }}%</div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="p-8 text-center text-slate-400">
+                                <i class="fas fa-coffee text-3xl mb-2 opacity-50"></i>
+                                <p>Hiện không có ai đang đi tuần.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+            <h3 class="font-bold text-slate-700 mb-4">Hiệu suất tuần qua</h3>
+            <div class="relative h-60 w-full">
+                <canvas id="patrolChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('patrolChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: {{ chart_labels|safe }},
+            datasets: [{
+                label: 'Lượt hoàn thành',
+                data: {{ chart_data|safe }},
+                backgroundColor: '#4f46e5',
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                y: { beginAtZero: true, grid: { display: false } },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+</script>
+{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

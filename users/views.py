@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
@@ -15,9 +19,13 @@ Description: Views xử lý logic người dùng (Nhân sự).
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, permission_required
+<<<<<<< HEAD
 from main.dashboard_router import dashboard_access_required
 from django.utils import timezone
 from django.conf import settings
+=======
+from django.utils import timezone
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
@@ -26,6 +34,7 @@ from pathlib import Path
 from weasyprint import HTML
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+<<<<<<< HEAD
 from django.db.models import Count, Q
 from main.dashboard_cta import admin_url_if_permitted, reverse_or_none
 
@@ -42,10 +51,16 @@ from .models import (
     PhongBan,
     QuyetDinhNghiViec,
 )
+=======
+from django.db.models import Count
+
+from .models import NhanVien, BangCapChungChi, PhongBan, LichSuCongTac
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from .forms import UserProfileForm
 from operations.models import PhanCongCaTruc
 from accounting.models import ChiTietLuong
 from clients.models import MucTieu
+<<<<<<< HEAD
 from inventory.application.asset_recovery_use_cases import GetEmployeeOutstandingAssetsUseCase
 
 
@@ -64,10 +79,13 @@ def _admin_change_url(app_label, model_name, pk, *, user=None, permission_codena
     if user is not None and permission_codename:
         return _admin_url_if_permitted(user, viewname, permission_codename, args=[pk])
     return _safe_reverse(viewname, args=[pk])
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # ==============================================================================
 # 1. DASHBOARD NHÂN SỰ (HR)
 # ==============================================================================
+<<<<<<< HEAD
 @dashboard_access_required("users:dashboard")
 def dashboard_view(request):
     """Màn hình làm việc cho Phòng Hành chính Nhân sự.
@@ -569,6 +587,50 @@ def dashboard_view(request):
             "offboarding": offboarding_changelist_url,
             "operations_schedule": _admin_url_if_permitted(request.user, "admin:operations_phancongcatruc_changelist", "operations.view_phancongcatruc") if can_view_schedule else None,
         },
+=======
+@login_required
+def dashboard_view(request):
+    today = timezone.now().date()
+    current_month = today.month
+    current_year = today.year
+
+    # 1. KPIs Tổng quát
+    total_staff = NhanVien.objects.filter(trang_thai_lam_viec__in=['THUVIEC', 'CHINHTHUC']).count()
+    new_staff_count = NhanVien.objects.filter(ngay_vao_lam__month=current_month, ngay_vao_lam__year=current_year).count()
+    probation_staff_count = NhanVien.objects.filter(trang_thai_lam_viec='THUVIEC').count()
+    
+    # 2. Cảnh báo Bằng cấp (Sắp hết hạn trong 30 ngày)
+    next_30_days = today + timedelta(days=30)
+    expiring_certs = BangCapChungChi.objects.filter(
+        ngay_het_han__range=[today, next_30_days]
+    ).select_related('nhan_vien', 'nhan_vien__phong_ban')
+
+    # 3. Nhân sự mới gia nhập gần đây (Để chào mừng/theo dõi)
+    recent_staff = NhanVien.objects.filter(trang_thai_lam_viec__in=['THUVIEC', 'CHINHTHUC']).order_by('-ngay_vao_lam')[:5]
+
+    # 4. Dữ liệu biểu đồ cơ cấu phòng ban
+    dept_stats = PhongBan.objects.annotate(count=Count('cac_nhan_vien')).filter(count__gt=0)
+    chart_labels = [dept.ten_phong_ban for dept in dept_stats]
+    chart_data = [dept.count for dept in dept_stats]
+
+    # 5. Sinh nhật trong tháng
+    birthdays = NhanVien.objects.filter(
+        ngay_sinh__month=current_month,
+        trang_thai_lam_viec__in=['THUVIEC', 'CHINHTHUC']
+    ).order_by('ngay_sinh__day')
+
+    context = {
+        "total_staff": total_staff,
+        "new_staff_count": new_staff_count,
+        "probation_staff_count": probation_staff_count,
+        "expiring_certs": expiring_certs,
+        "recent_staff": recent_staff,
+        "today": today,
+        "chart_labels": chart_labels,
+        "chart_data": chart_data,
+        "birthdays": birthdays,
+        "now": today,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     }
     return render(request, "users/dashboard_hr.html", context)
 
@@ -693,16 +755,22 @@ def mobile_salary_detail_view(request, luong_id):
 # 4. EXPORT PDF
 # ==============================================================================
 @login_required
+<<<<<<< HEAD
 @permission_required('users.view_nhanvien', raise_exception=True)
 def export_ly_lich_options_view(request, nhan_vien_id):
     nhan_vien = get_object_or_404(
         NhanVien.objects.for_tenant(settings.SCMD_ORGANIZATION_ID),
         pk=nhan_vien_id,
     )
+=======
+def export_ly_lich_options_view(request, nhan_vien_id):
+    nhan_vien = get_object_or_404(NhanVien, pk=nhan_vien_id)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     return render(request, "users/ly_lich_options.html", {"nhan_vien": nhan_vien})
 
 @login_required
 @permission_required('users.view_nhanvien', raise_exception=True)
+<<<<<<< HEAD
 @export_audit_log(
     module="users",
     model_name="NhanVien",
@@ -720,6 +788,10 @@ def export_ly_lich_pdf(request, nhan_vien_id):
         NhanVien.objects.for_tenant(settings.SCMD_ORGANIZATION_ID),
         pk=nhan_vien_id,
     )
+=======
+def export_ly_lich_pdf(request, nhan_vien_id):
+    nhan_vien = get_object_or_404(NhanVien, pk=nhan_vien_id)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     options = {
         "bao_gom_anh_the": request.POST.get("bao_gom_anh_the") == "on",
         "bao_gom_thong_tin_ca_nhan": request.POST.get("bao_gom_thong_tin_ca_nhan") == "on",
@@ -734,6 +806,7 @@ def export_ly_lich_pdf(request, nhan_vien_id):
         except: pass
     
     html_string = render_to_string("users/ly_lich_pdf.html", {
+<<<<<<< HEAD
         "nhan_vien": nhan_vien,
         "options": options,
         "avatar_uri": avatar_uri,
@@ -742,12 +815,22 @@ def export_ly_lich_pdf(request, nhan_vien_id):
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
     pdf_file = html.write_pdf()
 
+=======
+        "nhan_vien": nhan_vien, 
+        "options": options, 
+        "avatar_uri": avatar_uri
+    })
+    html = HTML(string=html_string, base_url=request.build_absolute_uri())
+    pdf_file = html.write_pdf()
+    
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'filename="ly_lich_{nhan_vien.ma_nhan_vien}.pdf"'
     return response
 
 @login_required
 @permission_required('users.view_nhanvien', raise_exception=True)
+<<<<<<< HEAD
 @export_audit_log(
     module="users",
     model_name="NhanVien",
@@ -761,6 +844,11 @@ def export_the_ten_pdf(request, nhan_vien_id):
         NhanVien.objects.for_tenant(settings.SCMD_ORGANIZATION_ID),
         pk=nhan_vien_id,
     )
+=======
+def export_the_ten_pdf(request, nhan_vien_id):
+    """Xuất file PDF thẻ tên nhân viên chuyên nghiệp (Standard ID Card)"""
+    nhan_vien = get_object_or_404(NhanVien, pk=nhan_vien_id)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     html_string = render_to_string("users/pdf/the_ten.html", {
         "nv": nhan_vien,
@@ -769,13 +857,18 @@ def export_the_ten_pdf(request, nhan_vien_id):
     
     html = HTML(string=html_string, base_url=request.build_absolute_uri())
     pdf_file = html.write_pdf()
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'filename="the_ten_{nhan_vien.ma_nhan_vien}.pdf"'
     return response
 
 @login_required
 @permission_required('users.view_nhanvien', raise_exception=True)
+<<<<<<< HEAD
 @export_audit_log(
     module="users",
     model_name="MucTieu",
@@ -789,12 +882,21 @@ def export_danh_sach_nhan_su_muc_tieu_pdf(request, muc_tieu_id):
         MucTieu.objects.for_tenant(settings.SCMD_ORGANIZATION_ID),
         pk=muc_tieu_id,
     )
+=======
+def export_danh_sach_nhan_su_muc_tieu_pdf(request, muc_tieu_id):
+    """Xuất danh sách nhân sự đang công tác tại một mục tiêu cụ thể (Site Personnel)"""
+    muc_tieu = get_object_or_404(MucTieu, pk=muc_tieu_id)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     # SSOT: Lấy từ lịch sử công tác đang hoạt động
     nhan_su = LichSuCongTac.objects.filter(
         muc_tieu=muc_tieu,
+<<<<<<< HEAD
         nhan_vien__tenant_id=settings.SCMD_ORGANIZATION_ID,
         ngay_ket_thuc__isnull=True,
+=======
+        ngay_ket_thuc__isnull=True
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ).select_related('nhan_vien', 'nhan_vien__chuc_danh')
 
     html_string = render_to_string("users/pdf/danh_sach_muc_tieu.html", {
@@ -808,4 +910,8 @@ def export_danh_sach_nhan_su_muc_tieu_pdf(request, muc_tieu_id):
 
     response = HttpResponse(pdf_file, content_type='application/pdf')
     response['Content-Disposition'] = f'filename="danh_sach_nhan_su_{muc_tieu.id}.pdf"'
+<<<<<<< HEAD
     return response
+=======
+    return response
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

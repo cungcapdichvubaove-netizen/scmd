@@ -2,7 +2,11 @@
 
 ## 1. Giới thiệu
 
+<<<<<<< HEAD
 Tính năng Báo cáo sự cố trong hệ thống SCMD cho phép nhân viên bảo vệ và quản lý nhanh chóng ghi nhận, theo dõi và xử lý các sự cố phát sinh tại mục tiêu. Hệ thống hỗ trợ báo cáo từ ứng dụng di động và hiển thị cảnh báo theo thời gian thực trên Bảng điều hành vận hành.
+=======
+Tính năng Báo cáo sự cố trong hệ thống SCMD cho phép nhân viên bảo vệ và quản lý nhanh chóng ghi nhận, theo dõi và xử lý các sự cố phát sinh tại mục tiêu. Hệ thống hỗ trợ báo cáo từ ứng dụng di động và hiển thị cảnh báo theo thời gian thực trên Dashboard War Room.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ## 2. Các loại sự cố có thể báo cáo
 
@@ -33,7 +37,11 @@ Ngay sau khi báo cáo được gửi:
 *   **Mã vụ việc tự động**: Hệ thống sẽ tự động gán một mã vụ việc duy nhất (ví dụ: `SC-YYYYMMDD-HEX`) cho báo cáo của bạn.
 *   **Nén ảnh tự động**: Các ảnh đính kèm sẽ được tự động nén ở chế độ nền để tối ưu hóa dung lượng lưu trữ.
 *   **Cảnh báo tức thời**:
+<<<<<<< HEAD
     *   Một cảnh báo sẽ được gửi ngay lập tức đến Bảng điều hành vận hành của quản lý và các bên liên quan thông qua WebSocket.
+=======
+    *   Một cảnh báo sẽ được gửi ngay lập tức đến Dashboard War Room của quản lý và các bên liên quan thông qua WebSocket.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     *   Tùy thuộc vào mức độ nghiêm trọng, hệ thống có thể kích hoạt các hành động bổ sung như gửi email hoặc SMS đến các cấp quản lý cao hơn.
 *   **Theo dõi trạng thái**: Quản lý có thể theo dõi trạng thái xử lý của sự cố (Chờ xử lý, Đang xử lý, Đã xử lý, Chờ đền bù, Hoàn tất, Đã hủy) trên Dashboard.
 
@@ -42,7 +50,11 @@ Ngay sau khi báo cáo được gửi:
 Trong trường hợp khẩn cấp đe dọa tính mạng hoặc an ninh nghiêm trọng, bạn có thể sử dụng tính năng SOS:
 
 1.  **Trên Dashboard Mobile**: Tìm nút "SOS" hoặc "Cấp cứu".
+<<<<<<< HEAD
 2.  **Nhấn và giữ (hoặc xác nhận)**: Hệ thống sẽ gửi ngay lập tức một tín hiệu khẩn cấp với vị trí GPS hiện tại của bạn đến Bảng điều hành vận hành.
+=======
+2.  **Nhấn và giữ (hoặc xác nhận)**: Hệ thống sẽ gửi ngay lập tức một tín hiệu khẩn cấp với vị trí GPS hiện tại của bạn đến Dashboard War Room.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 3.  **Thông báo**: Một báo cáo sự cố với mức độ "Nguy hiểm" sẽ được tạo tự động, kèm theo tiêu đề "CẤP CỨU: [Tên nhân viên]".
 
 ## 6. Lưu ý quan trọng

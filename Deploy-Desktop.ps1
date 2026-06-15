@@ -5,6 +5,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
+<<<<<<< HEAD
 $OutputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 try { chcp 65001 > $null } catch {}
@@ -24,6 +25,26 @@ $script:HealthUrls = @(
 $script:TailwindBuildArtifact = Join-Path $script:ProjectRoot "theme\static\css\dist\styles.css"
 $script:AdminUsername = if ($env:SCMD_ADMIN_USERNAME) { $env:SCMD_ADMIN_USERNAME } elseif ($env:DJANGO_SUPERUSER_USERNAME) { $env:DJANGO_SUPERUSER_USERNAME } else { "admin" }
 $script:DotEnvFile = Join-Path $script:ProjectRoot ".env"
+=======
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+try { chcp 65001 > $null } catch {}
+
+$script:ProjectRoot = if ($env:SCMDERP_ROOT) { $env:SCMDERP_ROOT } else { "D:\SCMDERP" }
+$script:ComposeFile = Join-Path $script:ProjectRoot "docker-compose.yml"
+$script:AppUrl = "http://localhost:8000"
+$script:LogFile = Join-Path (Split-Path -Parent $PSCommandPath) "deploy-scmderp.log"
+$script:InfraServices = @("db", "redis")
+$script:AppServices = @("web", "celery_worker", "celery_beat")
+$script:AppImages = @("scmderp-web:latest", "scmderp-celery_worker:latest", "scmderp-celery_beat:latest")
+$script:HealthUrls = @(
+    "$script:AppUrl/login/",
+    "$script:AppUrl/admin/login/",
+    "$script:AppUrl/api/docs/"
+)
+$script:TailwindBuildArtifact = Join-Path $script:ProjectRoot "theme\static\css\dist\styles.css"
+$script:AdminUsername = if ($env:SCMD_ADMIN_USERNAME) { $env:SCMD_ADMIN_USERNAME } elseif ($env:DJANGO_SUPERUSER_USERNAME) { $env:DJANGO_SUPERUSER_USERNAME } else { "admin" }
+$script:AdminPassword = if ($env:SCMD_ADMIN_PASSWORD) { $env:SCMD_ADMIN_PASSWORD } elseif ($env:DJANGO_SUPERUSER_PASSWORD) { $env:DJANGO_SUPERUSER_PASSWORD } else { "ScmdAdmin2026!" }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 function Write-Header([string]$Text) {
     Write-Host ""
@@ -42,6 +63,7 @@ function Write-Warn([string]$Text) { Write-Host "  WARN $Text" -ForegroundColor 
 function Write-Err([string]$Text) { Write-Host "  ERR  $Text" -ForegroundColor Red }
 function Write-Info([string]$Text) { Write-Host "  INFO $Text" -ForegroundColor DarkGray }
 
+<<<<<<< HEAD
 function Get-DotEnvValue([string[]]$Keys) {
     if (-not (Test-Path $script:DotEnvFile)) {
         return $null
@@ -93,6 +115,8 @@ function Assert-BootstrapAdminPassword {
     }
 }
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 function Write-LogChunk([string]$Content) {
     if (-not $Content) {
         return
@@ -158,6 +182,7 @@ function Assert-Project {
     if (-not (Test-Path $script:TailwindBuildArtifact)) {
         throw "Khong tim thay Tailwind build artifact: $script:TailwindBuildArtifact. Can build frontend asset truoc khi deploy."
     }
+<<<<<<< HEAD
 
     Assert-BootstrapAdminPassword
 }
@@ -184,6 +209,8 @@ function Invoke-Cleanup {
     Get-ChildItem -Path $script:ProjectRoot -Include "__pycache__", "*.pyc" -Recurse | Remove-Item -Recurse -Force -ErrorAction SilentlyContinue
     
     Write-Ok "Dọn dẹp hoàn tất."
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 }
 
 function Invoke-Compose([string[]]$ComposeArgs, [switch]$IgnoreFailure) {
@@ -209,15 +236,19 @@ function Invoke-DjangoExec([string[]]$CommandArgs, [string]$ErrorText) {
 }
 
 function Invoke-DjangoRun([string[]]$CommandArgs, [string]$ErrorText) {
+<<<<<<< HEAD
     $pass = if ($env:SCMD_ADMIN_PASSWORD) { $env:SCMD_ADMIN_PASSWORD }
             elseif ($env:DJANGO_SUPERUSER_PASSWORD) { $env:DJANGO_SUPERUSER_PASSWORD }
             else { Get-DotEnvValue -Keys @("SCMD_ADMIN_PASSWORD", "DJANGO_SUPERUSER_PASSWORD") }
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     $dockerArgs = @(
         "compose",
         "--project-directory", $script:ProjectRoot,
         "-f", $script:ComposeFile,
         "run",
+<<<<<<< HEAD
         "--rm"
     )
 
@@ -226,6 +257,9 @@ function Invoke-DjangoRun([string[]]$CommandArgs, [string]$ErrorText) {
     }
 
     $dockerArgs += @(
+=======
+        "--rm",
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         "--no-deps",
         "--entrypoint",
         "python",
@@ -295,7 +329,11 @@ function Wait-AppHealth([int]$TimeoutSec = 300) {
 
         Start-Sleep -Seconds 5
         $elapsed += 5
+<<<<<<< HEAD
         Write-Host "  ... dang cho SCMD Pro san sang $elapsed/$TimeoutSec giay" -ForegroundColor Gray
+=======
+        Write-Host "  ... dang cho SCMDERP san sang $elapsed/$TimeoutSec giay" -ForegroundColor Gray
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     }
 
     throw "Health check timeout sau $TimeoutSec giay."
@@ -304,10 +342,16 @@ function Wait-AppHealth([int]$TimeoutSec = 300) {
 try {
     Set-Content -Path $script:LogFile -Value ("[{0}] DEPLOY START" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss")) -Encoding UTF8
     Assert-Project
+<<<<<<< HEAD
     Invoke-Cleanup
     $usedLocalImageFallback = $false
 
     Write-Header "SCMD Pro - Deploy"
+=======
+    $usedLocalImageFallback = $false
+
+    Write-Header "SCMDERP - DEPLOY"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     Write-Host "  Project root: $script:ProjectRoot" -ForegroundColor White
     Write-Host "  Compose file: $script:ComposeFile" -ForegroundColor White
     Write-Host "  App URL     : $script:AppUrl" -ForegroundColor White
@@ -322,7 +366,11 @@ try {
     Write-Ok "Compose hop le."
 
     if (-not $SkipBuild) {
+<<<<<<< HEAD
         Write-Step "2/6" "Build image cho SCMD Pro app stack"
+=======
+        Write-Step "2/6" "Build image cho SCMDERP app stack"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         try {
             Invoke-Compose -ComposeArgs (@("build") + $script:AppServices)
             Write-Ok "Build image thanh cong."
@@ -368,9 +416,15 @@ try {
     Wait-AppHealth -TimeoutSec 300
 
     Write-Header "DEPLOY THANH CONG"
+<<<<<<< HEAD
     Write-Host "  SCMD Pro san sang tai $script:AppUrl" -ForegroundColor Green
     Write-Host "  Tai khoan admin: $script:AdminUsername" -ForegroundColor Green
     Write-Host "  Mat khau admin : da dong bo tu cau hinh moi truong" -ForegroundColor Green
+=======
+    Write-Host "  SCMDERP san sang tai $script:AppUrl" -ForegroundColor Green
+    Write-Host "  Tai khoan admin: $script:AdminUsername" -ForegroundColor Green
+    Write-Host "  Mat khau admin : $script:AdminPassword" -ForegroundColor Green
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     Write-Host "  Log file: $script:LogFile" -ForegroundColor Green
 } catch {
     Write-Header "DEPLOY THAT BAI"

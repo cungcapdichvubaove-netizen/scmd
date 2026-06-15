@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
  * SCMD Pro - GPS & Live Map Module
+=======
+ * Security Command (SCMD) System - GPS & Live Map Module
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
  * File: static/js/scmd_gps.js
  * Updated: 2025-12-11 (Live Map Integrated)
  */

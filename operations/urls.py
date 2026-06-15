@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -32,20 +36,32 @@ urlpatterns = [
     path('api/v1/mobile/checkin/', api_views.CheckInAPI.as_view(), name='mobile_checkin_api'),
     path('api/v1/mobile/checkout/', api_views.CheckOutAPI.as_view(), name='mobile_checkout_api'),
     path('api/v1/mobile/lich-truc/', api.FrozenLegacyAPIView.as_view(), name='mobile_lich_truc_api'),
+<<<<<<< HEAD
     path('api/v1/mobile/doi-ca/', api_views.MobileShiftChangeRequestAPIView.as_view(), name='mobile_doi_ca_api'),
     path('api/v1/mobile/doi-ca/phe-duyet/', api_views.MobileShiftChangeApproveAPIView.as_view(), name='mobile_doi_ca_approve_api'),
     path('api/v1/mobile/alive-check/respond/', api_views.MobileAliveCheckResponseAPIView.as_view(), name='mobile_alive_check_respond_api'),
 
     # Reports & Analytics
     path('api/v1/operations/reports/swap-rate/', api_views.SwapRateReportAPIView.as_view(), name='report_swap_rate_api'),
+=======
+    path('api/v1/mobile/doi-ca/', api.FrozenLegacyAPIView.as_view(), name='mobile_doi_ca_api'),
+    path('api/v1/mobile/doi-ca/phe-duyet/', api.FrozenLegacyAPIView.as_view(), name='mobile_doi_ca_approve_api'),
+    path('api/v1/mobile/alive-check/respond/', api_views.MobileAliveCheckResponseAPIView.as_view(), name='mobile_alive_check_respond_api'),
+
+    # Reports & Analytics
+    path('api/v1/operations/reports/swap-rate/', api.FrozenLegacyAPIView.as_view(), name='report_swap_rate_api'),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     # Sau đó mới đến router chung
     path('api/', include(router.urls)),
     
     # --- WEB DASHBOARD ---
     path('dashboard/', views.dashboard_vanhanh_view, name='dashboard_vanhanh'),
+<<<<<<< HEAD
     path('dashboard/trinh-chieu/', views.dashboard_trinh_chieu_view, name='dashboard_trinh_chieu'),
     path('dashboard/xep-lich/', views.xep_lich_view, name='dashboard_xep_lich'),
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     path('muc-tieu/', views.danh_sach_muc_tieu, name='danh_sach_muc_tieu'),
     path('muc-tieu/<int:pk>/', views.chi_tiet_muc_tieu, name='chi_tiet_muc_tieu'),
 
@@ -62,12 +78,15 @@ urlpatterns = [
     path('mobile/lich-truc/', views.mobile_lich_truc_view, name='mobile_lich_truc'),
     path('mobile/bao-cao-su-co/', views.bao_cao_su_co_mobile_view, name='bao_cao_su_co'),
     path('mobile/cham-cong/', views.mobile_cham_cong_view, name='mobile_cham_cong'),
+<<<<<<< HEAD
     path('mobile/tuan-tra/', views.mobile_tuan_tra_list, name='mobile_tuan_tra_list'),
     path('mobile/tuan-tra/bat-dau/<int:loai_id>/', views.bat_dau_tuan_tra, name='bat_dau_tuan_tra'),
     path('mobile/tuan-tra/thuc-hien/<int:luot_id>/', views.thuc_hien_tuan_tra, name='thuc_hien_tuan_tra'),
     path('mobile/tuan-tra/ghi-nhan/', views.ghi_nhan_diem_tuan_tra, name='ghi_nhan_diem_tuan_tra'),
     path('mobile/tuan-tra/ghi-nhan/quet-qr/', views.ghi_nhan_diem_tuan_tra, name='xu_ly_quet_qr'),
     path('mobile/tuan-tra/hoan-thanh/<int:luot_id>/', views.hoan_thanh_tuan_tra, name='hoan_thanh_tuan_tra'),
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     # --- LEGACY FUNCTION VIEWS (Giữ tương thích) ---
     path('mobile/check-in/<int:phan_cong_id>/', views.check_in_view, name='check_in'),

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 """Central dashboard routing for SCMD Pro.
 
@@ -31,6 +32,13 @@ class DashboardAccessRule:
     alias_keys: tuple[str, ...] = ()
     allow_any_authenticated: bool = False
 
+=======
+from dataclasses import dataclass
+
+from rolepermissions.checkers import has_role
+
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 @dataclass(frozen=True)
 class DashboardRouteDecision:
     route_name: str
@@ -40,6 +48,7 @@ class DashboardRouteDecision:
 
 class DashboardRouter:
     ADMIN_ROUTE = "admin:index"
+<<<<<<< HEAD
     DEFAULT_ROUTE = "main:access_pending"
     ROUTE_PRIORITY = (
         "dashboard:main",
@@ -128,12 +137,34 @@ class DashboardRouter:
         ("thu_kho", "inventory:dashboard"),
         ("nhan_su", "users:dashboard"),
         ("nghiep_vu", "operations:dashboard_vanhanh"),
+=======
+    DEFAULT_ROUTE = "operations:mobile_dashboard"
+
+    GROUP_ROUTE_NAMES = {
+        "bangiamdoc": "dashboard:main",
+        "nghiepvu": "operations:dashboard_vanhanh",
+        "vanhanh": "operations:dashboard_vanhanh",
+        "ketoan": "accounting:dashboard",
+        "kho": "inventory:dashboard",
+        "thanhtra": "inspection:dashboard",
+        "baove": "operations:mobile_dashboard",
+        "kinhdoanh": "clients:dashboard_crm",
+        "nhansu": "users:dashboard",
+        "quanlyvung": "operations:dashboard_vanhanh",
+        "doitruong": "operations:dashboard_vanhanh",
+    }
+
+    ROLE_ROUTE_NAMES = (
+        ("ban_giam_doc", "dashboard:main"),
+        ("ke_toan", "accounting:dashboard"),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         ("quan_ly_vung", "operations:dashboard_vanhanh"),
         ("doi_truong", "operations:dashboard_vanhanh"),
         ("nhan_vien_kinh_doanh", "clients:dashboard_crm"),
         ("nhan_vien_bao_ve", "operations:mobile_dashboard"),
     )
 
+<<<<<<< HEAD
     ROUTE_CANONICAL_ALIASES = {
         "operations:dashboard_trinh_chieu": "operations:dashboard_vanhanh",
         "operations:dashboard_xep_lich": "operations:dashboard_vanhanh",
@@ -188,6 +219,8 @@ class DashboardRouter:
         ),
     }
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     @classmethod
     def resolve(cls, user):
         return cls.resolve_decision(user).route_name
@@ -201,10 +234,13 @@ class DashboardRouter:
         if role_route:
             return DashboardRouteDecision(role_route, True, "rolepermissions")
 
+<<<<<<< HEAD
         profile_route = cls._resolve_from_employee_profile(user)
         if profile_route:
             return DashboardRouteDecision(profile_route, True, "employee-profile")
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         group_route = cls._resolve_from_groups(user)
         if group_route:
             return DashboardRouteDecision(group_route, True, "django-group")
@@ -212,6 +248,7 @@ class DashboardRouter:
         return DashboardRouteDecision(cls.DEFAULT_ROUTE, False, "fallback")
 
     @classmethod
+<<<<<<< HEAD
     def canonical_route(cls, route_name):
         return cls.ROUTE_CANONICAL_ALIASES.get(route_name, route_name)
 
@@ -340,6 +377,8 @@ class DashboardRouter:
         return sorted(canonical_routes)[0]
 
     @classmethod
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def _resolve_from_roles(cls, user):
         for role_name, route_name in cls.ROLE_ROUTE_NAMES:
             if has_role(user, role_name):
@@ -347,6 +386,7 @@ class DashboardRouter:
         return None
 
     @classmethod
+<<<<<<< HEAD
     def _resolve_from_employee_profile(cls, user):
         nhan_vien = getattr(user, "nhan_vien", None)
         if not nhan_vien:
@@ -380,10 +420,20 @@ class DashboardRouter:
 
         for keywords, route_name in cls.KEYWORD_ROUTE_ALIASES:
             if any(keyword in key for keyword in keywords):
+=======
+    def _resolve_from_groups(cls, user):
+        normalized_groups = {
+            cls._normalize_group_name(name)
+            for name in user.groups.values_list("name", flat=True)
+        }
+        for group_name, route_name in cls.GROUP_ROUTE_NAMES.items():
+            if group_name in normalized_groups:
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 return route_name
         return None
 
     @staticmethod
+<<<<<<< HEAD
     def _normalize_key(value):
         # NFKD removes combining accents but does not convert Vietnamese đ/Đ.
         value = (value or "").replace("Đ", "D").replace("đ", "d")
@@ -405,3 +455,7 @@ def dashboard_access_required(route_name):
         return _wrapped
 
     return decorator
+=======
+    def _normalize_group_name(value):
+        return "".join(ch for ch in value.lower() if ch.isalnum())
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

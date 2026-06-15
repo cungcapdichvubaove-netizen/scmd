@@ -1,14 +1,23 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
 File: accounting/models.py
 Author: Mr. Anh
 Created Date: 2025-11-30
+<<<<<<< HEAD
 Updated Date: 2026-06-03
 Version: v3.5.0
+=======
+Updated Date: 2026-05-15
+Version: v2.0.0-pro
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 Description: Model quản lý Kế toán - Tiền lương (Core Payroll Models).
              HARDENING PHASE: Chuẩn hóa SSOT (CRM -> Payroll) theo DOCUMENTATION.md.
              - Cập nhật định danh các khoản thu nhập/khấu trừ.
@@ -17,27 +26,41 @@ Description: Model quản lý Kế toán - Tiền lương (Core Payroll Models).
 
 import uuid
 import logging
+<<<<<<< HEAD
 from typing import TYPE_CHECKING, Optional
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.db import models, transaction
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError, ImproperlyConfigured
+<<<<<<< HEAD
 from core.managers import ChiTietLuongManager, TenantAwareManager, TenantScopedModel
 from core.workflow_transition_policy import WorkflowTransitionPolicy
+=======
+from core.managers import TenantAwareManager
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.conf import settings
 from users.models import NhanVien
 from decimal import Decimal, ROUND_HALF_UP
 
+<<<<<<< HEAD
 if TYPE_CHECKING:
     from core.managers import TenantAwareManager
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 logger = logging.getLogger(__name__)
 
 # ==============================================================================
 # 0. MULTI-TENANCY CORE
 # ==============================================================================
 
+<<<<<<< HEAD
 class CauHinhLuong(TenantScopedModel):
+=======
+class CauHinhLuong(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Hồ sơ thiết lập các tham số lương và phụ cấp cố định cho từng nhân viên an ninh"""
     nhan_vien = models.OneToOneField(
         NhanVien, 
@@ -45,12 +68,23 @@ class CauHinhLuong(TenantScopedModel):
         related_name="cau_hinh_luong", 
         verbose_name="Nhân viên thụ hưởng"
     )
+<<<<<<< HEAD
     # --- Dữ liệu đóng bảo hiểm ---
+=======
+
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+    
+    # --- Dữ liệu kế thừa (Legacy) ---
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     luong_co_ban_ngay = models.DecimalField(
         "Mức lương đóng BHXH", 
         max_digits=12, 
         decimal_places=0, 
+<<<<<<< HEAD
         default=Decimal('0'),
+=======
+        default=0,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         help_text="Mức lương căn bản dùng để tính bảo hiểm và các chế độ nhà nước."
     )
     
@@ -59,21 +93,33 @@ class CauHinhLuong(TenantScopedModel):
         "Phụ cấp trách nhiệm", 
         max_digits=12, 
         decimal_places=0, 
+<<<<<<< HEAD
         default=Decimal('0'),
+=======
+        default=0,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         help_text="Phụ cấp dành cho các vị trí chỉ huy, đội trưởng, hoặc mục tiêu trọng yếu."
     )
     phu_cap_xang_xe = models.DecimalField(
         "Phụ cấp đi lại/Xăng xe", 
         max_digits=12, 
         decimal_places=0, 
+<<<<<<< HEAD
         default=Decimal('0'),
+=======
+        default=0,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         help_text="Hỗ trợ chi phí di chuyển giữa các mục tiêu bảo vệ."
     )
     phu_cap_an_uong = models.DecimalField(
         "Phụ cấp ăn ca", 
         max_digits=12, 
         decimal_places=0, 
+<<<<<<< HEAD
         default=Decimal('0'),
+=======
+        default=0,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         help_text="Hỗ trợ tiền ăn trực ca theo quy định của SCMD."
     )
 
@@ -83,13 +129,30 @@ class CauHinhLuong(TenantScopedModel):
         verbose_name = "Hồ sơ Lương cá nhân"
         verbose_name_plural = "Hồ sơ Lương cá nhân"
 
+<<<<<<< HEAD
 
+=======
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def __str__(self): 
         return f"Cấu hình lương: {self.nhan_vien.ho_ten} ({self.nhan_vien.ma_nhan_vien})"
 
 
+<<<<<<< HEAD
 class BangLuongThang(TenantScopedModel):
+=======
+class BangLuongThang(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Quản lý các kỳ lương tổng hợp hàng tháng của toàn hệ thống SCMD"""
     class TrangThai(models.TextChoices):
         DRAFT = "DRAFT", "Dự thảo"
@@ -99,6 +162,12 @@ class BangLuongThang(TenantScopedModel):
         PAID = "PAID", "Đã thanh toán"
 
     LOCKED_STATES = {TrangThai.LOCKED, TrangThai.PAID}
+<<<<<<< HEAD
+=======
+    
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ten_bang_luong = models.CharField(
         "Tên bảng lương", 
         max_length=200, 
@@ -131,7 +200,11 @@ class BangLuongThang(TenantScopedModel):
         "Tổng ngân sách chi trả", 
         max_digits=15, 
         decimal_places=0, 
+<<<<<<< HEAD
         default=Decimal('0'),
+=======
+        default=0,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         help_text="Tổng số tiền thực lĩnh của toàn bộ nhân viên trong kỳ."
     )
     tong_gio_cong = models.FloatField(
@@ -142,20 +215,29 @@ class BangLuongThang(TenantScopedModel):
 
     nguoi_duyet = models.ForeignKey(
         "users.NhanVien", 
+<<<<<<< HEAD
         on_delete=models.SET_NULL,
+=======
+        on_delete=models.SET_NULL, 
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         null=True, 
         blank=True, 
         verbose_name="Người phê duyệt (KTT/GĐ)"
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Ngày tạo bảng kê")
 
+<<<<<<< HEAD
     objects: "TenantAwareManager" = TenantAwareManager()
+=======
+    objects = TenantAwareManager()
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     class Meta: 
         verbose_name = "Kỳ lương hệ thống"
         verbose_name_plural = "1. Quản lý Kỳ lương"
         unique_together = ('thang', 'nam', 'tenant_id')
         ordering = ['-nam', '-thang']
+<<<<<<< HEAD
         indexes = [
             models.Index(fields=['tenant_id', 'nam', 'thang']),
             models.Index(fields=['tenant_id', 'trang_thai', 'nam', 'thang']),
@@ -165,6 +247,19 @@ class BangLuongThang(TenantScopedModel):
         chi_tiet: models.Manager["ChiTietLuong"]
 
 
+=======
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def update_totals(self):
         """Tính toán lại tổng chi và tổng công dựa trên các phiếu lương chi tiết"""
@@ -176,8 +271,12 @@ class BangLuongThang(TenantScopedModel):
         
         # Tối ưu: Sử dụng .update() để tránh gọi lại save() của BangLuongThang
         # Điều này ngăn chặn các signal hoặc logic save() khác bị lặp lại vô tận
+<<<<<<< HEAD
         # SCMD Pro: Enforce organization scope SSOT (WHITEPAPER.md 9)
         BangLuongThang.objects.for_tenant(self.tenant_id).filter(pk=self.pk).update(
+=======
+        BangLuongThang.objects.filter(pk=self.pk).update(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             tong_chi_tra=stats['total_pay'],
             tong_gio_cong=stats['total_hours']
         )
@@ -193,8 +292,21 @@ class BangLuongThang(TenantScopedModel):
         return f"Kỳ lương SCMD - Tháng {self.thang}/{self.nam}"
 
 
+<<<<<<< HEAD
 
 class ChiTietLuong(TenantScopedModel):
+=======
+class ChiTietLuongManager(TenantAwareManager):
+    """Manager tối ưu hóa truy vấn để triệt tiêu lỗi N+1 Query"""
+    def get_queryset(self):
+        return super().get_queryset().select_related(
+            'nhan_vien', 
+            'bang_luong'
+        )
+
+
+class ChiTietLuong(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Phiếu lương chi tiết cho từng cá nhân (Payslip). Lưu trữ dữ liệu tĩnh để đối soát lịch sử."""
     bang_luong = models.ForeignKey(
         BangLuongThang, 
@@ -207,11 +319,19 @@ class ChiTietLuong(TenantScopedModel):
         on_delete=models.CASCADE,
         verbose_name="Nhân sự"
     )
+<<<<<<< HEAD
 # --- Nhóm dữ liệu Chấm công ---
+=======
+    
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+
+    # --- Nhóm dữ liệu Chấm công ---
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     tong_gio_lam = models.FloatField("Tổng giờ làm việc", default=0)
     so_ngay_nghi = models.IntegerField("Số ngày nghỉ phép/không lương", default=0)
     
     # --- Nhóm dữ liệu Thu nhập (Earnings) - SSOT Section 7 ---
+<<<<<<< HEAD
     luong_chinh = models.DecimalField("Lương khoán (từ CRM)", max_digits=12, decimal_places=0, default=Decimal('0'))
     thuong_chuyen_can = models.DecimalField("Thưởng chuyên cần", max_digits=12, decimal_places=0, default=Decimal('0'))
     phu_cap_khac = models.DecimalField("Tổng phụ cấp khác", max_digits=12, decimal_places=0, default=Decimal('0'))
@@ -238,12 +358,30 @@ class ChiTietLuong(TenantScopedModel):
         blank=True,
         help_text="Giải thích thay đổi thực lãnh hoặc lần tính lại.",
     )
+=======
+    luong_chinh = models.DecimalField("Lương khoán (từ CRM)", max_digits=12, decimal_places=0, default=0)
+    thuong_chuyen_can = models.DecimalField("Thưởng chuyên cần", max_digits=12, decimal_places=0, default=0)
+    phu_cap_khac = models.DecimalField("Tổng phụ cấp khác", max_digits=12, decimal_places=0, default=0)
+    
+    # --- Nhóm dữ liệu Khấu trừ (Deductions) - SSOT Section 7 ---
+    ung_luong = models.DecimalField("Khoản tạm ứng", max_digits=12, decimal_places=0, default=0)
+    phat_vi_pham = models.DecimalField("Phạt kỷ luật/Vi phạm", max_digits=12, decimal_places=0, default=0)
+    tien_dong_phuc = models.DecimalField("Khấu trừ vật tư/Đồng phục", max_digits=12, decimal_places=0, default=0)
+    tien_den_bu = models.DecimalField("Khấu trừ đền bù sự cố", max_digits=12, decimal_places=0, default=0)
+    bao_hiem = models.DecimalField("Khấu trừ BHXH/BHYT", max_digits=12, decimal_places=0, default=0)
+    phi_cong_doan = models.DecimalField("Kinh phí Công đoàn", max_digits=12, decimal_places=0, default=0)
+    
+    # --- Kết quả quyết toán ---
+    thuc_lanh = models.DecimalField("Thực lĩnh cuối kỳ", max_digits=12, decimal_places=0, default=0)
+    ghi_chu = models.TextField("Ghi chú nghiệp vụ", blank=True, help_text="Giải trình các khoản thưởng/phạt đặc thù.")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     class Meta: 
         verbose_name = "Phiếu lương cá nhân"
         verbose_name_plural = "Phiếu lương cá nhân"
         unique_together = ('bang_luong', 'nhan_vien', 'tenant_id')
 
+<<<<<<< HEAD
     if TYPE_CHECKING:
         # Type hints for dynamic and auto-generated attributes
         bang_luong_id: int
@@ -257,6 +395,11 @@ class ChiTietLuong(TenantScopedModel):
             raise ValidationError(
                 "Kỳ lương đã LOCKED/PAID. Phiếu lương chi tiết chỉ được đọc, không được sửa trực tiếp."
             )
+=======
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         super().clean()
 
     objects = ChiTietLuongManager()
@@ -281,7 +424,11 @@ class ChiTietLuong(TenantScopedModel):
 
     @property
     def tong_phu_cap(self):
+<<<<<<< HEAD
         """Compatibility alias cho các báo cáo và template."""
+=======
+        """Compatibility alias for legacy templates and reports."""
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         return self.phu_cap_khac
 
     @property
@@ -292,14 +439,23 @@ class ChiTietLuong(TenantScopedModel):
                 self.bao_hiem + self.phi_cong_doan)
 
     def save(self, *args, **kwargs):
+<<<<<<< HEAD
         """Save đơn thuần: enforce organization scope và validate payroll lock."""
         self.tenant_id = self.organization_id()
         self.full_clean()
+=======
+        """Save đơn thuần: Enforce multi-tenancy và cập nhật bảng tổng."""
+        # 0. Thực thi Multi-tenancy
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
         # Infrastructure Layer only. 
         # Side effects (update_totals) must be called explicitly by the Orchestrator/UseCase.
         with transaction.atomic():
             super().save(*args, **kwargs)
+<<<<<<< HEAD
             # Capability 11: Bổ sung audit trail trực tiếp tại model cho dữ liệu nhạy cảm
             if hasattr(self, '_audit_note'):
                  from main.models import AuditLog
@@ -311,11 +467,14 @@ class ChiTietLuong(TenantScopedModel):
                      object_id=self.pk,
                      note=self._audit_note
                  )
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     def __str__(self): 
         return f"Phiếu lương: {self.nhan_vien.ma_nhan_vien} | Thực nhận: {self.thuc_lanh:,.0f} VNĐ"
 
 
+<<<<<<< HEAD
 class PayrollAdjustment(TenantScopedModel):
     """Append-only retroactive payroll adjustment after a payroll period is locked/paid.
 
@@ -602,6 +761,9 @@ class KhoanKhauTruNhanVien(TenantScopedModel):
 
 
 class PhanHoiLuong(TenantScopedModel):
+=======
+class PhanHoiLuong(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """
     Lưu trữ các phản hồi/khiếu nại về lương từ nhân viên.
     Tuân thủ Audit Trail (Section 12.3 - DOCUMENTATION.md).
@@ -612,6 +774,11 @@ class PhanHoiLuong(TenantScopedModel):
         ('DA_GIAI_QUYET', 'Đã giải quyết'),
         ('TU_CHOI', 'Từ chối'),
     ]
+<<<<<<< HEAD
+=======
+
+    tenant_id = models.UUIDField("Tenant ID", db_index=True)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     chi_tiet_luong = models.ForeignKey(
         ChiTietLuong, 
         on_delete=models.CASCADE, 
@@ -634,8 +801,11 @@ class PhanHoiLuong(TenantScopedModel):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     class Meta:
         verbose_name = "Phản hồi lương"
         verbose_name_plural = "2. Phản hồi lương (Dispute)"

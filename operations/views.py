@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
@@ -11,6 +15,10 @@ Updated Date: 2026-04-28
 Version: v1.1.0
 Description: Views xử lý logic Vận hành.
              UPDATED: dashboard_vanhanh_view chuyển sang render Skeleton (tối ưu hiệu năng).
+<<<<<<< HEAD
+=======
+             PRESERVED: Giữ nguyên toàn bộ logic Mobile Views và Xếp lịch từ file gốc.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 """
 
 import os
@@ -19,16 +27,24 @@ import logging
 from datetime import datetime, timedelta, date
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+<<<<<<< HEAD
 from main.dashboard_router import dashboard_access_required
 from django.utils import timezone
 from django.db.models import Count
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
 from django.views.decorators.http import require_POST
+=======
+from django.utils import timezone
+from django.db.models import Count
+from django.http import HttpResponse
+from django.conf import settings
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.views.decorators.cache import cache_control
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
+<<<<<<< HEAD
 from django.urls import reverse
 from main.dashboard_cta import admin_url_if_permitted, dashboard_route_url, reverse_or_none
 from reports.access_policies import ReportAccessPolicy
@@ -57,11 +73,23 @@ from .application.proposal_management_use_cases import CreateFieldProposalUseCas
 from .access_policies import ShiftAccessPolicy, ShiftAssignmentPolicy
 from users.access_policies import StaffVisibilityPolicy
 from rolepermissions.checkers import has_permission, has_role
+=======
+
+from .models import PhanCongCaTruc, BaoCaoSuCo, ChamCong, KiemTraQuanSo, ViTriChot, CaLamViec, BaoCaoDeXuat
+from users.models import NhanVien
+from clients.models import MucTieu
+from .forms import BaoCaoSuCoForm, BaoCaoDeXuatForm
+from .application.attendance_use_cases import CheckInUseCase, CheckOutUseCase, GetMobileDashboardUseCase, TriggerSOSUseCase, ConfirmAliveCheckUseCase
+from .api_serializers import CheckInCheckOutSerializer
+from .access_policies import ShiftAccessPolicy
+from rolepermissions.checkers import has_role
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from rolepermissions.decorators import has_permission_decorator
 
 logger = logging.getLogger(__name__)
 
 
+<<<<<<< HEAD
 def _user_can_schedule_shifts(user):
     return bool(
         getattr(user, "is_authenticated", False)
@@ -72,6 +100,8 @@ def _user_can_schedule_shifts(user):
     )
 
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 def _handle_mobile_operation_error(request, message, log_message):
     logger.exception(log_message)
     messages.error(request, message)
@@ -92,6 +122,7 @@ def get_mobile_context(request):
     except (AttributeError, NhanVien.DoesNotExist):
         return None
 
+<<<<<<< HEAD
 
 def _build_schedule_dashboard_context(request):
     """
@@ -325,6 +356,41 @@ def hoan_thanh_tuan_tra(request, luot_id):
     return redirect('operations:mobile_tuan_tra_list')
 
 
+=======
+@login_required
+def dashboard_vanhanh_view(request):
+    """
+    [OPTIMIZED] Render khung Dashboard "War Room".
+    Dữ liệu sẽ được fetch async từ API /api/dashboard/data/
+    """
+    return render(request, "operations/dashboard_vanhanh.html")
+
+# --- MOBILE VIEWS (Giữ nguyên logic gốc) ---
+@login_required
+def mobile_dashboard(request):
+    nhan_vien = get_mobile_context(request)
+    if not nhan_vien: return render(request, "operations/mobile/error_no_profile.html")
+    
+    # SSOT: Delegate logic tìm ca trực sang Application Layer
+    ca_truc_hom_nay, trang_thai_checkin = GetMobileDashboardUseCase.execute(nhan_vien)
+
+    alive_check_pending = None
+    if ca_truc_hom_nay:
+        alive_check_pending = KiemTraQuanSo.objects.filter(ca_truc=ca_truc_hom_nay, trang_thai='PENDING').first()
+
+    local_now = timezone.localtime(timezone.now())
+    greeting = "Chào buổi sáng" if 5 <= local_now.hour < 11 else "Chào buổi trưa" if 11 <= local_now.hour < 13 else "Chào buổi chiều" if 13 <= local_now.hour < 18 else "Chào buổi tối"
+
+    return render(request, 'operations/mobile/dashboard.html', {
+        'nhan_vien': nhan_vien,
+        'ca_truc_hom_nay': ca_truc_hom_nay,
+        'greeting': greeting,
+        'trang_thai_checkin': trang_thai_checkin,
+        'alive_check_pending': alive_check_pending,
+        'google_maps_api_key': getattr(settings, 'GOOGLE_MAPS_API_KEY', '')
+    })
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 @login_required
 def check_in_view(request, phan_cong_id):
     if request.method == 'POST':
@@ -411,27 +477,41 @@ def trigger_sos(request):
             lat, lng = request.POST.get('lat', ''), request.POST.get('lng', '')
             # Rule 3.2: Delegated to TriggerSOSUseCase
             success, msg, _, _ = TriggerSOSUseCase.execute(nhan_vien, lat, lng)
+<<<<<<< HEAD
             if success:
                 messages.warning(request, msg)
             else:
                 messages.error(request, msg)
+=======
+            if success: messages.warning(request, msg)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     return redirect('operations:mobile_dashboard')
 
 @login_required
 def mobile_cham_cong_view(request):
+<<<<<<< HEAD
     nhan_vien = get_mobile_context(request)
     if not nhan_vien:
         return redirect('operations:mobile_dashboard')
 
     if request.method == 'POST':
         try:
+=======
+    if request.method == 'POST':
+        try:
+            nhan_vien = request.user.nhan_vien
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             action = request.POST.get('action') 
             lat = request.POST.get('lat')
             lng = request.POST.get('lng')
             note = request.POST.get('note', '')
             
             # DRY: Tái sử dụng logic xác định ca trực từ GetMobileDashboardUseCase
+<<<<<<< HEAD
             target_pc, status_pc, alive_check_pending = GetMobileDashboardUseCase.execute(nhan_vien)
+=======
+            target_pc, status_pc = GetMobileDashboardUseCase.execute(nhan_vien)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             
             if not target_pc: 
                 messages.error(request, "Không tìm thấy ca trực hợp lệ!"); 
@@ -454,6 +534,7 @@ def mobile_cham_cong_view(request):
                 "Khong the xu ly cham cong luc nay. Vui long thu lai hoac lien he quan tri.",
                 "Unexpected error while processing mobile attendance",
             )
+<<<<<<< HEAD
         return redirect('operations:mobile_cham_cong')
 
     current_shift, status_pc, alive_check_pending = GetMobileDashboardUseCase.execute(nhan_vien)
@@ -474,18 +555,26 @@ def mobile_cham_cong_view(request):
             'attendance_history': attendance_history,
         },
     )
+=======
+    return redirect('operations:mobile_dashboard')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 @login_required
 def mobile_lich_truc_view(request):
     nhan_vien = get_mobile_context(request); 
     if not nhan_vien: return redirect('operations:mobile_dashboard')
     today = timezone.now().date()
+<<<<<<< HEAD
     return render(request, 'operations/mobile/lich_truc.html', {'danh_sach_ca_truc': PhanCongCaTruc.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(nhan_vien=nhan_vien, ngay_truc__gte=today, ngay_truc__lte=today+timedelta(days=7)).select_related('ca_lam_viec', 'vi_tri_chot__muc_tieu').order_by('ngay_truc')})
+=======
+    return render(request, 'operations/mobile/lich_truc.html', {'danh_sach_ca_truc': PhanCongCaTruc.objects.filter(nhan_vien=nhan_vien, ngay_truc__gte=today, ngay_truc__lte=today+timedelta(days=7)).select_related('ca_lam_viec', 'vi_tri_chot__muc_tieu').order_by('ngay_truc')})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 @login_required
 def bao_cao_su_co_mobile_view(request):
     nhan_vien = get_mobile_context(request); 
     if not nhan_vien: return redirect('operations:mobile_dashboard')
+<<<<<<< HEAD
     ca_truc = PhanCongCaTruc.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(nhan_vien=nhan_vien, chamcong__thoi_gian_check_in__isnull=False, chamcong__thoi_gian_check_out__isnull=True).last()
     if request.method == "POST":
         form = BaoCaoSuCoForm(request.POST, request.FILES)
@@ -501,6 +590,15 @@ def bao_cao_su_co_mobile_view(request):
             else:
                 messages.success(request, "Đã gửi báo cáo!")
                 return redirect("operations:mobile_dashboard")
+=======
+    ca_truc = PhanCongCaTruc.objects.filter(nhan_vien=nhan_vien, chamcong__thoi_gian_check_in__isnull=False, chamcong__thoi_gian_check_out__isnull=True).last()
+    if request.method == "POST":
+        form = BaoCaoSuCoForm(request.POST, request.FILES)
+        if form.is_valid():
+            bc = form.save(commit=False); bc.nhan_vien_bao_cao = nhan_vien
+            if ca_truc: bc.muc_tieu = ca_truc.vi_tri_chot.muc_tieu
+            bc.save(); messages.success(request, "Đã gửi báo cáo!"); return redirect("operations:mobile_dashboard")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     return render(request, "operations/mobile/bao_cao_su_co.html", {"form": BaoCaoSuCoForm(), "ca_truc": ca_truc})
 
 @login_required
@@ -516,6 +614,7 @@ def xac_nhan_alive_check(request, check_id):
 def mobile_lich_su_cham_cong(request):
     nhan_vien = get_mobile_context(request); 
     if not nhan_vien: return redirect('operations:mobile_dashboard')
+<<<<<<< HEAD
     
     history_data = GetAttendanceHistoryUseCase.execute(nhan_vien)
     return render(request, 'operations/mobile/lich_su_cham_cong.html', {
@@ -523,6 +622,11 @@ def mobile_lich_su_cham_cong(request):
         'tong_cong': history_data['tong_cong'], 
         'thang': history_data['month']
     })
+=======
+    today = timezone.now().date(); start_month = today.replace(day=1)
+    lich_su = PhanCongCaTruc.objects.filter(nhan_vien=nhan_vien, ngay_truc__gte=start_month, ngay_truc__lte=today).select_related('ca_lam_viec', 'vi_tri_chot__muc_tieu', 'chamcong').order_by('-ngay_truc')
+    return render(request, 'operations/mobile/lich_su_cham_cong.html', {'lich_su': lich_su, 'tong_cong': lich_su.filter(chamcong__thoi_gian_check_out__isnull=False).count(), 'thang': today.month})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 @login_required
 def mobile_de_xuat_list(request):
@@ -532,6 +636,7 @@ def mobile_de_xuat_list(request):
 
 @login_required
 def mobile_de_xuat_create(request):
+<<<<<<< HEAD
     nhan_vien = get_mobile_context(request)
     if not nhan_vien:
         return redirect('operations:mobile_dashboard')
@@ -543,6 +648,16 @@ def mobile_de_xuat_create(request):
             return redirect('operations:mobile_de_xuat_list')
         messages.error(request, "Biểu mẫu đề xuất chưa hợp lệ. Vui lòng kiểm tra lại thông tin.")
     return render(request, "operations/mobile/de_xuat_form.html", {"form": form})
+=======
+    nhan_vien = get_mobile_context(request); 
+    if not nhan_vien: return redirect('operations:mobile_dashboard')
+    if request.method == "POST":
+        form = BaoCaoDeXuatForm(request.POST, request.FILES)
+        if form.is_valid():
+            dx = form.save(commit=False); dx.nhan_vien = nhan_vien
+            dx.save(); messages.success(request, "Đã gửi đề xuất!"); return redirect('operations:mobile_de_xuat_list')
+    return render(request, "operations/mobile/de_xuat_form.html", {"form": BaoCaoDeXuatForm()})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 @login_required
 def mobile_de_xuat_detail(request, pk):
@@ -552,6 +667,7 @@ def mobile_de_xuat_detail(request, pk):
 def danh_sach_muc_tieu(request):
     # Rule 4.1: Thực thi Site Scoping / Organization ID
     # MucTieu chưa có tenant_id (thuộc module clients), nhưng ta có thể lọc theo logic phân vùng sau này
+<<<<<<< HEAD
     muc_tieus = (
         MucTieu.objects.for_tenant(settings.SCMD_ORGANIZATION_ID)
         .select_related('quan_ly_muc_tieu')
@@ -570,10 +686,14 @@ def danh_sach_muc_tieu(request):
             'add_muc_tieu_admin_url': add_muc_tieu_admin_url,
         },
     )
+=======
+    return render(request, "operations/danh_sach_muc_tieu.html", {'muc_tieus': MucTieu.objects.select_related('quan_ly_muc_tieu').annotate(so_vi_tri=Count('cac_vi_tri_chot'))})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 @login_required
 def chi_tiet_muc_tieu(request, pk):
     # Tận dụng các related_name đã chuẩn hóa
+<<<<<<< HEAD
     muc_tieu = get_object_or_404(
         MucTieu.objects.for_tenant(settings.SCMD_ORGANIZATION_ID),
         pk=pk,
@@ -618,10 +738,49 @@ def chi_tiet_muc_tieu(request, pk):
 @dashboard_access_required("operations:dashboard_xep_lich")
 def xep_lich_view(request):
     return render(request, "operations/xep_lich.html", _build_schedule_dashboard_context(request))
+=======
+    muc_tieu = get_object_or_404(MucTieu, pk=pk)
+    vi_tris = ViTriChot.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(muc_tieu=muc_tieu)
+    nhan_viens = NhanVien.objects.filter(cac_phan_cong__vi_tri_chot__muc_tieu=muc_tieu, cac_phan_cong__ngay_truc=timezone.now().date()).distinct()
+    return render(request, "operations/chi_tiet_muc_tieu.html", {'muc_tieu': muc_tieu, 'vi_tris': vi_tris, 'nhan_viens': nhan_viens})
+
+@login_required
+@has_permission_decorator('giao_ca_truc')
+def xep_lich_view(request):
+    date_str = request.GET.get('date')
+    start_date = datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else timezone.now().date()
+    start_of_week = start_date - timedelta(days=start_date.weekday())
+    days_of_week = [start_of_week + timedelta(days=i) for i in range(7)]
+    muc_tieu_id = request.GET.get('muc_tieu')
+
+    # --- SITE SCOPING (Rule 2.2 WHITEPAPER) ---
+    nv = getattr(request.user, 'nhan_vien', None)
+    if request.user.is_superuser or has_role(request.user, ['ban_giam_doc', 'ke_toan']):
+        managed_sites = MucTieu.objects.all()
+    elif has_role(request.user, 'quan_ly_vung'):
+        managed_sites = MucTieu.objects.filter(quan_ly_vung=nv)
+    elif has_role(request.user, 'doi_truong'):
+        managed_sites = MucTieu.objects.filter(quan_ly_muc_tieu=nv)
+    else:
+        managed_sites = MucTieu.objects.none()
+
+    vi_tris_qs = ViTriChot.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(muc_tieu__in=managed_sites)
+    if muc_tieu_id:
+        vi_tris = vi_tris_qs.filter(muc_tieu_id=muc_tieu_id)
+    else:
+        vi_tris = vi_tris_qs.all()[:10]
+
+    phan_congs = PhanCongCaTruc.objects.for_tenant(settings.SCMD_ORGANIZATION_ID).filter(vi_tri_chot__in=vi_tris, ngay_truc__range=[start_of_week, days_of_week[-1]])
+    schedule_map = {vt: {day: [] for day in days_of_week} for vt in vi_tris}
+    for pc in phan_congs:
+        if pc.vi_tri_chot in schedule_map: schedule_map[pc.vi_tri_chot][pc.ngay_truc].append(pc)
+    return render(request, "operations/xep_lich.html", {'days_of_week': days_of_week, 'vi_tris': vi_tris, 'schedule_map': schedule_map, 'muc_tieus': managed_sites, 'ca_lam_viecs': CaLamViec.objects.all(), 'nhan_viens': NhanVien.objects.filter(trang_thai_lam_viec='CHINHTHUC'), 'prev_week': (start_of_week - timedelta(days=7)).strftime('%Y-%m-%d'), 'next_week': (start_of_week + timedelta(days=7)).strftime('%Y-%m-%d'), 'today': timezone.now().date()})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 @login_required
 @has_permission_decorator('giao_ca_truc')
 def them_ca_form_view(request, vi_tri_id, ca_id, ngay):
+<<<<<<< HEAD
     if not _user_can_schedule_shifts(request.user):
         return HttpResponse(
             '<div class="text-error text-[10px] leading-tight p-1">Bạn chưa có đủ quyền thêm/sửa/xóa ca trực.</div>',
@@ -657,11 +816,15 @@ def them_ca_form_view(request, vi_tri_id, ca_id, ngay):
         "ngay_truc": ngay_truc,
         "nhan_vien_list": nhan_vien_list,
     })
+=======
+    return render(request, "operations/partials/them_ca_form.html", {"vi_tri": get_object_or_404(ViTriChot, id=vi_tri_id), "ca": get_object_or_404(CaLamViec, id=ca_id), "ngay_truc": datetime.strptime(ngay, '%Y-%m-%d').date(), "nhan_vien_list": NhanVien.objects.filter(trang_thai_lam_viec='CHINHTHUC')})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 @login_required
 @has_permission_decorator('giao_ca_truc')
 def luu_ca_view(request):
     if request.method == "POST":
+<<<<<<< HEAD
         try:
             cell_context = ManageShiftAssignmentUseCase.execute(
                 action='SAVE',
@@ -731,3 +894,30 @@ def xoa_ca_view(request, phan_cong_id):
         return HttpResponse(f'<div class="text-error text-[10px] p-1">{e.result.message}</div>', status=403)
     except ValidationError as e:
         return HttpResponse(f'<div class="text-error text-[10px] p-1">{e.message}</div>', status=422)
+=======
+        # Refactored to Application Layer logic
+        delete_old_id = request.POST.get("delete_old")
+        nv_id = request.POST.get("nhan_vien_id")
+        vt_id = request.POST.get("vi_tri_id")
+        ca_id = request.POST.get("ca_id")
+        ngay = request.POST.get("ngay_truc")
+
+        # Logic moved from View to atomic transactional flow
+        with transaction.atomic():
+            if delete_old_id: 
+                PhanCongCaTruc.objects.filter(id=delete_old_id).delete()
+            if nv_id: 
+                PhanCongCaTruc.objects.create(nhan_vien_id=nv_id, vi_tri_chot_id=vt_id, ca_lam_viec_id=ca_id, ngay_truc=ngay)
+            
+        return render(request, "operations/partials/ca_truc_cell.html", {"phan_congs": PhanCongCaTruc.objects.filter(vi_tri_chot_id=vt_id, ca_lam_viec_id=ca_id, ngay_truc=ngay), "vi_tri": get_object_or_404(ViTriChot, id=vt_id), "ca": get_object_or_404(CaLamViec, id=ca_id), "day": datetime.strptime(ngay, '%Y-%m-%d').date()})
+    return redirect('operations:xep_lich')
+
+@login_required
+def sua_ca_form_view(request, phan_cong_id):
+    return render(request, "operations/partials/sua_ca_form.html", {"phan_cong": get_object_or_404(PhanCongCaTruc, id=phan_cong_id), "nhan_vien_list": NhanVien.objects.filter(trang_thai_lam_viec='CHINHTHUC')})
+
+@login_required
+def xoa_ca_view(request, phan_cong_id):
+    pc = get_object_or_404(PhanCongCaTruc, id=phan_cong_id); vt, ca, day = pc.vi_tri_chot, pc.ca_lam_viec, pc.ngay_truc; pc.delete()
+    return render(request, "operations/partials/ca_truc_cell.html", {"phan_congs": [], "vi_tri": vt, "ca": ca, "day": day})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

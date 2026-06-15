@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Sai lệch Audit Log</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { width: 80%; margin: 20px auto; border: 1px solid #ddd; padding: 20px; border-radius: 8px; }
+        .header { background-color: #ef4444; color: white; padding: 10px 20px; border-radius: 8px 8px 0 0; text-align: center; }
+        .content { padding: 20px; }
+        .footer { text-align: center; font-size: 0.8em; color: #777; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .warning { color: #ef4444; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>⚠️ CẢNH BÁO: PHÁT HIỆN SAI LỆCH TRONG AUDIT LOG SCMD ERP ⚠️</h2>
+        </div>
+        <div class="content">
+            <p>Kính gửi Ban Giám đốc,</p>
+            <p>Hệ thống SCMD ERP vừa phát hiện các bản ghi Audit Log có dấu hiệu bị can thiệp hoặc sai lệch checksum trong quá trình kiểm tra định kỳ.</p>
+            <p class="warning">Đây là một vấn đề bảo mật nghiêm trọng, có thể chỉ ra việc thay đổi dữ liệu trái phép hoặc lỗi hệ thống.</p>
+            
+            <h3>Chi tiết các bản ghi bị sai lệch:</h3>
+            {% if compromised_logs %}
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID Log</th>
+                            <th>Người thực hiện</th>
+                            <th>Hành động</th>
+                            <th>Thời điểm</th>
+                            <th>Lý do</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in compromised_logs %}
+                            <tr>
+                                <td>{{ log.id }}</td>
+                                <td>{{ log.user }}</td>
+                                <td>{{ log.action }}</td>
+                                <td>{{ log.timestamp }}</td>
+                                <td>{{ log.reason }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>Không có bản ghi nào bị sai lệch được tìm thấy trong báo cáo này.</p>
+            {% endif %}
+
+            <p>Vui lòng truy cập hệ thống Admin để kiểm tra chi tiết và thực hiện các biện pháp cần thiết.</p>
+            <p>Trân trọng,</p>
+            <p>Hệ thống SCMD ERP.</p>
+        </div>
+        <div class="footer">
+            <p>&copy; 2026 SCMD.co.ltd. All Rights Reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

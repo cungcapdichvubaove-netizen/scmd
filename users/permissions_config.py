@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -16,12 +20,17 @@ from django.utils.translation import gettext_lazy as _
 # Định nghĩa các nhóm chức năng để hiển thị trên Ma trận
 PERMISSION_GROUPS = {
     "1. VẬN HÀNH (OPERATIONS)": {
+<<<<<<< HEAD
         "description": _("Quản lý lịch trực, sự cố, chấm công và tuần tra mục tiêu"),
+=======
+        "description": _("Quản lý Lịch trực, Sự cố, Chấm công"),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         "models": [
             ("operations", "phancongcatruc", _("Lịch trực")),
             ("operations", "baocaosuco", _("Báo cáo Sự cố")),
             ("operations", "chamcong", _("Dữ liệu Chấm công")),
             ("operations", "kiemtraquanso", _("Kiểm tra Quân số (Alive Check)")),
+<<<<<<< HEAD
             ("operations", "lichtuantravanhanh", _("Lịch tuần tra theo ca")),
             ("operations", "nhiemvutuantraca", _("Nhiệm vụ tuần tra theo ca")),
             ("inspection", "loaituantra", _("Tuyến/điểm QR tuần tra vận hành (legacy table)")),
@@ -33,6 +42,15 @@ PERMISSION_GROUPS = {
         "models": [
             ("inspection", "dotthanhtra", _("Kế hoạch/đợt kiểm tra mục tiêu")),
             ("inspection", "bienbanthanhtra", _("Biên bản kiểm tra mục tiêu")),
+=======
+        ]
+    },
+    "2. TUẦN TRA (INSPECTION)": {
+        "description": _("Cấu hình Tuyến & Giám sát đi tuần"),
+        "models": [
+            ("inspection", "loaituantra", _("Tuyến tuần tra (QR)")),
+            ("inspection", "luottuantra", _("Lượt đi tuần")),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             ("inspection", "bienbanvipham", _("Biên bản Vi phạm/Kỷ luật")),
         ]
     },

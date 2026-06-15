@@ -1,6 +1,10 @@
 @echo off
 chcp 65001 >nul
+<<<<<<< HEAD
 title SCMD Pro - Deploy
+=======
+title SCMDERP - Deploy
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 where powershell.exe >nul 2>&1
 if %errorlevel% neq 0 (
@@ -19,7 +23,11 @@ if not exist "%~dp0Deploy-Desktop.ps1" (
 
 echo.
 echo =============================================================
+<<<<<<< HEAD
 echo   SCMD Pro - Deploy
+=======
+echo   SCMDERP - DEPLOY
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 echo =============================================================
 echo.
 echo   [1] Fast restart ^(bo qua build image, van migrate/check^)

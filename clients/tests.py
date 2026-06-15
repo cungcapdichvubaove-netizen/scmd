@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import uuid
 from decimal import Decimal
 
@@ -146,3 +147,8 @@ class MucTieuPayrollRateTest(TestCase):
 
         with self.assertRaises(PayrollRateConfigurationError):
             muc_tieu.get_payroll_rate_context(timezone.datetime(2025, 3, 10).date())
+=======
+from django.test import TestCase
+
+# Create your tests here.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

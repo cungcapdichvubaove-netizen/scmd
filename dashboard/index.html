@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% load static humanize %}
+
+{% block title %}Bảng điều hành vận hành | SCMD Pro{% endblock %}
+
+{% block content %}
+<div class="space-y-6 animate-fade-in">
+    <!-- 1. HÀNG CHỈ SỐ CHÍNH (KPIs) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Bảo vệ đang trực -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center text-xl">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-slate-500">Đang trực ca</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ stats.on_duty_guards }}</h3>
+            </div>
+        </div>
+
+        <!-- Sự cố chưa xử lý -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xl">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-slate-500">Sự cố chờ xử lý</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ stats.pending_incidents }}</h3>
+            </div>
+        </div>
+
+        <!-- Mục tiêu hoạt động -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl">
+                <i class="fas fa-map-marker-alt"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-slate-500">Mục tiêu ổn định</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ stats.active_targets }}</h3>
+            </div>
+        </div>
+
+        <!-- Cảnh báo kho -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center text-xl">
+                <i class="fas fa-boxes"></i>
+            </div>
+            <div>
+                <p class="text-sm font-medium text-slate-500">Vật tư sắp hết</p>
+                <h3 class="text-2xl font-bold text-slate-800">{{ inventory_alerts.count }}</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 2. BIỂU ĐỒ XU HƯỚNG SỰ CỐ (Dùng Chart.js) -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-slate-800">Tình hình an ninh tuần này</h3>
+                <select class="text-xs border-slate-200 rounded-lg focus:ring-blue-500">
+                    <option>7 ngày qua</option>
+                    <option>30 ngày qua</option>
+                </select>
+            </div>
+            <canvas id="incidentChart" height="280"></canvas>
+        </div>
+
+        <!-- 3. DANH SÁCH CẢNH BÁO KHO (Theo Realtime Inventory) -->
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+            <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <i class="fas fa-box-open text-amber-500"></i> Cảnh báo Vật tư
+            </h3>
+            <div class="space-y-4">
+                {% for item in inventory_alerts %}
+                <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                        <span class="text-sm font-medium text-slate-700">{{ item.ten_vat_tu }}</span>
+                    </div>
+                    <span class="text-xs font-bold text-red-600">Tồn: {{ item.so_luong_ton }}</span>
+                </div>
+                {% empty %}
+                <div class="text-center py-8">
+                    <i class="fas fa-check-circle text-success text-3xl mb-2"></i>
+                    <p class="text-sm text-slate-400">Kho hàng đang ở mức an toàn</p>
+                </div>
+                {% endfor %}
+                <a href="/inventory/kho-tong/" class="block text-center text-sm text-blue-600 font-semibold mt-4 hover:underline">Xem tất cả kho</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ chart_data.labels|json_script:"chart-labels" }}
+{{ chart_data.incidents|json_script:"chart-incidents" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('incidentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: JSON.parse(document.getElementById('chart-labels').textContent),
+                datasets: [{
+                    label: 'Số vụ sự cố',
+                    data: JSON.parse(document.getElementById('chart-incidents').textContent),
+                    borderColor: '#ef4444',
+                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, grid: { display: false } }, x: { grid: { display: false } } }
+            }
+        });
+    });
+</script>
+{% endblock %}

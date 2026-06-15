@@ -1,6 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
+<<<<<<< HEAD
 PROJECT_ROOT="${SCMDPRO_ROOT:-$(cd "$(dirname "$0")" && pwd)}"
 COMPOSE_FILE="$PROJECT_ROOT/docker-compose.yml"
 APP_URL="${SCMDPRO_APP_URL:-http://localhost:8000}"
@@ -11,6 +12,19 @@ APP_SERVICES=(web celery_worker celery_beat)
 APP_IMAGES=(scmd_pro-web:latest scmd_pro-celery_worker:latest scmd_pro-celery_beat:latest)
 ADMIN_USERNAME="${SCMD_ADMIN_USERNAME:-${DJANGO_SUPERUSER_USERNAME:-admin}}"
 HEALTH_URLS=("$APP_URL/login/" "$APP_URL/admin/login/")
+=======
+PROJECT_ROOT="${SCMDERP_ROOT:-/d/SCMDERP}"
+COMPOSE_FILE="$PROJECT_ROOT/docker-compose.yml"
+APP_URL="${SCMDERP_APP_URL:-http://localhost:8000}"
+LOG_FILE="$(cd "$(dirname "$0")" && pwd)/deploy-scmderp.log"
+MODE="${1:-full}"
+INFRA_SERVICES=(db redis)
+APP_SERVICES=(web celery_worker celery_beat)
+APP_IMAGES=(scmderp-web:latest scmderp-celery_worker:latest scmderp-celery_beat:latest)
+ADMIN_USERNAME="${SCMD_ADMIN_USERNAME:-${DJANGO_SUPERUSER_USERNAME:-admin}}"
+ADMIN_PASSWORD="${SCMD_ADMIN_PASSWORD:-${DJANGO_SUPERUSER_PASSWORD:-ScmdAdmin2026!}}"
+HEALTH_URLS=("$APP_URL/login/" "$APP_URL/admin/login/" "$APP_URL/api/docs/")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 TAILWIND_BUILD_ARTIFACT="$PROJECT_ROOT/theme/static/css/dist/styles.css"
 
 log() {
@@ -71,7 +85,11 @@ wait_app_health() {
 
     sleep 5
     elapsed=$((elapsed + 5))
+<<<<<<< HEAD
     log "INFO Dang cho SCMD Pro san sang $elapsed/$timeout giay"
+=======
+    log "INFO Dang cho SCMDERP san sang $elapsed/$timeout giay"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
   done
 
   log "ERR Health check timeout sau $timeout giay."
@@ -81,7 +99,11 @@ wait_app_health() {
 : > "$LOG_FILE"
 USED_LOCAL_IMAGE_FALLBACK=0
 log "========================================================="
+<<<<<<< HEAD
 log "  SCMD Pro - Deploy"
+=======
+log "  SCMDERP - DEPLOY"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 log "========================================================="
 log "INFO Project root: $PROJECT_ROOT"
 log "INFO Compose file: $COMPOSE_FILE"
@@ -127,6 +149,12 @@ run_compose up -d --force-recreate "${APP_SERVICES[@]}"
 
 wait_app_health 300
 
+<<<<<<< HEAD
 log "OK SCMD Pro san sang tai $APP_URL"
 log "OK Tai khoan admin: $ADMIN_USERNAME"
 log "OK Mat khau admin : da dong bo tu cau hinh moi truong"
+=======
+log "OK SCMDERP san sang tai $APP_URL"
+log "OK Tai khoan admin: $ADMIN_USERNAME"
+log "OK Mat khau admin : $ADMIN_PASSWORD"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

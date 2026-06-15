@@ -40,6 +40,7 @@ case "$1" in
         echo "✅ Đã cập nhật cấu trúc bảng dữ liệu."
         ;;
 
+<<<<<<< HEAD
     profile)
         echo "--- 📊 ĐANG CHẠY QUERY PROFILING TRÊN DASHBOARD ---"
         docker-compose exec web python manage.py profile_ops_dashboard
@@ -47,11 +48,18 @@ case "$1" in
 
     *)
         echo "Sử dụng: ./manage_dock.sh {debug|prod|restart|log|migrate|profile}"
+=======
+    *)
+        echo "Sử dụng: ./manage_dock.sh {debug|prod|restart|log|migrate}"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         echo "  debug   : Bật hot-reload để sửa lỗi nhanh"
         echo "  prod    : Tắt debug, chạy Gunicorn ổn định"
         echo "  log     : Xem log thời gian thực"
         echo "  migrate : Chạy lệnh migrate nhanh vào container"
+<<<<<<< HEAD
         echo "  profile : Kiểm tra hiệu năng truy vấn SQL trên Dashboard"
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         exit 1
         ;;
 esac

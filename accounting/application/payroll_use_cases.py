@@ -5,6 +5,7 @@ Application Layer: Payroll Use Cases.
 
 import logging
 from decimal import Decimal
+<<<<<<< HEAD
 from typing import TYPE_CHECKING, cast
 
 from django.conf import settings
@@ -17,6 +18,19 @@ from accounting.models import BangLuongThang, ChiTietLuong
 
 if TYPE_CHECKING:
     from core.managers import TenantAwareManager
+=======
+
+from django.db import transaction
+from django.db.models import Sum
+
+from main.decorators import application_audit_log
+from main.models import AuditLog
+from accounting.models import BangLuongThang, ChiTietLuong
+from accounting.models_soquy import SoQuy
+from inspection.models import BienBanViPham
+from inventory.models import PhieuXuat
+from operations.models import BaoCaoSuCo, ChamCong
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +41,7 @@ class CalculatePayrollUseCase:
     """
 
     @staticmethod
+<<<<<<< HEAD
     def build_batch_context(bang_luong, tenant_id, nhan_vien_ids):
         return PayrollCalculationService.build_batch_context(
             bang_luong=bang_luong,
@@ -35,11 +50,14 @@ class CalculatePayrollUseCase:
         )
 
     @staticmethod
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     @application_audit_log(
         module="accounting",
         model_name="ChiTietLuong",
         action=AuditLog.Action.EXECUTE,
     )
+<<<<<<< HEAD
     def execute(nhan_vien, bang_luong, tenant_id, batch_context=None, **kwargs):
         with transaction.atomic():
             tenant_id = tenant_id or settings.SCMD_ORGANIZATION_ID
@@ -84,10 +102,108 @@ class CalculatePayrollUseCase:
                 }
 
             chi_tiet, _ = chi_tiet_mgr.update_or_create(
+=======
+    def execute(nhan_vien, bang_luong, tenant_id, **kwargs):
+        with transaction.atomic():
+            thang = bang_luong.thang
+            nam = bang_luong.nam
+
+            attendance_qs = (
+                ChamCong.objects.for_tenant(tenant_id)
+                .filter(
+                    ca_truc__nhan_vien=nhan_vien,
+                    thoi_gian_check_in__year=nam,
+                    thoi_gian_check_in__month=thang,
+                    thoi_gian_check_in__isnull=False,
+                )
+                .select_related("ca_truc__vi_tri_chot__muc_tieu")
+            )
+
+            tong_gio_lam = Decimal("0")
+            luong_chinh = Decimal("0")
+            for cham_cong in attendance_qs:
+                gio_lam = Decimal(str(cham_cong.thuc_lam_gio or 0))
+                muc_tieu = cham_cong.ca_truc.vi_tri_chot.muc_tieu
+                don_gia_gio = Decimal(
+                    str(muc_tieu.get_don_gia_gio_thuc_te(thang, nam) or 0)
+                )
+
+                tong_gio_lam += gio_lam
+                luong_chinh += gio_lam * don_gia_gio
+
+            salary_config = getattr(nhan_vien, "cau_hinh_luong", None)
+            phu_cap_khac = Decimal("0")
+            if salary_config:
+                phu_cap_khac = (
+                    ChiTietLuong.to_decimal_safe(salary_config.phu_cap_trach_nhiem)
+                    + ChiTietLuong.to_decimal_safe(salary_config.phu_cap_xang_xe)
+                    + ChiTietLuong.to_decimal_safe(salary_config.phu_cap_an_uong)
+                )
+
+            thuong_chuyen_can = Decimal("0")
+
+            fines_data = BienBanViPham.objects.filter(
+                doi_tuong_vi_pham=nhan_vien,
+                ngay_vi_pham__month=thang,
+                ngay_vi_pham__year=nam,
+                trang_thai="DA_DUYET",
+            ).aggregate(total_fines=Sum("so_tien_phat"))
+            phat_vi_pham = ChiTietLuong.to_decimal_safe(fines_data.get("total_fines"))
+
+            inventory_data = PhieuXuat.objects.filter(
+                nhan_vien_nhan=nhan_vien,
+                loai_xuat="BAN_TRU_LUONG",
+                ngay_xuat__month=thang,
+                ngay_xuat__year=nam,
+                trang_thai_thanh_toan="CHUA_TRU",
+            ).aggregate(total_inventory=Sum("tong_tien_phai_thu"))
+            tien_dong_phuc = ChiTietLuong.to_decimal_safe(
+                inventory_data.get("total_inventory")
+            )
+
+            advance_data = SoQuy.objects.filter(
+                nhan_vien=nhan_vien,
+                loai_phieu="CHI",
+                hang_muc="TAM_UNG",
+                trang_thai="DA_DUYET",
+                ngay_lap__month=thang,
+                ngay_lap__year=nam,
+            ).aggregate(total_advance=Sum("so_tien"))
+            ung_luong = ChiTietLuong.to_decimal_safe(advance_data.get("total_advance"))
+
+            incident_data = BaoCaoSuCo.objects.filter(
+                nhan_vien_co_loi=nhan_vien,
+                thoi_gian_phat_hien__month=thang,
+                thoi_gian_phat_hien__year=nam,
+                trang_thai__in=["CHO_DEN_BU", "HOAN_TAT"],
+                tenant_id=tenant_id,
+            ).aggregate(total_compensation=Sum("phai_thu_nhan_vien"))
+            tien_den_bu = ChiTietLuong.to_decimal_safe(
+                incident_data.get("total_compensation")
+            )
+
+            bao_hiem = Decimal("0")
+            phi_cong_doan = Decimal("0")
+
+            thuc_lanh = (
+                luong_chinh
+                + thuong_chuyen_can
+                + phu_cap_khac
+                - ung_luong
+                - phat_vi_pham
+                - tien_dong_phuc
+                - tien_den_bu
+                - bao_hiem
+                - phi_cong_doan
+            )
+
+            chi_tiet, _ = ChiTietLuong.objects.update_or_create(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 bang_luong=bang_luong,
                 nhan_vien=nhan_vien,
                 defaults={
                     "tenant_id": tenant_id,
+<<<<<<< HEAD
                     "tong_gio_lam": calculation["tong_gio_lam"],
                     "so_ngay_nghi": calculation.get("so_ngay_nghi", 0),
                     "luong_chinh": calculation["luong_chinh"],
@@ -103,10 +219,27 @@ class CalculatePayrollUseCase:
                     "nguon_du_lieu_snapshot": snapshot,
                     "reconciliation_note": kwargs.get("reconciliation_note", "") or (
                         "Phase D: cần chạy lại đối soát nguồn trước khi review/lock." if existing_phase_c else ""
+=======
+                    "tong_gio_lam": float(tong_gio_lam),
+                    "luong_chinh": ChiTietLuong.to_decimal_safe(luong_chinh),
+                    "thuong_chuyen_can": ChiTietLuong.to_decimal_safe(
+                        thuong_chuyen_can
+                    ),
+                    "phu_cap_khac": ChiTietLuong.to_decimal_safe(phu_cap_khac),
+                    "ung_luong": ChiTietLuong.to_decimal_safe(ung_luong),
+                    "phat_vi_pham": ChiTietLuong.to_decimal_safe(phat_vi_pham),
+                    "tien_dong_phuc": ChiTietLuong.to_decimal_safe(tien_dong_phuc),
+                    "tien_den_bu": ChiTietLuong.to_decimal_safe(tien_den_bu),
+                    "bao_hiem": ChiTietLuong.to_decimal_safe(bao_hiem),
+                    "phi_cong_doan": ChiTietLuong.to_decimal_safe(phi_cong_doan),
+                    "thuc_lanh": max(
+                        ChiTietLuong.to_decimal_safe(thuc_lanh), Decimal("0")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                     ),
                 },
             )
 
+<<<<<<< HEAD
             if kwargs.get("reconcile_after_calculate"):
                 from accounting.application.payroll_reconciliation_use_case import PayrollSourceReconciliationUseCase
 
@@ -118,6 +251,8 @@ class CalculatePayrollUseCase:
                 )
                 chi_tiet.refresh_from_db()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             return chi_tiet
 
 
@@ -127,12 +262,15 @@ class AuditPayrollUseCase:
     """
 
     @staticmethod
+<<<<<<< HEAD
     @application_audit_log(
         module="accounting",
         model_name="BangLuongThang",
         action=AuditLog.Action.ACCESS,
         object_id_field="bang_luong"
     )
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def execute(bang_luong, tenant_id, user=None):
         try:
             bang_luong_id = (
@@ -156,17 +294,29 @@ class AuditPayrollUseCase:
             if not prev_bl:
                 return {
                     "status": "info",
+<<<<<<< HEAD
                     "message": f"Không có bảng lương tháng {prev_thang}/{prev_nam} để đối chiếu.",
                     "anomalies": [],
                 }
 
             chi_tiet_mgr = cast("TenantAwareManager", ChiTietLuong.objects)
             current_details = chi_tiet_mgr.for_tenant(tenant_id).filter(
+=======
+                    "message": f"Khong co bang luong thang {prev_thang}/{prev_nam} de doi chieu.",
+                    "anomalies": [],
+                }
+
+            current_details = ChiTietLuong.objects.for_tenant(tenant_id).filter(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 bang_luong=current_bl
             ).select_related("nhan_vien")
             prev_details_map = {
                 detail.nhan_vien_id: detail.thuc_lanh
+<<<<<<< HEAD
                 for detail in chi_tiet_mgr.for_tenant(tenant_id).filter(
+=======
+                for detail in ChiTietLuong.objects.for_tenant(tenant_id).filter(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                     bang_luong=prev_bl
                 )
             }
@@ -208,6 +358,7 @@ class AuditPayrollUseCase:
                 "anomalies": anomalies,
             }
         except Exception as exc:
+<<<<<<< HEAD
             # Rule 9: Tránh dump raw exception chứa PII/payroll detail vào log.
             # Sử dụng structured logging để ghi lại ngữ cảnh kỹ thuật an toàn.
             logger.error(
@@ -298,3 +449,7 @@ class LockPayrollBatchUseCase:
                 )
 
         return result
+=======
+            logger.error(f"Loi AuditPayrollUseCase: {str(exc)}")
+            return {"status": "error", "message": str(exc)}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

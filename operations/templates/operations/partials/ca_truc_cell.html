@@ -1,5 +1,6 @@
 {% for pc in phan_congs %}
     {% if pc.ca_lam_viec.id == ca.id %}
+<<<<<<< HEAD
         {% if can_schedule %}
             <div class="bg-blue-100 text-blue-800 rounded p-1.5 text-xs mb-1 cursor-pointer hover:bg-blue-200 border border-blue-200 relative group/card"
                  hx-get="{% url 'operations:sua_ca_form' pc.id %}"
@@ -18,10 +19,26 @@
 {% endfor %}
 
 {% if can_schedule %}
+=======
+        <div class="bg-blue-100 text-blue-800 rounded p-1.5 text-xs mb-1 cursor-pointer hover:bg-blue-200 border border-blue-200 relative group/card"
+             hx-get="{% url 'operations:sua_ca_form' pc.id %}" 
+             hx-target="#modal-content" 
+             onclick="document.getElementById('htmx-modal').showModal()">
+            <div class="font-bold">{{ pc.ca_lam_viec.ten_ca }}</div>
+            <div class="truncate">{{ pc.nhan_vien.ho_ten }}</div>
+        </div>
+    {% endif %}
+{% endfor %}
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 <button class="btn btn-ghost btn-xs w-full text-slate-300 hover:text-blue-600 hover:bg-blue-50 opacity-0 group-hover:opacity-100 transition-opacity"
         hx-get="{% url 'operations:them_ca_form' vi_tri.id ca.id day|date:'Y-m-d' %}"
         hx-target="#modal-content"
         onclick="document.getElementById('htmx-modal').showModal()">
     <i class="fas fa-plus"></i> {{ ca.ten_ca }}
+<<<<<<< HEAD
 </button>
 {% endif %}
+=======
+</button>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

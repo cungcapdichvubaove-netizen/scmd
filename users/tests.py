@@ -1,16 +1,26 @@
 # file: users/tests.py
+<<<<<<< HEAD
 from unittest.mock import patch
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.test import TestCase, RequestFactory
 from django.contrib.auth.models import User, Group, Permission
 from django.urls import reverse
 from django.core.exceptions import PermissionDenied # Import exception
+<<<<<<< HEAD
 from django.utils import timezone
 from .models import NhanVien, CauHinhMaNhanVien, PhongBan, ChucDanh
 from datetime import date, datetime, timedelta
 from main.models import AuditLog
 from rest_framework.test import APIClient
 from rest_framework import status
+=======
+from .models import NhanVien, CauHinhMaNhanVien, PhongBan, ChucDanh
+from datetime import date
+from main.models import AuditLog
+from rest_framework.test import APIClient
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from .views import export_ly_lich_pdf
 
 class NhanVienModelTestCase(TestCase):
@@ -21,6 +31,10 @@ class NhanVienModelTestCase(TestCase):
         
         self.phong_ban = PhongBan.objects.create(ten_phong_ban="Phòng Kỹ thuật")
         self.chuc_danh = ChucDanh.objects.create(ten_chuc_danh="Lập trình viên")
+<<<<<<< HEAD
+=======
+        self.user = User.objects.create_user('testuser', 'test@example.com', 'password')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def test_generate_employee_code_on_creation(self):
         nv1 = NhanVien.objects.create(
@@ -44,6 +58,7 @@ class NhanVienModelTestCase(TestCase):
         self.chuc_danh.nhom_quyen = group_cd
         self.chuc_danh.save()
 
+<<<<<<< HEAD
         user = User.objects.create_user('testuser', 'test@example.com', 'password')
         nhan_vien = user.nhan_vien
         nhan_vien.ho_ten = "Test Signal"
@@ -57,6 +72,16 @@ class NhanVienModelTestCase(TestCase):
 
         self.assertIn(group_pb, user.groups.all())
         self.assertIn(group_cd, user.groups.all())
+=======
+        nhan_vien = NhanVien.objects.create(
+            user=self.user, ho_ten="Test Signal", ngay_sinh=date(2000, 1, 1),
+            gioi_tinh="O", so_cccd="111222333", sdt_chinh="+84123456789",
+            email="signal@test.com", phong_ban=self.phong_ban, chuc_danh=self.chuc_danh
+        )
+        
+        self.assertIn(group_pb, self.user.groups.all())
+        self.assertIn(group_cd, self.user.groups.all())
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 class PDFExportTestCase(TestCase):
     def setUp(self):
@@ -92,6 +117,7 @@ class PDFExportTestCase(TestCase):
         response = export_ly_lich_pdf(request, self.nhan_vien.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], 'application/pdf')
+<<<<<<< HEAD
         audit_log = AuditLog.objects.filter(
             user=self.staff_user,
             module="users",
@@ -103,6 +129,8 @@ class PDFExportTestCase(TestCase):
         self.assertEqual(audit_log.user_id, self.staff_user.id)
         self.assertEqual(audit_log.changes["query_params"], {})
         self.assertIsNotNone(audit_log.timestamp)
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 class HRAlertHistoryAPITest(TestCase):
     def setUp(self):
@@ -110,7 +138,10 @@ class HRAlertHistoryAPITest(TestCase):
         self.user = User.objects.create_user(username='hr_user', password='password')
         self.client.force_authenticate(user=self.user)
         self.url = reverse('users:hralerthistory-list')
+<<<<<<< HEAD
         self.fixed_now = timezone.make_aware(datetime(2026, 6, 12, 9, 0, 0))
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
         # Create some AuditLog entries for testing
         self.alert1 = AuditLog.objects.create(
@@ -120,7 +151,11 @@ class HRAlertHistoryAPITest(TestCase):
             model_name='SystemAlert',
             note='hr_alert_summary',
             changes={'title': 'Alert 1', 'message': 'Message 1', 'count': 5},
+<<<<<<< HEAD
             timestamp=self.fixed_now - timedelta(days=5),
+=======
+            timestamp=timezone.now() - timedelta(days=5),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             status='SUCCESS'
         )
         self.alert2 = AuditLog.objects.create(
@@ -130,7 +165,11 @@ class HRAlertHistoryAPITest(TestCase):
             model_name='SystemAlert',
             note='hr_alert_summary',
             changes={'title': 'Alert 2', 'message': 'Another message', 'count': 10},
+<<<<<<< HEAD
             timestamp=self.fixed_now - timedelta(days=10),
+=======
+            timestamp=timezone.now() - timedelta(days=10),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             status='WARNING'
         )
         self.alert3 = AuditLog.objects.create(
@@ -140,7 +179,11 @@ class HRAlertHistoryAPITest(TestCase):
             model_name='SystemAlert',
             note='hr_alert_summary',
             changes={'title': 'Critical Alert', 'message': 'Important info', 'count': 1},
+<<<<<<< HEAD
             timestamp=self.fixed_now - timedelta(days=1),
+=======
+            timestamp=timezone.now() - timedelta(days=1),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             status='CRITICAL'
         )
         # Non-HR alert, should not be returned
@@ -150,6 +193,7 @@ class HRAlertHistoryAPITest(TestCase):
             module='operations',
             model_name='ChamCong',
             note='Check-in',
+<<<<<<< HEAD
             timestamp=self.fixed_now - timedelta(days=2),
             status='SUCCESS'
         )
@@ -216,3 +260,28 @@ class HRAlertHistoryAPITest(TestCase):
         fallback_entry = next(item for item in response.data['data'] if item['title'] == '')
         self.assertEqual(fallback_entry['message'], '')
         self.assertEqual(fallback_entry['count'], 0)
+=======
+            timestamp=timezone.now() - timedelta(days=2),
+            status='SUCCESS'
+        )
+
+    def test_list_hr_alerts(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(response.data['results'][0]['title'], 'Critical Alert') # Ordered by timestamp desc
+
+    def test_filter_by_date_range(self):
+        start_date = (timezone.now() - timedelta(days=6)).strftime('%Y-%m-%d')
+        end_date = (timezone.now() - timedelta(days=4)).strftime('%Y-%m-%d')
+        response = self.client.get(f"{self.url}?start_date={start_date}&end_date={end_date}")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['title'], 'Alert 1')
+
+    def test_filter_by_search(self):
+        response = self.client.get(f"{self.url}?search=Critical")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['title'], 'Critical Alert')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

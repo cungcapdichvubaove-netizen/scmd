@@ -4,7 +4,11 @@
     --scmd-navy-900: #0A192F;
     --scmd-navy-800: #112240;
     --scmd-navy-700: #233554;
+<<<<<<< HEAD
     --scmd-blue: #2563eb;
+=======
+    --scmd-cyan: #64FFDA;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     --scmd-slate: #8892B0;
     --scmd-white: #E6F1FF;
 }
@@ -51,13 +55,21 @@
     font-family: 'Saira', sans-serif;
     font-weight: 700;
     font-size: 11px;
+<<<<<<< HEAD
+=======
+    text-transform: uppercase;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     cursor: pointer; /* Bàn tay */
     display: flex; justify-content: space-between; align-items: center;
     transition: all 0.2s;
 }
 
 #nav-sidebar .module caption:hover {
+<<<<<<< HEAD
     color: var(--scmd-blue) !important;
+=======
+    color: var(--scmd-cyan) !important;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     background-color: rgba(100, 255, 218, 0.05) !important;
 }
 
@@ -96,8 +108,13 @@
 /* Active Highlight */
 .scmd-active-link {
     background-color: rgba(100, 255, 218, 0.15) !important;
+<<<<<<< HEAD
     border-left: 3px solid var(--scmd-blue) !important;
     color: var(--scmd-blue) !important;
+=======
+    border-left: 3px solid var(--scmd-cyan) !important;
+    color: var(--scmd-cyan) !important;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     font-weight: 700;
     padding-left: 30px !important;
 }

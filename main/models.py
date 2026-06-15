@@ -1,20 +1,30 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
 File: main/models.py
 Author: Senior Software Architect
 Version: v2.0.0 (Pro Edition)
+<<<<<<< HEAD
 Description: He thong Audit Log tap trung cho SCMD Pro.
              Tuan thu Nghi dinh 13/2023/ND-CP ve bao ve du lieu ca nhan.
+=======
+Description: Hệ thống Audit Log tập trung cho SCMD Erp.
+             Tuân thủ Nghị định 13/2023/ND-CP về bảo vệ dữ liệu cá nhân.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 """
 
 import uuid
 import hashlib
 import json
 from django.db import models
+<<<<<<< HEAD
 from django.core.exceptions import ValidationError
 from main.company_info import invalidate_company_info_cache
 from django.conf import settings
@@ -46,6 +56,11 @@ class AuditLogQuerySet(models.QuerySet):
 class AuditLogManager(models.Manager.from_queryset(AuditLogQuerySet)):
     use_in_migrations = False
 
+=======
+from django.conf import settings
+from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 class AuditLog(models.Model):
     """
@@ -60,6 +75,7 @@ class AuditLog(models.Model):
         EXECUTE = 'EXECUTE', _('Thực thi nghiệp vụ')
         LOGIN = 'LOGIN', _('Đăng nhập')
 
+<<<<<<< HEAD
     objects = AuditLogManager()
 
     tenant_id = models.UUIDField(
@@ -67,6 +83,13 @@ class AuditLog(models.Model):
         db_index=True,
         editable=False,
         null=True
+=======
+    tenant_id = models.UUIDField(
+        _("Tenant ID"), 
+        db_index=True, 
+        default=uuid.uuid4, 
+        editable=False
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     )
 
     user = models.ForeignKey(
@@ -101,6 +124,7 @@ class AuditLog(models.Model):
 
     def generate_checksum(self):
         """Tạo mã băm bảo vệ tính toàn vẹn của bản ghi log."""
+<<<<<<< HEAD
         # Sử dụng định dạng thời gian chuẩn hóa không có microsecond để đảm bảo tính ổn định giữa Memory và DB
         ts_str = self.timestamp.strftime('%Y-%m-%dT%H:%M:%S') if self.timestamp else "None"
         user_id_val = getattr(self, "user_id", "None")
@@ -130,6 +154,25 @@ class AuditLog(models.Model):
             _("AuditLog là append-only. Không được xóa bản ghi audit đã tạo.")
         )
 
+=======
+        # Sử dụng định dạng ISO cho timestamp để đảm bảo tính ổn định khi đối soát
+        ts_str = self.timestamp.isoformat() if self.timestamp else "None"
+        content = f"{self.tenant_id}-{self.user_id}-{self.action}-{self.model_name}-{self.object_id}-{json.dumps(self.changes or {})}-{ts_str}"
+        return hashlib.sha256(content.encode()).hexdigest()
+
+    def save(self, *args, **kwargs):
+        if not self.timestamp:
+            self.timestamp = timezone.now()
+            
+        if not self.tenant_id and hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            self.tenant_id = settings.SCMD_ORGANIZATION_ID
+            
+        if not self.checksum:
+            self.checksum = self.generate_checksum()
+            
+        super().save(*args, **kwargs)
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     @classmethod
     def log_access(cls, user, model_instance, field_name, tenant_id, ip="", ua=""):
         return cls.objects.create(
@@ -164,6 +207,7 @@ class WorkerHeartbeat(models.Model):
         verbose_name = _("Nhịp tim hệ thống")
         verbose_name_plural = _("Giám sát Workers (Heartbeat)")
 
+<<<<<<< HEAD
 
 
 class CompanyInfo(TenantScopedModel):
@@ -250,3 +294,9 @@ class CompanyInfo(TenantScopedModel):
             "logo_url": getattr(self.logo, "url", "") if self.logo else "",
             "logo_path": getattr(self.logo, "path", "") if self.logo else "",
         }
+=======
+    def save(self, *args, **kwargs):
+        if hasattr(settings, "SCMD_ORGANIZATION_ID"):
+            self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

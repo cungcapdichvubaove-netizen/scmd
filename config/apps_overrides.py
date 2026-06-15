@@ -3,6 +3,7 @@ from django.contrib.auth.apps import AuthConfig
 from django_celery_beat.apps import BeatConfig
 from django_celery_results.apps import CeleryResultConfig
 
+<<<<<<< HEAD
 
 class CustomAuthConfig(AuthConfig):
     verbose_name = "9. Quản trị hệ thống"
@@ -48,3 +49,13 @@ class CustomBeatConfig(BeatConfig):
 
 class CustomResultsConfig(CeleryResultConfig):
     verbose_name = "11. Kết quả tác vụ"
+=======
+class CustomAuthConfig(AuthConfig):
+    verbose_name = "9. QUẢN TRỊ HỆ THỐNG (AUTH)"
+
+class CustomBeatConfig(BeatConfig):
+    verbose_name = "10. LỊCH TRÌNH TỰ ĐỘNG"
+
+class CustomResultsConfig(CeleryResultConfig):
+    verbose_name = "11. KẾT QUẢ TÁC VỤ"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

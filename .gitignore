@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # =========================
 # SCMD Pro Git Ignore
 # =========================
@@ -54,10 +55,21 @@ gunicorn.pid
 daphne.pid
 
 # Python
+=======
+# Virtual Environments
+venv/
+.venv/
+env/
+venv.bak/
+ENV/
+
+# Python cache
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 __pycache__/
 *.py[cod]
 *$py.class
 .pytest_cache/
+<<<<<<< HEAD
 .mypy_cache/
 .ruff_cache/
 .coverage
@@ -78,10 +90,24 @@ local_settings.py
 settings_local.py
 
 # Node / frontend cache
+=======
+
+# Local Environment & Secrets
+.env
+.env.local
+.env.*
+db.sqlite3
+*.sqlite3
+dump.rdb
+celerybeat-schedule*
+
+# Node.js
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+<<<<<<< HEAD
 .pnpm-store/
 .cache/
 
@@ -117,3 +143,20 @@ desktop.ini
 *.mov
 *.avi
 *.webm
+=======
+
+# Django Specific
+staticfiles/
+media/
+
+# IDEs & Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+Thumbs.db
+*.log
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

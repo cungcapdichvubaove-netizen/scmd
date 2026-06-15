@@ -1,10 +1,17 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 Jazzmin configuration for the SCMD Pro operations admin shell.
 
 The admin shell is a working console, not a marketing site and not a purely
 technical menu. Keep the topbar quiet; navigation belongs in the sidebar and in
 role-aware workspaces rendered by the admin index.
+=======
+Jazzmin configuration for the SCMD technical admin console.
+
+This module defines the visual and navigational contract for `/admin/`.
+The goal is technical administration, not business dashboarding.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 """
 
 import logging
@@ -19,23 +26,39 @@ except (UndefinedValueError, Exception):
     ADMIN_UI_FEATURE_FLAG = True
 
 try:
+<<<<<<< HEAD
     _JAZZMIN_SITE_TITLE = config("JAZZMIN_SITE_TITLE", default="Quản trị kỹ thuật SCMD")
     _JAZZMIN_SITE_HEADER = config("JAZZMIN_SITE_HEADER", default="Quản trị kỹ thuật SCMD")
     _JAZZMIN_SITE_BRAND = config("JAZZMIN_SITE_BRAND", default="Quản trị kỹ thuật SCMD")
     _JAZZMIN_WELCOME_SIGN = config(
         "JAZZMIN_WELCOME_SIGN",
         default="Bàn làm việc vận hành SCMD Pro",
+=======
+    _JAZZMIN_SITE_TITLE = config("JAZZMIN_SITE_TITLE", default="SCMD Technical Console")
+    _JAZZMIN_SITE_HEADER = config("JAZZMIN_SITE_HEADER", default="SCMD Admin")
+    _JAZZMIN_SITE_BRAND = config("JAZZMIN_SITE_BRAND", default="SCMD")
+    _JAZZMIN_WELCOME_SIGN = config(
+        "JAZZMIN_WELCOME_SIGN",
+        default="Không gian quản trị kỹ thuật của SCMD",
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     )
     _JAZZMIN_COPYRIGHT = config("JAZZMIN_COPYRIGHT", default="SCMD © 2026")
     _JAZZMIN_THEME = config("JAZZMIN_THEME", default="flatly")
     _JAZZMIN_DARK_THEME = config("JAZZMIN_DARK_THEME", default="darkly")
+<<<<<<< HEAD
     _SITE_LOGO = config("JAZZMIN_SITE_LOGO", default="img/brand/logo-symbol.png")
     _LOGIN_LOGO = config("JAZZMIN_LOGIN_LOGO", default="img/brand/logo-symbol.png")
     _SITE_ICON = config("JAZZMIN_SITE_ICON", default="img/brand/favicon.ico")
+=======
+    _SITE_LOGO = config("JAZZMIN_SITE_LOGO", default="img/logo_moi.png")
+    _LOGIN_LOGO = config("JAZZMIN_LOGIN_LOGO", default="img/logo_moi.png")
+    _SITE_ICON = config("JAZZMIN_SITE_ICON", default="img/logo_moi.png")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     _CUSTOM_CSS = config("JAZZMIN_CUSTOM_CSS", default="common/css/custom_admin.css")
     _CUSTOM_JS = config("JAZZMIN_CUSTOM_JS", default="js/scmd_jazzmin_scroll.js")
 except (UndefinedValueError, Exception) as exc:
     logger.warning("Jazzmin config fallback applied: %s", exc)
+<<<<<<< HEAD
     _JAZZMIN_SITE_TITLE = "Quản trị kỹ thuật SCMD"
     _JAZZMIN_SITE_HEADER = "Quản trị kỹ thuật SCMD"
     _JAZZMIN_SITE_BRAND = "Quản trị kỹ thuật SCMD"
@@ -46,6 +69,18 @@ except (UndefinedValueError, Exception) as exc:
     _SITE_LOGO = "img/brand/logo-symbol.png"
     _LOGIN_LOGO = "img/brand/logo-symbol.png"
     _SITE_ICON = "img/brand/favicon.ico"
+=======
+    _JAZZMIN_SITE_TITLE = "SCMD Technical Console"
+    _JAZZMIN_SITE_HEADER = "SCMD Admin"
+    _JAZZMIN_SITE_BRAND = "SCMD"
+    _JAZZMIN_WELCOME_SIGN = "Không gian quản trị kỹ thuật của SCMD"
+    _JAZZMIN_COPYRIGHT = "SCMD © 2026"
+    _JAZZMIN_THEME = "flatly"
+    _JAZZMIN_DARK_THEME = "darkly"
+    _SITE_LOGO = "img/logo_moi.png"
+    _LOGIN_LOGO = "img/logo_moi.png"
+    _SITE_ICON = "img/logo_moi.png"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     _CUSTOM_CSS = "common/css/custom_admin.css"
     _CUSTOM_JS = "js/scmd_jazzmin_scroll.js"
 
@@ -56,6 +91,7 @@ JAZZMIN_SETTINGS = {
     "site_logo": _SITE_LOGO,
     "login_logo": _LOGIN_LOGO,
     "login_logo_dark": config("JAZZMIN_LOGIN_LOGO_DARK", default=_LOGIN_LOGO),
+<<<<<<< HEAD
     "site_logo_classes": "scmd-admin-brand-symbol",
     "site_icon": _SITE_ICON,
     "welcome_sign": _JAZZMIN_WELCOME_SIGN,
@@ -69,10 +105,26 @@ JAZZMIN_SETTINGS = {
     # The topbar must not become a second module navigation. Business navigation
     # belongs in the sidebar and operations workspace.
     "topmenu_links": [],
+=======
+    "site_logo_classes": "elevation-3",
+    "site_icon": _SITE_ICON,
+    "welcome_sign": _JAZZMIN_WELCOME_SIGN,
+    "copyright": _JAZZMIN_COPYRIGHT,
+    "search_model": ["users.NhanVien"],
+    "topmenu_links": [
+        {"name": "Bảng điều khiển hệ thống", "url": "admin:index", "icon": "fas fa-toolbox"},
+        {"name": "Người dùng", "model": "auth.User", "icon": "fas fa-user-lock"},
+        {"name": "Nhóm quyền", "model": "auth.Group", "icon": "fas fa-users-cog"},
+        {"name": "Nhật ký hệ thống", "model": "main.AuditLog", "icon": "fas fa-clipboard-list"},
+        {"name": "Giám sát worker", "model": "main.WorkerHeartbeat", "icon": "fas fa-heartbeat"},
+        {"name": "Lịch tác vụ", "model": "django_celery_beat.PeriodicTask", "icon": "fas fa-calendar-alt"},
+    ],
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     "show_sidebar": True,
     "navigation_expanded": False,
     "hide_apps": [],
     "hide_models": [],
+<<<<<<< HEAD
     # Sidebar should list stable admin destinations only. The work queue is
     # already rendered inside the admin index dashboard and must not be
     # duplicated here as a pseudo-navigation entry.
@@ -85,11 +137,25 @@ JAZZMIN_SETTINGS = {
         "inspection",
         "inventory",
         "accounting",
+=======
+    "order_with_respect_to": [
+        "auth",
+        "main",
+        "users",
+        "clients",
+        "operations",
+        "inspection",
+        "accounting",
+        "inventory",
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         "workflow",
         "reports",
         "notifications",
         "backup_restore",
+<<<<<<< HEAD
         "auth",
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         "django_celery_beat",
         "django_celery_results",
         "sessions",
@@ -116,16 +182,20 @@ JAZZMIN_SETTINGS = {
         "django_celery_beat": "fas fa-calendar-alt",
         "django_celery_results": "fas fa-history",
         "users.NhanVien": "fas fa-id-card-alt",
+<<<<<<< HEAD
         "users.HopDongLaoDong": "fas fa-file-contract",
         "users.PhuLucHopDongLaoDong": "fas fa-file-signature",
         "users.DonNghiPhep": "fas fa-calendar-minus",
         "users.QuyetDinhNghiViec": "fas fa-person-walking-arrow-right",
         "users.OffboardingChecklist": "fas fa-list-check",
         "users.HoSoBaoHiem": "fas fa-shield-heart",
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         "users.PhongBan": "fas fa-sitemap",
         "users.ChucDanh": "fas fa-user-tag",
         "clients.MucTieu": "fas fa-fort-awesome",
         "operations.BaoCaoSuCo": "fas fa-exclamation-triangle",
+<<<<<<< HEAD
         "operations.ShiftChangeRequest": "fas fa-right-left",
         "accounting.TamUngLuong": "fas fa-hand-holding-dollar",
         "accounting.KhoanKhauTruNhanVien": "fas fa-receipt",
@@ -135,11 +205,14 @@ JAZZMIN_SETTINGS = {
         "clients.CongNo": "fas fa-scale-balanced",
         "clients.ThanhToanKhachHang": "fas fa-money-bill-transfer",
         "clients.PhanBoThanhToanHoaDon": "fas fa-list-check",
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         "workflow.Task": "fas fa-clipboard-check",
     },
     "default_icon_parents": "fas fa-folder",
     "default_icon_children": "far fa-dot-circle",
     "related_modal_active": True,
+<<<<<<< HEAD
     "use_google_fonts_cdn": False,
     "custom_css": _CUSTOM_CSS,
     "custom_js": _CUSTOM_JS,
@@ -148,6 +221,13 @@ JAZZMIN_SETTINGS = {
     # but they hid required fields when Bootstrap tab activation failed and
     # made data entry unclear on operational admin screens.
     "changeform_format": "single",
+=======
+    "use_google_fonts_cdn": True,
+    "custom_css": _CUSTOM_CSS,
+    "custom_js": _CUSTOM_JS,
+    "show_ui_builder": False,
+    "changeform_format": "horizontal_tabs",
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 }
 
 JAZZMIN_UI_TWEAKS = {

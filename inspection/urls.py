@@ -14,7 +14,10 @@ urlpatterns = [
     path('mobile/bat-dau/<int:loai_id>/', views.bat_dau_tuan_tra, name='bat_dau_tuan_tra'),
     path('mobile/thuc-hien/<int:luot_id>/', views.thuc_hien_tuan_tra, name='thuc_hien_tuan_tra'),
     path('mobile/ghi-nhan/', views.ghi_nhan_diem, name='ghi_nhan_diem'),
+<<<<<<< HEAD
     path('mobile/ghi-nhan/quet-qr/', views.ghi_nhan_diem, name='xu_ly_quet_qr'),
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     path('mobile/hoan-thanh/<int:luot_id>/', views.hoan_thanh_tuan_tra, name='hoan_thanh_tuan_tra'),
     
     path('mobile/lap-bien-ban/', views.mobile_lap_bien_ban, name='mobile_lap_bien_ban'),

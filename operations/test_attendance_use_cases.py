@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+<<<<<<< HEAD
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
@@ -22,25 +23,45 @@ from operations.api_serializers import CheckInCheckOutSerializer
 from operations.admin import ChamCongAdmin
 from operations.application.attendance_correction_use_cases import CorrectAttendanceUseCase
 from operations.application.attendance_policies import AttendanceWindowPolicy
+=======
+from datetime import datetime
+from unittest.mock import patch
+
+from django.contrib.auth.models import User
+from django.test import TestCase
+from django.utils import timezone
+
+from clients.models import HopDong, MucTieu
+from main.models import AuditLog
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from operations.application.attendance_use_cases import (
     CalculateWorkHoursUseCase,
     CheckInUseCase,
     CheckOutUseCase,
+<<<<<<< HEAD
     TriggerSOSUseCase,
 )
 from operations.models import CaLamViec, ChamCong, ChamCongAdjustment, PhanCongCaTruc, ViTriChot
+=======
+)
+from operations.models import CaLamViec, ChamCong, PhanCongCaTruc, ViTriChot
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 class AttendanceUseCasesTest(TestCase):
     def setUp(self):
         today = timezone.now().date()
         self.today = today
+<<<<<<< HEAD
         self.tenant_id = settings.SCMD_ORGANIZATION_ID
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.user = User.objects.create_user(
             username="attendance-user",
             email="attendance@example.com",
             password="password",
         )
+<<<<<<< HEAD
         # Refactor (P1): Sử dụng update_or_create để tránh duplicate user_id/email từ signal
         self.nhan_vien, _ = NhanVien.objects.update_or_create(
             user=self.user,
@@ -52,6 +73,14 @@ class AttendanceUseCasesTest(TestCase):
                 "email": None # Enforce NULL for unique empty fields (P1)
             }
         )
+=======
+        self.nhan_vien = self.user.nhan_vien
+        self.nhan_vien.ho_ten = "Nhân viên chấm công"
+        self.nhan_vien.ngay_sinh = "1990-01-01"
+        self.nhan_vien.gioi_tinh = "M"
+        self.nhan_vien.sdt_chinh = "0912345678"
+        self.nhan_vien.save()
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
         self.hop_dong = HopDong.objects.create(
             so_hop_dong="HD-ATT-001",
@@ -59,7 +88,10 @@ class AttendanceUseCasesTest(TestCase):
             ngay_hieu_luc=today,
             ngay_het_han=today,
             gia_tri=1000000,
+<<<<<<< HEAD
             tenant_id=self.tenant_id,
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         self.muc_tieu = MucTieu.objects.create(
             hop_dong=self.hop_dong,
@@ -73,19 +105,26 @@ class AttendanceUseCasesTest(TestCase):
         self.vi_tri = ViTriChot.objects.create(
             muc_tieu=self.muc_tieu,
             ten_vi_tri="Cổng chính",
+<<<<<<< HEAD
             tenant_id=self.tenant_id,
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         self.ca_lam = CaLamViec.objects.create(
             ten_ca="Ca sáng",
             gio_bat_dau="06:00",
             gio_ket_thuc="14:00",
+<<<<<<< HEAD
             tenant_id=self.tenant_id,
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         self.phan_cong = PhanCongCaTruc.objects.create(
             vi_tri_chot=self.vi_tri,
             nhan_vien=self.nhan_vien,
             ca_lam_viec=self.ca_lam,
             ngay_truc=today,
+<<<<<<< HEAD
             tenant_id=self.tenant_id,
         )
         self.admin_site = AdminSite()
@@ -95,6 +134,13 @@ class AttendanceUseCasesTest(TestCase):
     def test_checkin_creates_attendance_and_audit_log(self, mock_validate_geofence):
         mock_validate_geofence.return_value.is_within_radius = True
         mock_validate_geofence.return_value.distance_meters = 12.5
+=======
+        )
+
+    @patch("operations.application.attendance_use_cases.validate_geofence")
+    def test_checkin_creates_attendance_and_audit_log(self, mock_validate_geofence):
+        mock_validate_geofence.return_value = (True, 12.5)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
         success, message, payload, error_code = CheckInUseCase.execute(
             phan_cong=self.phan_cong,
@@ -112,7 +158,11 @@ class AttendanceUseCasesTest(TestCase):
         self.assertEqual(message, "Check-in thành công.")
         self.assertIsNotNone(payload["id"])
 
+<<<<<<< HEAD
         cham_cong = ChamCong.objects.for_tenant(self.tenant_id).get(ca_truc=self.phan_cong)
+=======
+        cham_cong = ChamCong.objects.get(ca_truc=self.phan_cong)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.assertTrue(cham_cong.vi_tri_hop_le)
         self.assertEqual(cham_cong.khoang_cach_check_in, 12.5)
         self.assertEqual(
@@ -120,6 +170,7 @@ class AttendanceUseCasesTest(TestCase):
             1,
         )
 
+<<<<<<< HEAD
 
     @patch("operations.application.attendance_use_cases.GeofenceEvaluator.validate")
     def test_checkin_accepts_zero_coordinates_as_present_gps(self, mock_validate_geofence):
@@ -147,11 +198,16 @@ class AttendanceUseCasesTest(TestCase):
         self.assertTrue(cham_cong.vi_tri_hop_le)
         self.assertIsNotNone(cham_cong.location_check_in)
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def test_checkin_rejects_duplicate_checkin(self):
         ChamCong.objects.create(
             ca_truc=self.phan_cong,
             thoi_gian_check_in=timezone.now(),
+<<<<<<< HEAD
             tenant_id=self.tenant_id,
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
 
         success, _, payload, error_code = CheckInUseCase.execute(
@@ -168,6 +224,7 @@ class AttendanceUseCasesTest(TestCase):
         self.assertEqual(error_code, "ALREADY_CHECKED_IN")
         self.assertIsNotNone(payload["time"])
 
+<<<<<<< HEAD
     @override_settings(ATTENDANCE_REQUIRE_IMAGE_CHECKIN=True)
     def test_checkin_rejects_missing_image_when_policy_requires_photo(self):
         success, message, payload, error_code = CheckInUseCase.execute(
@@ -307,6 +364,8 @@ class AttendanceUseCasesTest(TestCase):
         self.assertEqual(error_code, "ALREADY_CHECKED_IN")
         self.assertEqual(payload["time"], existing_cham_cong.thoi_gian_check_in)
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def test_checkout_requires_existing_checkin(self):
         success, message, payload, error_code = CheckOutUseCase.execute(
             phan_cong=self.phan_cong,
@@ -323,6 +382,7 @@ class AttendanceUseCasesTest(TestCase):
         self.assertEqual(message, "Chưa tìm thấy dữ liệu Check-in.")
         self.assertIsNone(payload)
 
+<<<<<<< HEAD
     @override_settings(ATTENDANCE_REQUIRE_IMAGE_CHECKOUT=True)
     def test_checkout_rejects_missing_image_when_policy_requires_photo(self):
         ChamCong.objects.create(
@@ -369,13 +429,18 @@ class AttendanceUseCasesTest(TestCase):
         self.assertEqual(message, "Khong chap nhan GPS gia lap trong luong check-out.")
         self.assertIsNone(payload)
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     @patch("operations.application.attendance_use_cases.process_timesheet_async.delay")
     def test_checkout_updates_shift_and_enqueues_timesheet_processing(self, mock_delay):
         ChamCong.objects.create(
             ca_truc=self.phan_cong,
             thoi_gian_check_in=timezone.now(),
             ghi_chu="Đã vào ca",
+<<<<<<< HEAD
             tenant_id=self.tenant_id,
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
 
         with self.captureOnCommitCallbacks(execute=True):
@@ -395,11 +460,16 @@ class AttendanceUseCasesTest(TestCase):
         self.assertEqual(message, "Check-out thành công.")
         self.assertIsNotNone(payload["time"])
 
+<<<<<<< HEAD
         cham_cong = ChamCong.objects.for_tenant(self.tenant_id).get(ca_truc=self.phan_cong)
+=======
+        cham_cong = ChamCong.objects.get(ca_truc=self.phan_cong)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.assertIsNotNone(cham_cong.thoi_gian_check_out)
         self.assertIn("Kết thúc ca", cham_cong.ghi_chu)
         mock_delay.assert_called_once_with(cham_cong.id)
 
+<<<<<<< HEAD
     def test_trigger_sos_requires_real_gps_coordinates(self):
         success, message, payload, error_code = TriggerSOSUseCase.execute(
             self.nhan_vien,
@@ -415,6 +485,8 @@ class AttendanceUseCasesTest(TestCase):
         )
         self.assertIsNone(payload)
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def test_calculate_work_hours_returns_zero_for_negative_duration(self):
         cham_cong = ChamCong(
             ca_truc=self.phan_cong,
@@ -427,6 +499,7 @@ class AttendanceUseCasesTest(TestCase):
         )
 
         self.assertEqual(CalculateWorkHoursUseCase.execute(cham_cong), 0.0)
+<<<<<<< HEAD
 
     def test_admin_blocks_direct_attendance_edit_when_payroll_locked(self):
         cham_cong = ChamCong.objects.create(
@@ -711,3 +784,5 @@ class CheckInCheckOutSerializerTest(TestCase):
             str(serializer.errors['ca_truc_id'][0]),
             "Ca trực không hợp lệ hoặc bạn không có quyền thao tác."
         )
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

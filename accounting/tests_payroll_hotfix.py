@@ -2,19 +2,31 @@
 
 from datetime import datetime
 from decimal import Decimal
+<<<<<<< HEAD
 from unittest.mock import MagicMock, patch
 
 from django.conf import settings
+=======
+from unittest.mock import patch
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.test import TestCase
 from django.utils import timezone
 
 from accounting.application.payroll_use_cases import CalculatePayrollUseCase
+<<<<<<< HEAD
 from accounting.domain.payroll_rate import PayrollRateConfigurationError, calculate_hourly_rate
 from accounting.models import BangLuongThang, CauHinhLuong, ChiTietLuong, KhoanKhauTruNhanVien
 from accounting.models_soquy import SoQuy
 from accounting.services.payroll import PayrollService
 from accounting.tasks import accounting_calculate_monthly_payroll
 from clients.models import HopDong, MucTieu, MucTieuDonGiaHistory
+=======
+from accounting.models import BangLuongThang, CauHinhLuong, ChiTietLuong
+from accounting.models_soquy import SoQuy
+from accounting.services.payroll import PayrollService
+from clients.models import HopDong, MucTieu
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from inspection.models import BienBanViPham
 from inventory.models import PhieuXuat
 from operations.models import CaLamViec, ChamCong, PhanCongCaTruc, ViTriChot, BaoCaoSuCo
@@ -25,14 +37,20 @@ class PayrollHotfixTest(TestCase):
     def setUp(self):
         today = timezone.now().date()
         self.today = today
+<<<<<<< HEAD
         self.tenant_id = settings.SCMD_ORGANIZATION_ID
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.nhan_vien = NhanVien.objects.create(
             ma_nhan_vien="PAY001",
             ho_ten="Nhan vien Payroll",
             ngay_sinh="1990-01-01",
             trang_thai_lam_viec="CHINHTHUC",
             sdt_chinh="+84999999999",
+<<<<<<< HEAD
             tenant_id=self.tenant_id
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         CauHinhLuong.objects.create(
             nhan_vien=self.nhan_vien,
@@ -46,7 +64,10 @@ class PayrollHotfixTest(TestCase):
             ngay_hieu_luc=today,
             ngay_het_han=today,
             gia_tri=1000000,
+<<<<<<< HEAD
             tenant_id=self.tenant_id
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         self.muc_tieu = MucTieu.objects.create(
             hop_dong=self.hop_dong,
@@ -55,41 +76,61 @@ class PayrollHotfixTest(TestCase):
             sdt_lien_he="0123",
             luong_khoan_bao_ve=7200000,
             so_gio_mot_ngay=8,
+<<<<<<< HEAD
             # Most payroll hotfix tests assert base wage/allowance/deduction
             # behavior; they opt out of attendance incentive unless explicitly
             # testing the incentive contract.
             tien_chuyen_can=0,
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         self.vi_tri = ViTriChot.objects.create(
             muc_tieu=self.muc_tieu,
             ten_vi_tri="Cong chinh",
+<<<<<<< HEAD
             tenant_id=self.tenant_id
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         self.ca_lam = CaLamViec.objects.create(
             ten_ca="Ca A",
             gio_bat_dau="06:00",
             gio_ket_thuc="14:00",
+<<<<<<< HEAD
             tenant_id=self.tenant_id
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         self.bang_luong = BangLuongThang.objects.create(
             ten_bang_luong=f"Bang luong {today.month}/{today.year}",
             thang=today.month,
             nam=today.year,
+<<<<<<< HEAD
             tenant_id=self.tenant_id
         )
 
     def _create_attendance(self, hours, day=None):
         ngay_truc = day or self.today
+=======
+        )
+
+    def _create_attendance(self, hours):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         phan_cong = PhanCongCaTruc.objects.create(
             vi_tri_chot=self.vi_tri,
             nhan_vien=self.nhan_vien,
             ca_lam_viec=self.ca_lam,
+<<<<<<< HEAD
             ngay_truc=ngay_truc,
             tenant_id=self.tenant_id
+=======
+            ngay_truc=self.today,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         return ChamCong.objects.create(
             ca_truc=phan_cong,
             thoi_gian_check_in=timezone.make_aware(
+<<<<<<< HEAD
                 datetime.combine(ngay_truc, datetime.strptime("06:00", "%H:%M").time())
             ),
             thoi_gian_check_out=timezone.make_aware(
@@ -97,6 +138,14 @@ class PayrollHotfixTest(TestCase):
             ),
             thuc_lam_gio=hours,
             tenant_id=self.tenant_id
+=======
+                datetime.combine(self.today, datetime.strptime("06:00", "%H:%M").time())
+            ),
+            thoi_gian_check_out=timezone.make_aware(
+                datetime.combine(self.today, datetime.strptime("14:00", "%H:%M").time())
+            ),
+            thuc_lam_gio=hours,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
 
     def test_calculate_payroll_maps_to_current_model_fields(self):
@@ -113,6 +162,7 @@ class PayrollHotfixTest(TestCase):
         self.assertEqual(phieu.phu_cap_khac, Decimal("1000000"))
         self.assertEqual(phieu.tong_phu_cap, Decimal("1000000"))
         self.assertEqual(phieu.thuc_lanh, Decimal("1240000"))
+<<<<<<< HEAD
         self.assertEqual(phieu.nguon_du_lieu_snapshot["attendance_count"], 1)
         self.assertEqual(Decimal(str(phieu.nguon_du_lieu_snapshot["attendance"][0]["gio_lam"])), Decimal("8.0"))
         self.assertEqual(
@@ -229,6 +279,10 @@ class PayrollHotfixTest(TestCase):
         )
 
     def test_calculate_payroll_does_not_deduct_incident_field_without_approved_deduction_record(self):
+=======
+
+    def test_calculate_payroll_collects_current_deduction_sources(self):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self._create_attendance(10)
         BienBanViPham.objects.create(
             doi_tuong_vi_pham=self.nhan_vien,
@@ -277,6 +331,7 @@ class PayrollHotfixTest(TestCase):
         self.assertEqual(phieu.phat_vi_pham, Decimal("50000"))
         self.assertEqual(phieu.ung_luong, Decimal("100000"))
         self.assertEqual(phieu.tien_dong_phuc, Decimal("50000"))
+<<<<<<< HEAD
         self.assertEqual(phieu.tien_den_bu, Decimal("0"))
         self.assertEqual(phieu.thuc_lanh, Decimal("1100000"))
 
@@ -310,6 +365,10 @@ class PayrollHotfixTest(TestCase):
 
         self.assertEqual(phieu.tien_den_bu, Decimal("75000"))
         self.assertEqual(phieu.thuc_lanh, Decimal("1225000"))
+=======
+        self.assertEqual(phieu.tien_den_bu, Decimal("75000"))
+        self.assertEqual(phieu.thuc_lanh, Decimal("1025000"))
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     @patch("accounting.services.payroll.AuditPayrollUseCase.execute")
     def test_payroll_service_degrades_cleanly_when_audit_fails(self, mock_audit):
@@ -330,6 +389,7 @@ class PayrollHotfixTest(TestCase):
                 nhan_vien=self.nhan_vien,
             ).exists()
         )
+<<<<<<< HEAD
 
     def test_calculate_payroll_rejects_locked_period(self):
         self._create_attendance(8)
@@ -531,3 +591,5 @@ class PayrollHotfixTest(TestCase):
                 nhan_vien=self.nhan_vien,
             ).exists()
         )
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

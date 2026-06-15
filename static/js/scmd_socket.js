@@ -1,5 +1,9 @@
 /*
+<<<<<<< HEAD
  * SCMD Pro
+=======
+ * Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
  * File: static/js/scmd_socket.js
  * Description: WebSocket Manager (Updated Phase 7.1).
  * - Hiển thị Toast Notification.

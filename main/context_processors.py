@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 # main/context_processors.py
 from main.company_info import build_company_report_context, get_company_info
+=======
+﻿# main/context_processors.py
+from django.apps import apps
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 def company_info(request):
     """
+<<<<<<< HEAD
     Tu dong dua thong tin cong ty vao tat ca template cua SCMD Pro.
 
     - COMPANY: object co thuoc tinh ten_cong_ty, dia_chi, hotline...
@@ -28,3 +34,17 @@ def notification_context(request):
     except Exception:
         count = 0
     return {"notification_count": count}
+=======
+    Tu dong dua thong tin cong ty vao tat ca cac template cua he thong SCMD.
+    """
+    try:
+        CompanyProfile = apps.get_model('main', 'CompanyProfile')
+        profile = CompanyProfile.objects.first() if CompanyProfile else None
+        return {
+            'COMPANY': profile
+        }
+    except Exception:
+        return {
+            'COMPANY': None
+        }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

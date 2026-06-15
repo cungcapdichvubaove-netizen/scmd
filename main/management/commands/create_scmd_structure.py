@@ -8,13 +8,21 @@ realistic demo users.
 import random
 
 from django.contrib.auth.models import Group, User
+<<<<<<< HEAD
 from django.core.management.base import BaseCommand, CommandError
+=======
+from django.core.management.base import BaseCommand
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.db import transaction
 from django.utils.text import slugify
 
 from config.bootstrap_credentials import get_admin_password
 from users.models import PhongBan, ChucDanh, NhanVien, CauHinhMaNhanVien
 
+<<<<<<< HEAD
+=======
+DEFAULT_PASSWORD = get_admin_password()  # DEV ONLY - allow CLI override
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 POSITION_BLOCKS = [
     (
@@ -83,11 +91,16 @@ class Command(BaseCommand):
     help = "Khởi tạo cấu trúc tổ chức SCMD (idempotent, realistic demo users)"
 
     def add_arguments(self, parser):
+<<<<<<< HEAD
         parser.add_argument("--password", default=None, help="Password cho user demo (DEV only)")
+=======
+        parser.add_argument("--password", default=DEFAULT_PASSWORD, help="Password cho user demo (DEV only)")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         parser.add_argument("--create-superuser", action="store_true", help="Tạo superuser demo admin")
 
     def handle(self, *args, **options):
         pwd = options["password"]
+<<<<<<< HEAD
         if not pwd:
             try:
                 pwd = get_admin_password()
@@ -95,6 +108,8 @@ class Command(BaseCommand):
                 raise CommandError(
                     "Thieu password bootstrap. Truyen --password hoac cau hinh SCMD_ADMIN_PASSWORD/DJANGO_SUPERUSER_PASSWORD."
                 ) from exc
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.stdout.write(self.style.WARNING("🔨 ĐANG XÂY DỰNG CẤU TRÚC TỔ CHỨC SCMD (IMPROVED)..."))
 
         with transaction.atomic():

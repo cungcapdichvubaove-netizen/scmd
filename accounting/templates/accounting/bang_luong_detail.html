@@ -21,7 +21,11 @@
             <div>
                 <div class="flex items-center gap-2">
                     <h1 class="text-xl font-bold text-slate-800">{{ bang_luong.ten_bang_luong }}</h1>
+<<<<<<< HEAD
                     {% if bang_luong.is_locked %}
+=======
+                    {% if bang_luong.trang_thai == 'DA_PHAT_HANH' %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                         <span class="badge badge-success text-white">Đã phát hành</span>
                     {% else %}
                         <span class="badge badge-warning text-white">Bản thảo</span>
@@ -32,7 +36,11 @@
         </div>
         
         <div class="flex gap-2">
+<<<<<<< HEAD
             {% if not bang_luong.is_locked %}
+=======
+            {% if bang_luong.trang_thai != 'DA_PHAT_HANH' %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 <a href="{% url 'accounting:chot_luong' bang_luong.id %}" onclick="return confirm('Bạn có chắc chắn muốn phát hành bảng lương này? Nhân viên sẽ nhận được thông báo ngay lập tức.')" class="btn bg-emerald-600 hover:bg-emerald-700 text-white border-none gap-2 shadow-lg shadow-emerald-100">
                     <i class="fas fa-paper-plane"></i> CHỐT & PHÁT HÀNH
                 </a>
@@ -106,4 +114,8 @@
         </div>
     </div>
 </div>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

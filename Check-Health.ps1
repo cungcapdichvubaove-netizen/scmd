@@ -2,6 +2,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
+<<<<<<< HEAD
 $script:ProjectRoot = if ($env:SCMDPRO_ROOT) { $env:SCMDPRO_ROOT } else { "D:\SCMD Pro" }
 $script:ComposeFile = Join-Path $script:ProjectRoot "docker-compose.yml"
 $script:AppUrl = "http://localhost:8000"
@@ -10,6 +11,17 @@ $script:RequiredServices = @("web", "celery_worker", "celery_beat", "db", "redis
 $script:HealthUrls = @(
     "$script:AppUrl/login/",
     "$script:AppUrl/admin/login/"
+=======
+$script:ProjectRoot = if ($env:SCMDERP_ROOT) { $env:SCMDERP_ROOT } else { "D:\SCMDERP" }
+$script:ComposeFile = Join-Path $script:ProjectRoot "docker-compose.yml"
+$script:AppUrl = "http://localhost:8000"
+$script:LogFile = Join-Path (Split-Path -Parent $PSCommandPath) "check-health-scmderp.log"
+$script:RequiredServices = @("web", "celery_worker", "celery_beat", "db", "redis")
+$script:HealthUrls = @(
+    "$script:AppUrl/login/",
+    "$script:AppUrl/admin/login/",
+    "$script:AppUrl/api/docs/"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 )
 $script:DbUser = "scmd_user"
 $script:DbName = "scmd_db"
@@ -174,7 +186,11 @@ try {
     Set-Content -Path $script:LogFile -Value ("[{0}] HEALTH CHECK START" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss"))
     Assert-Project
 
+<<<<<<< HEAD
     Write-Header "SCMD Pro - Health check"
+=======
+    Write-Header "SCMDERP - HEALTH CHECK"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     Write-Host "  Project root: $script:ProjectRoot" -ForegroundColor White
     Write-Host "  Compose file: $script:ComposeFile" -ForegroundColor White
     Write-Host "  App URL     : $script:AppUrl" -ForegroundColor White

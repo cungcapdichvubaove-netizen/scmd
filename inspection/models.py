@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -21,14 +25,21 @@ from django.utils.translation import gettext_lazy as _
 
 from users.models import NhanVien
 from clients.models import MucTieu
+<<<<<<< HEAD
 from core.managers import TenantAwareManager, TenantScopedModel
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 # ==============================================================================
 # 1. MODULE TUẦN TRA (PATROL)
 # ==============================================================================
 
+<<<<<<< HEAD
 class LoaiTuanTra(TenantScopedModel):
+=======
+class LoaiTuanTra(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Quy định tuyến tuần tra"""
     muc_tieu = models.ForeignKey(
         MucTieu, 
@@ -44,6 +55,7 @@ class LoaiTuanTra(TenantScopedModel):
         default=30, 
         help_text=_("Thời gian tiêu chuẩn để hoàn thành toàn bộ tuyến tuần tra")
     )
+<<<<<<< HEAD
     yeu_cau_gps = models.BooleanField(
         _("Bắt buộc GPS khi tuần tra"),
         default=False,
@@ -51,6 +63,8 @@ class LoaiTuanTra(TenantScopedModel):
     )
 
     objects = TenantAwareManager()
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     def __str__(self):
         return f"{self.ten_loai} ({self.muc_tieu.ten_muc_tieu if self.muc_tieu else 'Chung'})"
@@ -59,10 +73,16 @@ class LoaiTuanTra(TenantScopedModel):
         verbose_name = _("Tuyến tuần tra")
         verbose_name_plural = _("1. Cấu hình Tuyến")
         ordering = ['muc_tieu', 'ten_loai']
+<<<<<<< HEAD
         indexes = [models.Index(fields=["tenant_id", "muc_tieu", "ten_loai"], name="insp_ltt_tenant_mt_name_idx")]
 
 
 class DiemTuanTra(TenantScopedModel):
+=======
+
+
+class DiemTuanTra(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Điểm Checkpoint kiểm soát trong tuyến"""
     loai_tuan_tra = models.ForeignKey(
         LoaiTuanTra, 
@@ -82,8 +102,11 @@ class DiemTuanTra(TenantScopedModel):
         help_text=_("Khoảng cách tối đa chấp nhận được so với tọa độ gốc")
     )
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def __str__(self):
         return f"[{self.thu_tu}] {self.ten_diem}"
     
@@ -93,7 +116,11 @@ class DiemTuanTra(TenantScopedModel):
         verbose_name_plural = _("Điểm kiểm soát")
 
 
+<<<<<<< HEAD
 class LuotTuanTra(TenantScopedModel):
+=======
+class LuotTuanTra(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Ghi nhận phiên thực hiện tuần tra của nhân viên"""
     TRANG_THAI = [
         ('DANG_DI', _('⏳ Đang thực hiện')), 
@@ -106,6 +133,7 @@ class LuotTuanTra(TenantScopedModel):
     thoi_gian_bat_dau = models.DateTimeField(_("Thời điểm bắt đầu"), auto_now_add=True)
     thoi_gian_ket_thuc = models.DateTimeField(_("Thời điểm kết thúc"), null=True, blank=True)
     trang_thai = models.CharField(_("Trạng thái"), max_length=20, choices=TRANG_THAI, default='DANG_DI')
+<<<<<<< HEAD
     phan_cong_ca_truc = models.ForeignKey(
         "operations.PhanCongCaTruc",
         on_delete=models.PROTECT,
@@ -154,6 +182,9 @@ class LuotTuanTra(TenantScopedModel):
     
     objects = TenantAwareManager()
 
+=======
+    
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     @property
     def tien_do(self):
         """Tính % hoàn thành dựa trên số điểm đã quét thực tế"""
@@ -188,10 +219,16 @@ class LuotTuanTra(TenantScopedModel):
         verbose_name = _("Lượt tuần tra")
         verbose_name_plural = _("2. Nhật ký Tuần tra")
         ordering = ['-thoi_gian_bat_dau']
+<<<<<<< HEAD
         indexes = [models.Index(fields=["tenant_id", "trang_thai", "thoi_gian_bat_dau"], name="insp_luot_tenant_state_dt_idx")]
 
 
 class GhiNhanTuanTra(TenantScopedModel):
+=======
+
+
+class GhiNhanTuanTra(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Chi tiết từng điểm quét QR trong một lượt tuần tra"""
     KET_QUA_GPS = [
         ('HOP_LE', _('🟢 Hợp lệ')), 
@@ -218,6 +255,7 @@ class GhiNhanTuanTra(TenantScopedModel):
     hinh_anh_xac_thuc = models.ImageField(_("Hình ảnh xác thực"), upload_to="tuan_tra/%Y/%m/", null=True, blank=True)
     ghi_chu = models.TextField(_("Ghi chú nghiệp vụ"), blank=True)
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
     class Meta: 
@@ -231,19 +269,32 @@ class GhiNhanTuanTra(TenantScopedModel):
                 name="uq_patrol_evidence_once_per_checkpoint",
             ),
         ]
+=======
+    class Meta: 
+        ordering = ['thoi_gian_quet']
+        verbose_name = _("Chi tiết quét QR")
+        verbose_name_plural = _("Chi tiết Quét QR")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 # ==============================================================================
 # 2. MODULE THANH TRA & KỶ LUẬT
 # ==============================================================================
 
+<<<<<<< HEAD
 class HangMucKiemTra(TenantScopedModel):
+=======
+class HangMucKiemTra(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Các tiêu chí chấm điểm khi thanh tra mục tiêu"""
     ten_hang_muc = models.CharField(_("Tên hạng mục kiểm tra"), max_length=255)
     mo_ta = models.TextField(_("Tiêu chuẩn đánh giá"), blank=True)
     
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def __str__(self):
         return self.ten_hang_muc
 
@@ -252,7 +303,11 @@ class HangMucKiemTra(TenantScopedModel):
         verbose_name_plural = _("Cấu hình Hạng mục Thanh tra")
 
 
+<<<<<<< HEAD
 class BienBanThanhTra(TenantScopedModel):
+=======
+class BienBanThanhTra(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Biên bản ghi lại kết quả thanh tra hiện trường"""
     thanh_tra_vien = models.ForeignKey(
         NhanVien, 
@@ -272,8 +327,11 @@ class BienBanThanhTra(TenantScopedModel):
     ket_luan = models.TextField(_("Kết luận chung của đoàn"), blank=True)
     diem_danh_gia = models.IntegerField(_("Tổng điểm đánh giá"), default=100)
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def __str__(self):
         return f"BB-{self.id} ({self.muc_tieu})"
 
@@ -283,21 +341,32 @@ class BienBanThanhTra(TenantScopedModel):
         verbose_name_plural = _("Biên bản thanh tra")
 
 
+<<<<<<< HEAD
 class KetQuaKiemTra(TenantScopedModel):
+=======
+class KetQuaKiemTra(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Chi tiết kết quả theo từng hạng mục trong biên bản"""
     bien_ban = models.ForeignKey(BienBanThanhTra, on_delete=models.CASCADE, related_name="chi_tiet")
     hang_muc = models.ForeignKey(HangMucKiemTra, on_delete=models.CASCADE, verbose_name=_("Hạng mục"))
     dat_yeu_cau = models.BooleanField(_("Đạt yêu cầu?"), default=True)
     ghi_chu = models.TextField(_("Ghi chú chi tiết"), blank=True)
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     class Meta:
         verbose_name = _("Kết quả kiểm tra chi tiết")
         verbose_name_plural = _("Kết quả kiểm tra chi tiết")
 
 
+<<<<<<< HEAD
 class BuoiHuanLuyen(TenantScopedModel):
+=======
+class BuoiHuanLuyen(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Ghi nhận đào tạo nội bộ và điều lệnh"""
     chu_de = models.CharField(_("Chủ đề đào tạo"), max_length=255, null=True, blank=True)
     nguoi_dao_tao = models.ForeignKey(
@@ -316,8 +385,11 @@ class BuoiHuanLuyen(TenantScopedModel):
         verbose_name=_("Danh sách nhân viên tham gia")
     )
     
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def __str__(self):
         return self.chu_de or "Buổi huấn luyện"
 
@@ -331,7 +403,11 @@ class BuoiHuanLuyen(TenantScopedModel):
 # 3. MODULE VI PHẠM (MOBILE APP)
 # ==============================================================================
 
+<<<<<<< HEAD
 class BienBanViPham(TenantScopedModel):
+=======
+class BienBanViPham(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Ghi nhận các lỗi kỷ luật của nhân viên tại mục tiêu"""
     LOAI_LOI = [
         ('NGU_GAT', _('😴 Ngủ gật trong ca trực')), 
@@ -393,8 +469,11 @@ class BienBanViPham(TenantScopedModel):
     
     created_at = models.DateTimeField(_("Ngày tạo hồ sơ"), auto_now_add=True)
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def save(self, *args, **kwargs):
         """Tự động phát sinh mã biên bản theo định dạng chuẩn SCMD"""
         if not self.ma_bien_ban:
@@ -412,10 +491,16 @@ class BienBanViPham(TenantScopedModel):
         verbose_name = _("Biên bản Vi phạm")
         verbose_name_plural = _("4. Quản lý Vi phạm")
         ordering = ['-created_at']
+<<<<<<< HEAD
         indexes = [models.Index(fields=["tenant_id", "trang_thai", "ngay_vi_pham"], name="insp_vp_tenant_state_dt_idx")]
 
 
 class DotThanhTra(TenantScopedModel):
+=======
+
+
+class DotThanhTra(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Nhật ký thanh tra nhanh qua Mobile App (Checklist thực địa)"""
     KET_QUA = [
         ('DAT', _('✅ Đạt yêu cầu vận hành')), 
@@ -437,8 +522,11 @@ class DotThanhTra(TenantScopedModel):
     ket_qua = models.CharField(_("Kết luận thanh tra"), max_length=20, choices=KET_QUA, default='DAT')
     hinh_anh_tong_quan = models.ImageField(_("Ảnh chụp tổng quan hiện trường"), upload_to="thanhtra/%Y/%m/", null=True, blank=True)
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def __str__(self):
         return f"{self.can_bo.ho_ten} kiểm tra {self.muc_tieu.ten_muc_tieu}"
 

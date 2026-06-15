@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 Application Layer: Dashboard use cases.
 
 Contract:
@@ -22,10 +23,27 @@ from clients.models import MucTieu
 from operations.models import BaoCaoSuCo, ChamCong, PhanCongCaTruc
 from operations.application.shift_change_use_cases import LeaveScheduleConflictUseCase
 from operations.application.guard_patrol_use_cases import GuardPatrolComplianceUseCase
+=======
+Application Layer: Dashboard Use Cases.
+
+Standardized layered monolith edition:
+- Interface calls use cases from this module.
+- Use cases orchestrate ORM queries and permission-aware filtering.
+"""
+
+import logging
+
+from django.utils import timezone
+from rolepermissions.checkers import has_role
+
+from clients.models import MucTieu
+from operations.models import BaoCaoSuCo, ChamCong, PhanCongCaTruc
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 logger = logging.getLogger(__name__)
 
 
+<<<<<<< HEAD
 MAX_ACTIVE_MARKERS = 300
 MAX_INCIDENT_MARKERS = 100
 MAX_RECENT_ACTIVITY = 20
@@ -171,6 +189,31 @@ class GetOperationsDashboardUseCase:
         )
 
         target_scope_qs = allowed_targets_qs
+=======
+class GetWarRoomDashboardUseCase:
+    @staticmethod
+    def execute(user, tenant_id, target_date, muc_tieu_id=None):
+        if not hasattr(user, "nhan_vien"):
+            return {}
+
+        nv = user.nhan_vien
+        allowed_target_ids = []
+
+        if has_role(user, ["ban_giam_doc", "ke_toan"]):
+            allowed_target_ids = list(MucTieu.objects.values_list("id", flat=True))
+        elif has_role(user, "quan_ly_vung"):
+            allowed_target_ids = list(
+                MucTieu.objects.filter(quan_ly_vung=nv).values_list("id", flat=True)
+            )
+        elif has_role(user, "doi_truong"):
+            allowed_target_ids = list(
+                MucTieu.objects.filter(quan_ly_muc_tieu=nv).values_list(
+                    "id", flat=True
+                )
+            )
+
+        final_target_ids = allowed_target_ids
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         if muc_tieu_id:
             try:
                 requested_id = int(muc_tieu_id)
@@ -178,9 +221,14 @@ class GetOperationsDashboardUseCase:
                 requested_id = None
 
             if requested_id is not None:
+<<<<<<< HEAD
                 requested_target_qs = allowed_targets_qs.filter(id=requested_id)
                 if requested_target_qs.exists():
                     target_scope_qs = requested_target_qs
+=======
+                if requested_id in allowed_target_ids:
+                    final_target_ids = [requested_id]
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 else:
                     logger.warning(
                         "SECURITY: user %s attempted to access unauthorized site %s",
@@ -189,6 +237,7 @@ class GetOperationsDashboardUseCase:
                     )
                     return {"error": "Unauthorized site access"}
 
+<<<<<<< HEAD
         scope = GetOperationsDashboardUseCase._resolve_target_scope(target_scope_qs)
 
         active_ccs_base_qs = ChamCong.objects.for_tenant(tenant_id).filter(
@@ -330,10 +379,47 @@ class GetOperationsDashboardUseCase:
                         "summary": f"{nhan_vien.ho_ten} vừa check-in tại {muc_tieu.ten_muc_tieu}.",
                         "post_name": vi_tri_chot.ten_vi_tri,
                     },
+=======
+        active_ccs_qs = ChamCong.objects.for_tenant(tenant_id).filter(
+            thoi_gian_check_in__date=target_date,
+            thoi_gian_check_out__isnull=True,
+            ca_truc__vi_tri_chot__muc_tieu_id__in=final_target_ids,
+        ).select_related("ca_truc__nhan_vien", "ca_truc__vi_tri_chot__muc_tieu")
+
+        total_shifts_qs = PhanCongCaTruc.objects.for_tenant(tenant_id).filter(
+            ngay_truc=target_date,
+            vi_tri_chot__muc_tieu_id__in=final_target_ids,
+        )
+
+        incidents_qs = BaoCaoSuCo.objects.for_tenant(tenant_id).filter(
+            trang_thai__in=["CHO_XU_LY", "DANG_XU_LY", "CHO_DEN_BU"],
+            muc_tieu_id__in=final_target_ids,
+        ).select_related("muc_tieu", "nhan_vien_bao_cao").order_by("-created_at")
+
+        active_ccs_list = list(active_ccs_qs)
+        total_shifts = total_shifts_qs.count()
+        active_count = len(active_ccs_list)
+
+        markers_data = []
+        for cc in active_ccs_list:
+            point = cc.location_check_in
+            if point:
+                nhan_vien = cc.ca_truc.nhan_vien
+                markers_data.append(
+                    {
+                        "id": nhan_vien.id,
+                        "name": nhan_vien.ho_ten,
+                        "lat": float(point.y),
+                        "lng": float(point.x),
+                        "target": cc.ca_truc.vi_tri_chot.muc_tieu.ten_muc_tieu,
+                        "status": "active",
+                    }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 )
 
         incidents_data = []
         for incident in incidents_qs:
+<<<<<<< HEAD
             if not incident.muc_tieu:
                 skipped_invalid_coordinates += 1
                 continue
@@ -419,11 +505,43 @@ class GetOperationsDashboardUseCase:
             target_scope_qs=target_scope_qs,
         )
 
+=======
+            if incident.muc_tieu and incident.muc_tieu.vi_do is not None:
+                incidents_data.append(
+                    {
+                        "id": incident.id,
+                        "title": incident.tieu_de,
+                        "level": incident.muc_do,
+                        "lat": float(incident.muc_tieu.vi_do),
+                        "lng": float(incident.muc_tieu.kinh_do),
+                    }
+                )
+
+        last_cc = (
+            ChamCong.objects.for_tenant(tenant_id)
+            .filter(thoi_gian_check_in__date=target_date)
+            .select_related("ca_truc__nhan_vien", "ca_truc__vi_tri_chot__muc_tieu")
+            .order_by("-thoi_gian_check_in")
+            .first()
+        )
+
+        last_activity = None
+        if last_cc:
+            last_activity = {
+                "user": last_cc.ca_truc.nhan_vien.ho_ten,
+                "action": "Check-in",
+                "time": timezone.localtime(last_cc.thoi_gian_check_in).strftime(
+                    "%H:%M"
+                ),
+            }
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         return {
             "stats": {
                 "tong_ca": total_shifts,
                 "da_checkin": active_count,
                 "vang_mat": total_shifts - active_count,
+<<<<<<< HEAD
                 "tong_muc_tieu": scope.count,
                 "tong_su_co": incident_count,
                 "su_co_nghiem_trong": severe_incident_count,
@@ -450,4 +568,10 @@ class GetOperationsDashboardUseCase:
                 "skipped_invalid_coordinates": skipped_invalid_coordinates,
             },
             "diagnostic_mode": technical_admin_mode and not hasattr(user, "nhan_vien"),
+=======
+            },
+            "markers": markers_data,
+            "incidents": incidents_data,
+            "last_activity": last_activity,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         }

@@ -1,18 +1,28 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
 File: accounting/admin.py
 Author: Mr. Anh (CTO) & AI Assistant
 Created Date: 2025-12-04
+<<<<<<< HEAD
 Updated Date: 2026-06-08
 Description: Cấu hình Admin Kế toán (SCMD Pro).
+=======
+Updated Date: 2026-03-21
+Description: Cấu hình Admin Kế toán (PRO UI).
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
              UPDATED: Sửa lỗi lọc phòng ban (E116), Tối ưu SQL, 
              Chuyên nghiệp hóa định dạng tiền tệ & Ngày tháng.
 """
 
+<<<<<<< HEAD
 import csv
 from typing import Any, Optional
 
@@ -37,6 +47,17 @@ from accounting.application.payroll_use_cases import (
 )
 from .models_soquy import SoQuy
 from main.models import AuditLog
+=======
+from django.contrib import admin
+from django.contrib import messages
+from django.utils.html import format_html
+from django.db import transaction
+from django.utils.translation import gettext_lazy as _
+from .models import CauHinhLuong, BangLuongThang, ChiTietLuong
+from accounting.application.payroll_use_cases import AuditPayrollUseCase
+from .models_soquy import SoQuy
+from .services.payroll import PayrollService
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # --- CONFIG MÀU SẮC ĐỒNG BỘ HỆ THỐNG SCMD ---
 UI_COLORS = {
@@ -49,6 +70,7 @@ UI_COLORS = {
     'BORDER_SUCCESS': '#86efac',
 }
 
+<<<<<<< HEAD
 
 def _format_vnd(value):
     """Format tiền VND nhất quán trong admin kế toán."""
@@ -195,11 +217,14 @@ class PayrollDetailOperationalFilter(admin.SimpleListFilter):
         return queryset
 
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 # ==============================================================================
 # 1. CẤU HÌNH LƯƠNG CƠ BẢN
 # ==============================================================================
 @admin.register(CauHinhLuong)
 class CauHinhLuongAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
     """Quản lý cấu hình lương cố định theo từng nhân viên, có audit khi export/sửa dữ liệu."""
     change_list_template = 'accounting/admin/cauhinhluong_change_list.html'
     list_display = [
@@ -432,6 +457,37 @@ class CauHinhLuongAdmin(admin.ModelAdmin):
             '<a href="{}" class="button" style="background:#059669;color:white;padding:6px 10px;border-radius:8px;text-decoration:none;font-size:11px;font-weight:800;">Sửa</a>',
             f'{obj.pk}/change/',
         )
+=======
+    """Quản lý cấu hình lương cơ bản cho nhân viên an ninh SCMD"""
+    list_display = [
+        'nhan_vien', 
+        'phu_cap_trach_nhiem_vnd', 
+        'phu_cap_xang_xe_vnd', 
+        'phu_cap_an_uong_vnd'
+    ]
+    search_fields = ['nhan_vien__ho_ten', 'nhan_vien__ma_nhan_vien']
+    autocomplete_fields = ['nhan_vien']
+    list_per_page = 25
+
+    def get_queryset(self, request):
+        """Tối ưu hóa truy vấn liên kết nhân viên"""
+        return super().get_queryset(request).select_related('nhan_vien')
+
+    @admin.display(description=_("P.Cấp Trách Nhiệm"))
+    def phu_cap_trach_nhiem_vnd(self, obj):
+        val = obj.phu_cap_trach_nhiem or 0
+        return f"{val:,.0f} ₫".replace(",", ".")
+
+    @admin.display(description=_("P.Cấp Xăng Xe"))
+    def phu_cap_xang_xe_vnd(self, obj):
+        val = obj.phu_cap_xang_xe or 0
+        return f"{val:,.0f} ₫".replace(",", ".")
+
+    @admin.display(description=_("P.Cấp Ăn Uống"))
+    def phu_cap_an_uong_vnd(self, obj):
+        val = obj.phu_cap_an_uong or 0
+        return f"{val:,.0f} ₫".replace(",", ".")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 # ==============================================================================
@@ -518,6 +574,7 @@ class ChiTietLuongInline(admin.TabularInline):
 # ==============================================================================
 @admin.register(BangLuongThang)
 class BangLuongThangAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
     """Quản trị kỳ lương: đối soát, khóa kỳ, phát hành và truy xuất báo cáo."""
     change_list_template = 'accounting/admin/bangluongthang_change_list.html'
     list_display = [
@@ -682,6 +739,112 @@ class BangLuongThangAdmin(admin.ModelAdmin):
             messages.WARNING if warnings_count else messages.SUCCESS,
         )
     audit_payroll_anomalies.short_description = 'Kiểm toán bất thường trước khi khóa kỳ'
+=======
+    """Quản trị bảng lương tổng hợp hàng tháng của SCMD"""
+    list_display = [
+        'ten_bang_luong', 
+        'thang', 
+        'nam', 
+        'hien_thi_tong_chi', 
+        'trang_thai_badge', 
+        'nut_xem_bao_cao',
+        'nut_doi_soat'
+    ]
+    list_filter = ['nam', 'trang_thai', 'thang']
+    search_fields = ['ten_bang_luong']
+    inlines = [ChiTietLuongInline]
+    actions = ['tinh_luong_lai', 'phat_hanh_luong', 'audit_payroll_anomalies']
+    list_per_page = 20
+
+    @admin.display(description=_("Tổng ngân sách chi"))
+    def hien_thi_tong_chi(self, obj):
+        val = obj.tong_chi_tra or 0
+        return format_html('<b>{:,.0f} VNĐ</b>', val)
+
+    @admin.display(description=_("Trạng thái phê duyệt"))
+    def trang_thai_badge(self, obj):
+        """Badge trạng thái bảng lương chuẩn UI/UX SCMD"""
+        colors = {
+            'DA_PHAT_HANH': (UI_COLORS['SUCCESS'], UI_COLORS['BG_SUCCESS']),
+            'CHO_DUYET': (UI_COLORS['WARNING'], '#ffedd5'),
+            'NHAP': (UI_COLORS['NEUTRAL'], '#f3f4f6'),
+        }
+        text_color, bg_color = colors.get(obj.trang_thai, (UI_COLORS['NEUTRAL'], '#f3f4f6'))
+        return format_html(
+            '<span style="color:{}; background:{}; padding:2px 10px; border-radius:12px; font-weight:bold; font-size:11px;">{}</span>',
+            text_color, bg_color, obj.get_trang_thai_display()
+        )
+
+    @admin.display(description=_("Công cụ báo cáo"))
+    def nut_xem_bao_cao(self, obj):
+        """Nút truy cập nhanh báo cáo chuyên nghiệp"""
+        if obj.pk:
+            url = f"/accounting/bang-luong/{obj.pk}/"
+            return format_html(
+                '<a href="{}" target="_blank" class="button" '
+                'style="background:#3b82f6; color:white; padding:4px 12px; border-radius:4px; '
+                'text-decoration:none; font-size:11px; font-weight:bold;">🖨️ XEM PHIẾU LƯƠNG</a>', 
+                url
+            )
+        return "-"
+
+    @admin.display(description=_("Đối soát Quỹ"))
+    def nut_doi_soat(self, obj):
+        """Nút truy cập báo cáo đối soát khấu trừ"""
+        if obj.pk:
+            url = f"/accounting/doi-soat-khau-tru/{obj.pk}/"
+            return format_html(
+                '<a href="{}" target="_blank" class="button" '
+                'style="background:#059669; color:white; padding:4px 12px; border-radius:4px; '
+                'text-decoration:none; font-size:11px; font-weight:bold;">📊 ĐỐI SOÁT</a>', 
+                url
+            )
+        return "-"
+    def tinh_luong_lai(self, request, queryset):
+        """Thực thi tính toán lại số liệu lương định kỳ"""
+        count = 0
+        error_count = 0
+        for bl in queryset:
+            if bl.trang_thai == 'DA_PHAT_HANH':
+                self.message_user(request, f"Cảnh báo: Bảng lương {bl} đã khóa sổ!", messages.WARNING)
+                continue
+            
+            try:
+                with transaction.atomic():
+                    success, msg = PayrollService.tinh_luong_thang(bl.thang, bl.nam)
+                    if success:
+                        count += 1
+                        bl.refresh_from_db()
+                    else:
+                        error_count += 1
+                        self.message_user(request, f"Lỗi nghiệp vụ tại {bl}: {msg}", messages.ERROR)
+            except Exception as e:
+                error_count += 1
+                self.message_user(request, f"Lỗi hệ thống khi xử lý {bl}: {str(e)}", messages.ERROR)
+        
+        if count > 0:
+            self.message_user(request, f"Thực thi thành công: Đã cập nhật {count} bảng lương.", messages.SUCCESS)
+        if error_count > 0:
+            self.message_user(request, f"Thông báo: Có {error_count} bảng lương gặp lỗi.", messages.ERROR)
+
+    tinh_luong_lai.short_description = "⚡ TÁNH TOÁN LẠI SỐ LIỆU (TỰ ĐỘNG)"
+
+    def phat_hanh_luong(self, request, queryset):
+        """Chốt sổ lương hàng tháng"""
+        try:
+            count = 0
+            for bl in queryset.filter(trang_thai__in=['NHAP', 'CHO_DUYET']):
+                with transaction.atomic():
+                    bl.trang_thai = 'DA_PHAT_HANH'
+                    bl.save()
+                    PayrollService.lock_related_records(bl)
+                    count += 1
+            self.message_user(request, f"Xác nhận: Đã khóa sổ {count} bảng lương và đồng bộ dữ liệu SSOT.", messages.SUCCESS)
+        except Exception as e:
+            self.message_user(request, f"Lỗi khi thực hiện khóa sổ: {str(e)}", messages.ERROR)
+
+    phat_hanh_luong.short_description = "✅ CHỐT SỔ & PHÁT HÀNH (KHÔNG SỬA)"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 # ==============================================================================
@@ -689,6 +852,7 @@ class BangLuongThangAdmin(admin.ModelAdmin):
 # ==============================================================================
 @admin.register(ChiTietLuong)
 class ChiTietLuongAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
     """Quản lý phiếu lương cá nhân: xem, đối soát, xuất dữ liệu và chặn sửa kỳ đã khóa."""
     change_list_template = 'accounting/admin/chitietluong_change_list.html'
     LOCKED_READONLY_FIELDS = [
@@ -1072,6 +1236,43 @@ class ChiTietLuongAdmin(admin.ModelAdmin):
             report_url,
             batch_url,
         )
+=======
+    """Quản lý chi tiết thu nhập từng nhân viên an ninh"""
+    list_display = [
+        'nhan_vien', 
+        'bang_luong', 
+        'tong_gio_lam_format', 
+        'luong_chinh_format', 
+        'thuc_lanh_format'
+    ]
+    # FIXED: Sửa lỗi (admin.E116) - nhan_vien__bo_phan -> nhan_vien__phong_ban
+    list_filter = ['bang_luong__thang', 'bang_luong__nam', 'nhan_vien__phong_ban']
+    search_fields = ['nhan_vien__ho_ten', 'nhan_vien__ma_nhan_vien']
+    readonly_fields = ['thuc_lanh']
+
+    def get_queryset(self, request):
+        """Tối ưu hóa query tránh N+1 cho thông tin nhân viên và phòng ban"""
+        return super().get_queryset(request).select_related(
+            'nhan_vien', 
+            'nhan_vien__phong_ban', 
+            'bang_luong'
+        )
+
+    @admin.display(description=_("Công làm việc"), ordering='tong_gio_lam')
+    def tong_gio_lam_format(self, obj):
+        val = obj.tong_gio_lam or 0
+        return f"{val} giờ"
+
+    @admin.display(description=_("Lương cơ bản"))
+    def luong_chinh_format(self, obj):
+        val = obj.luong_chinh or 0
+        return f"{val:,.0f} ₫".replace(",", ".")
+
+    @admin.display(description=_("Thực lĩnh"))
+    def thuc_lanh_format(self, obj):
+        val = obj.thuc_lanh or 0
+        return format_html('<b style="color: {};">{:,.0f} VNĐ</b>', UI_COLORS['SUCCESS'], val)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 # ==============================================================================
@@ -1079,6 +1280,7 @@ class ChiTietLuongAdmin(admin.ModelAdmin):
 # ==============================================================================
 @admin.register(SoQuy)
 class SoQuyAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
     """Quản lý sổ quỹ tiền mặt/ngân hàng: lập phiếu, duyệt phiếu và đối soát dòng tiền."""
     change_list_template = 'accounting/admin/soquy_change_list.html'
     list_display = [
@@ -1369,3 +1571,45 @@ class PayrollAdjustmentAdmin(admin.ModelAdmin):
             sign,
             _format_vnd(obj.so_tien_dieu_chinh),
         )
+=======
+    """Quản lý sổ quỹ tiền mặt và dòng tiền nghiệp vụ SCMD"""
+    list_display = [
+        'ma_phieu', 
+        'loai_phieu', 
+        'hang_muc', 
+        'so_tien_vnd', 
+        'ngay_lap_format', 
+        'trang_thai_format'
+    ]
+    list_filter = ['loai_phieu', 'hang_muc', 'trang_thai', 'ngay_lap']
+    search_fields = ['ma_phieu', 'dien_giai']
+    date_hierarchy = 'ngay_lap'
+    ordering = ['-ngay_lap', '-ma_phieu']
+
+    @admin.display(description=_("Số tiền giao dịch"), ordering='so_tien')
+    def so_tien_vnd(self, obj):
+        val = obj.so_tien or 0
+        is_chi = obj.loai_phieu == 'CHI'
+        color = UI_COLORS['DANGER'] if is_chi else UI_COLORS['SUCCESS']
+        prefix = "-" if is_chi else "+"
+        return format_html(
+            '<span style="color:{}; font-weight:bold;">{}{:,.0f} ₫</span>', 
+            color, prefix, val
+        )
+
+    @admin.display(description=_("Ngày lập phiếu"), ordering='ngay_lap')
+    def ngay_lap_format(self, obj):
+        if not obj.ngay_lap: return "-"
+        return obj.ngay_lap.strftime('%d/%m/%Y')
+
+    @admin.display(description=_("Tình trạng"))
+    def trang_thai_format(self, obj):
+        status_colors = {
+            'HOAN_THANH': UI_COLORS['SUCCESS'],
+            'HUY': UI_COLORS['DANGER'],
+            'CHO_DUYET': UI_COLORS['WARNING'],
+        }
+        color = status_colors.get(obj.trang_thai, UI_COLORS['NEUTRAL'])
+        label = obj.get_trang_thai_display() if hasattr(obj, 'get_trang_thai_display') else obj.trang_thai
+        return format_html('<span style="color:{}; font-weight:bold;">{}</span>', color, label)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

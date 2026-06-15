@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # SCMD Pro Cursor Compatibility Contract
 
 Canonical source:
@@ -32,3 +33,160 @@ Required reading before non-trivial changes:
 - `DOCUMENTATION.md`
 - `UI_SYSTEM_REFACTOR_SPEC.md`
 - `docs/access_scope/ACCESS_SCOPE_AUTHORIZATION_CONTRACT.md` for scoped data workflows
+=======
+# Cursor Code Generation Rules for SCMD
+
+SCMD là viết tắt của **Security Commander**.
+
+Định vị thương hiệu bắt buộc:
+
+> **SCMD**
+> Công ty công nghệ phần mềm cho ngành dịch vụ bảo vệ
+
+> **SCMD Pro**
+> Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp
+
+Các quy tắc dưới đây là contract cho mọi thay đổi code, refactor, UI, tài liệu và test. Trước khi sửa hoặc nâng cấp hệ thống, AI/Cursor/Vibe Coding phải đọc và tuân thủ `WHITEPAPER.md`, `DOCUMENTATION.md`, `UI_SYSTEM_REFACTOR_SPEC.md` và các checklist QA liên quan.
+
+## 1. Product & brand language
+
+- **SCMD** là công ty/thương hiệu mẹ, viết tắt từ **Security Commander**.
+- **SCMD Pro** là tên user-facing chính của sản phẩm phần mềm bán cho khách hàng.
+- UI sản phẩm, login, dashboard, admin title, PWA manifest, print/export header phải dùng **SCMD Pro**.
+- Chỉ dùng **SCMD** riêng khi nói về công ty, chủ sở hữu, pháp lý, copyright, vendor/about hoặc kiến trúc thương hiệu mẹ.
+- `ERP` chỉ được dùng để mô tả nhóm năng lực quản trị nội bộ: nhân sự, hợp đồng, kho, tài chính, lương, báo cáo.
+- Tagline tiếng Việt chuẩn cho sản phẩm: **Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp**.
+- English descriptor hợp lệ: **Security Command & Management Platform for Professional Security Companies**.
+- Không dùng ngôn ngữ cyber/war-room trình diễn: `War Room`, `Tactical`, `Sentinel Command`, `Security Command System`, neon/glow/radar motif.
+- Domain language hợp lệ: mục tiêu bảo vệ, chốt bảo vệ, ca trực, tuần tra, sự cố, quân số, chấm công, bảng lương, kho, hợp đồng.
+
+## 2. Architecture: pragmatic layered monolith
+
+SCMD Pro hiện là Django layered monolith, không phải microservices, không phải strict clean architecture giáo điều.
+
+Layer chính:
+
+```text
+Interface Layer       Django views, DRF endpoints, serializers, templates, consumers
+Application Layer     Use case classes, transaction boundary, orchestration logic
+Domain Helpers        Pure Python rules: geofence, payroll formulas, validators, state transition checks
+Infrastructure Layer  Django ORM, Celery, Redis, Channels, storage, SMTP, external integrations
+```
+
+Bắt buộc:
+
+- Views/API chỉ nhận request, gọi use case, định dạng response.
+- Application layer điều phối business flow và transaction boundary.
+- Domain helpers không phụ thuộc HTTP/session/template/Celery.
+- Celery task phải gọi application layer, không nhân bản logic nghiệp vụ.
+- Không tạo duplicate model, duplicate manager, duplicate use case hoặc duplicate identity generator.
+- Không dùng wildcard-only facade trong `*/application/*.py`.
+
+## 3. Organization scope, not SaaS multi-tenancy
+
+SCMD Pro hiện phục vụ một tổ chức duy nhất theo mô hình **single-organization hardened**.
+
+- `tenant_id` nếu còn tồn tại là legacy naming cho organization scope, không phải SaaS tenant động.
+- Không nhận `tenant_id` tùy ý từ request/API/form.
+- Không thiết kế multi-tenant thật, RLS, tenant sharding hoặc subdomain tenant trước khi hardening xong.
+- Manager scope tổ chức phải có một SSOT trong `core.managers` hoặc tên tương đương.
+- Query dashboard/payroll/attendance phải được scope rõ hoặc document single-org exception.
+
+## 4. Operational truth first
+
+SCMD Pro không phải UI trình diễn. Giá trị lõi là dữ liệu vận hành đáng tin cậy để điều phối, kiểm soát, đối soát và tính lương.
+
+Flow nghiệp vụ trung tâm:
+
+```text
+Lead/Khách hàng
+  -> Hợp đồng
+  -> Mục tiêu bảo vệ
+  -> Vị trí chốt
+  -> Phân công ca trực
+  -> Chấm công GPS/ảnh
+  -> Sự cố / Kiểm tra quân số / Alive check
+  -> Đối soát vận hành
+  -> Bảng lương / Chi tiết lương / Khấu trừ
+```
+
+Không hardcode số liệu demo vào production dashboard. KPI phải có nguồn dữ liệu rõ.
+
+## 5. Attendance, payroll, incident and inventory integrity
+
+Dữ liệu chấm công, GPS, ảnh, sự cố, lương, khấu trừ, tạm ứng, đồng phục và đền bù là dữ liệu kiểm toán.
+
+- Không sửa âm thầm `ChamCong` đã dùng cho tính lương.
+- Sửa chấm công phải có actor, lý do, thời điểm, before/after và audit.
+- Kỳ lương `LOCKED` hoặc `PAID` không được sửa trực tiếp nếu không có quyền đặc biệt và audit.
+- Tính lại lương phải có reconciliation note nếu làm đổi thực lãnh.
+- Sự cố đã đóng muốn sửa nội dung chính phải reopen có lý do.
+- `ma_su_co` là identity bất biến sau khi tạo.
+- Phiếu kho đã ảnh hưởng tồn kho không được xóa vật lý; dùng void/reversal/audit.
+
+## 6. UI/UX contract
+
+- Mobile-first, thumb-first cho guard/mobile operations.
+- Rõ ràng hơn hiệu ứng: người dùng nghiệp vụ phải hiểu trạng thái trong 3 giây.
+- Màu chỉ dùng khi có ý nghĩa nghiệp vụ.
+- Primary palette: navy / blue / neutral.
+- State colors: success, warning, danger, info, neutral.
+- Không neon/glow/cyber motif trên internal operations surface.
+- Label tiếng Việt phải có dấu, UTF-8 chuẩn, không mojibake.
+- Empty state phải hướng dẫn việc cần làm tiếp theo.
+- Error state phải có hành động khắc phục, không chỉ báo lỗi kỹ thuật.
+
+## 7. Frontend/runtime rules
+
+- Không dùng `cdn.tailwindcss.com` trong production template.
+- Tailwind phải build local và dùng brand tokens.
+- Không để file `.py` trong `static/` hoặc trong cây `templates/`.
+- Nếu đã collect static, khi xóa file source sai chỗ phải xử lý cả artifact trong `staticfiles/`.
+- PWA/login/mobile shell phải giữ brand SCMD nhất quán.
+
+## 8. Security and permissions
+
+- API nghiệp vụ phải yêu cầu authentication.
+- Object-level permission cho ca trực, chấm công, lương, sự cố, export.
+- Không trả GPS/ảnh/lương nếu user không có quyền.
+- Export chứa dữ liệu nhạy cảm phải permission + audit, nên có cơ chế bảo vệ tương đương password.
+- Không cho check-in hộ nếu không có role đặc biệt và audit.
+- Không tin `employee_id` từ client nếu có thể derive từ authenticated user.
+
+## 9. Test and verification before merge
+
+Chạy tối thiểu:
+
+```bash
+python manage.py check
+python manage.py test
+python manage.py showmigrations --plan
+find static/ -name "*.py"
+find . -path "*/templates/*" -name "*.py"
+grep -R "cdn.tailwindcss.com" -n .
+grep -R "SCMD Pro\|Security Command System\|Sentinel Command\|War Room\|Tactical" -n templates static dashboard main users operations accounting clients
+grep -R "from .* import \*" -n */application/*.py
+```
+
+Manual QA bắt buộc:
+
+- Login hiển thị SCMD và tagline đúng nơi phù hợp.
+- Dashboard load KPI thật, không còn war-room/cyber copy.
+- Admin title/copy đúng SCMD Technical Console.
+- Chấm công mobile/API hoạt động.
+- Export nhạy cảm yêu cầu quyền phù hợp và có audit.
+- Worker heartbeat/task queue ổn.
+
+## 10. Output expectation for AI/Cursor/Vibe Coding
+
+Khi được yêu cầu sửa hoặc nâng cấp hệ thống, phải trả lời theo cấu trúc:
+
+1. Đã đọc tài liệu nào và contract nào chi phối thay đổi.
+2. Phạm vi file sẽ sửa.
+3. Rủi ro P0/P1/P2 nếu có.
+4. Thay đổi cụ thể.
+5. Test/grep/QA đã chạy hoặc cần chạy.
+6. Những phần không đụng đến và lý do.
+
+Không tự ý đổi kiến trúc lớn, thêm multi-tenant thật, tách microservice, rewrite SPA, đổi brand hoặc tạo subsystem song song nếu chưa có quyết định trong `WHITEPAPER.md`.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

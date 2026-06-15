@@ -20,8 +20,11 @@ services:
     build: .
     volumes:
       - .:/app
+<<<<<<< HEAD
     # Sử dụng command để đảm bảo database sẵn sàng và kiểm tra integrity mỗi khi code đổi
     command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ports:
       - "8000:8000"
     environment:
@@ -30,13 +33,17 @@ services:
       - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
       - REDIS_URL=redis://redis:6379/0
       - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+<<<<<<< HEAD
       - STATIC_ROOT=/tmp/scmd_staticfiles
       - SCMD_COLLECTSTATIC_ON_START=1
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     depends_on:
       db:
         condition: service_healthy
       redis:
         condition: service_started
+<<<<<<< HEAD
     healthcheck:
       test:
         [
@@ -53,14 +60,23 @@ services:
     build: .
     # Thêm watchdog nếu đã cài hoặc restart đơn giản để nhận code mới
     command: watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery -A config worker -l info
+=======
+
+  celery_worker:
+    build: .
+    command: celery -A config worker -l info
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     volumes:
       - .:/app
     environment:
       - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
       - REDIS_URL=redis://redis:6379/0
       - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+<<<<<<< HEAD
       - STATIC_ROOT=/tmp/scmd_staticfiles
       - SCMD_COLLECTSTATIC_ON_START=0
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     depends_on:
       - db
       - redis
@@ -74,8 +90,11 @@ services:
       - DATABASE_URL=postgres://scmd_user:scmd_pass@db:5432/scmd_db
       - REDIS_URL=redis://redis:6379/0
       - SCMD_ORGANIZATION_ID=00000000-0000-0000-0000-000000000001
+<<<<<<< HEAD
       - STATIC_ROOT=/tmp/scmd_staticfiles
       - SCMD_COLLECTSTATIC_ON_START=0
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     depends_on:
       - db
       - redis

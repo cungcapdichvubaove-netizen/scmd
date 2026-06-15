@@ -8,8 +8,11 @@ import logging
 from django.db.models import Sum, Q
 from accounting.models import BangLuongThang, ChiTietLuong
 from accounting.models_soquy import SoQuy
+<<<<<<< HEAD
 from main.decorators import application_audit_log
 from main.models import AuditLog
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 logger = logging.getLogger(__name__)
 
@@ -20,26 +23,38 @@ class DeductionAuditUseCase:
     """
 
     @staticmethod
+<<<<<<< HEAD
     @application_audit_log(
         module="accounting",
         model_name="BangLuongThang",
         action=AuditLog.Action.EXECUTE,
         object_id_field="bang_luong_id"
     )
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def execute(bang_luong_id: int, tenant_id: str):
         try:
             # 1. Lấy thông tin bảng lương
             bl = BangLuongThang.objects.for_tenant(tenant_id).get(id=bang_luong_id)
             
             # 2. Tổng hợp Khấu trừ từ Bảng Lương (Payroll Side)
+<<<<<<< HEAD
             payroll_deductions = ChiTietLuong.objects.for_tenant(tenant_id).filter(bang_luong=bl).values('nhan_vien_id').annotate(
+=======
+            payroll_deductions = ChiTietLuong.objects.filter(bang_luong=bl).values('nhan_vien_id').annotate(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 total_payroll_advance=Sum('ung_luong')
             )
             payroll_map = {item['nhan_vien_id']: item['total_payroll_advance'] for item in payroll_deductions}
 
             # 3. Tổng hợp Chi thực tế từ Sổ Quỹ (Cash Side)
+<<<<<<< HEAD
             # Lọc các phiếu CHI - TAM_UNG trong tháng của kỳ lương - Bổ sung for_tenant() để đảm bảo Isolation
             cash_advances = SoQuy.objects.for_tenant(tenant_id).filter(
+=======
+            # Lọc các phiếu CHI - TAM_UNG trong tháng của kỳ lương
+            cash_advances = SoQuy.objects.filter(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 loai_phieu='CHI',
                 hang_muc='TAM_UNG',
                 trang_thai='DA_DUYET',
@@ -55,7 +70,11 @@ class DeductionAuditUseCase:
             all_employee_ids = set(list(payroll_map.keys()) + list(cash_map.keys()))
             
             from users.models import NhanVien
+<<<<<<< HEAD
             nhan_viens = {nv.id: nv for nv in NhanVien.objects.for_tenant(tenant_id).filter(id__in=all_employee_ids)}
+=======
+            nhan_viens = {nv.id: nv for nv in NhanVien.objects.filter(id__in=all_employee_ids)}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
             for nv_id in all_employee_ids:
                 payroll_val = payroll_map.get(nv_id, 0)

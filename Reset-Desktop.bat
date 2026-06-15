@@ -1,6 +1,10 @@
 @echo off
 chcp 65001 >nul
+<<<<<<< HEAD
 title SCMD Pro - Factory Reset
+=======
+title SCMDERP - Factory Reset
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 where powershell.exe >nul 2>&1
 if %errorlevel% neq 0 (

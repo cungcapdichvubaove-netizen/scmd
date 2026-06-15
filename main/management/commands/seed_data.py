@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 File: main/management/commands/seed_data.py
 Author: Mr. Anh (CTO)
@@ -16,7 +20,11 @@ from datetime import timedelta, datetime, time as dt_time
 
 from django.contrib.auth.models import User, Group
 from django.contrib.gis.geos import Point
+<<<<<<< HEAD
 from django.core.management.base import BaseCommand, CommandError
+=======
+from django.core.management.base import BaseCommand
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.db import transaction
 from django.utils import timezone
 from faker import Faker
@@ -33,12 +41,17 @@ fake = Faker("vi_VN")
 # --- GEO IMPORT (QUAN TRỌNG) ---
 
 # CẤU HÌNH MẬT KHẨU MẶC ĐỊNH
+<<<<<<< HEAD
+=======
+DEFAULT_PASS = get_seed_password()
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 class Command(BaseCommand):
     help = "Tạo dữ liệu mẫu Enterprise (500 NV, 3 Ca, Geo-enabled)"
 
     def add_arguments(self, parser):
+<<<<<<< HEAD
         parser.add_argument("--clear", action="store_true", help="Xoa sach du lieu cu")
         parser.add_argument("--password", default=None, help="Password cho user seed (DEV only)")
 
@@ -54,6 +67,14 @@ class Command(BaseCommand):
                 ) from exc
 
         self.stdout.write(self.style.WARNING("Password seed user da duoc cau hinh an toan qua bien moi truong hoac tham so CLI."))
+=======
+        parser.add_argument("--clear", action="store_true", help="Xóa sạch dữ liệu cũ")
+
+    def handle(self, *args, **options):
+        start_time = datetime.now()
+
+        self.stdout.write(self.style.WARNING(f'🔑 Mật khẩu mặc định user: "{DEFAULT_PASS}"'))
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
         if options["clear"]:
             self.stdout.write(self.style.WARNING("🗑️ Đang xóa sạch dữ liệu cũ..."))
@@ -177,7 +198,11 @@ class Command(BaseCommand):
                 username = f"{prefix}_{i + 1}" if count > 1 else prefix
 
                 user = User(username=username, email=f"{username}@scmd.vn", is_active=True)
+<<<<<<< HEAD
                 user.set_password(self.default_password)
+=======
+                user.set_password(DEFAULT_PASS)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 users_to_create.append(user)
 
                 profiles_to_create.append(
@@ -347,5 +372,8 @@ class Command(BaseCommand):
             muc_tieu=targets[0],
             thoi_gian_phat_hien=timezone.now(),
         )
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

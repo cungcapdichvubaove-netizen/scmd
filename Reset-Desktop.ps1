@@ -2,6 +2,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+<<<<<<< HEAD
 $OutputEncoding = [System.Text.Encoding]::UTF8
 try { chcp 65001 > $null } catch {}
 
@@ -10,16 +11,34 @@ $script:ProjectRoot = if ($env:SCMDPRO_ROOT) { $env:SCMDPRO_ROOT } else { $defau
 $script:ComposeFile = Join-Path $script:ProjectRoot "docker-compose.yml"
 $script:AppUrl = "http://localhost:8000"
 $script:LogFile = Join-Path (Split-Path -Parent $PSCommandPath) "reset-scmdpro.log"
+=======
+try { chcp 65001 > $null } catch {}
+
+$defaultProjectRoot = Split-Path -Parent $PSCommandPath
+$script:ProjectRoot = if ($env:SCMDERP_ROOT) { $env:SCMDERP_ROOT } else { $defaultProjectRoot }
+$script:ComposeFile = Join-Path $script:ProjectRoot "docker-compose.yml"
+$script:AppUrl = "http://localhost:8000"
+$script:LogFile = Join-Path (Split-Path -Parent $PSCommandPath) "reset-scmderp.log"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 $script:DbService = "db"
 $script:AppServices = @("web", "celery_worker", "celery_beat")
 $script:InfraServices = @("db", "redis")
 $script:HealthEndpoints = @(
     "$script:AppUrl/",
+<<<<<<< HEAD
     "$script:AppUrl/admin/login/"
+=======
+    "$script:AppUrl/admin/login/",
+    "$script:AppUrl/api/docs/"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 )
 $script:DbName = "scmd_db"
 $script:DbUser = "scmd_user"
 $script:AdminUsername = if ($env:SCMD_ADMIN_USERNAME) { $env:SCMD_ADMIN_USERNAME } elseif ($env:DJANGO_SUPERUSER_USERNAME) { $env:DJANGO_SUPERUSER_USERNAME } else { "admin" }
+<<<<<<< HEAD
+=======
+$script:AdminPassword = if ($env:SCMD_ADMIN_PASSWORD) { $env:SCMD_ADMIN_PASSWORD } elseif ($env:DJANGO_SUPERUSER_PASSWORD) { $env:DJANGO_SUPERUSER_PASSWORD } else { "ScmdAdmin2026!" }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 function Write-Header([string]$Text) {
     Write-Host ""
@@ -108,15 +127,19 @@ function Invoke-Compose([string[]]$ComposeArgs, [switch]$IgnoreFailure) {
 }
 
 function Invoke-DjangoRun([string[]]$CommandArgs, [string]$ErrorText) {
+<<<<<<< HEAD
     # Lấy mật khẩu từ session môi trường để truyền vào container
     $pass = if ($env:SCMD_ADMIN_PASSWORD) { $env:SCMD_ADMIN_PASSWORD }
             elseif ($env:DJANGO_SUPERUSER_PASSWORD) { $env:DJANGO_SUPERUSER_PASSWORD }
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     $dockerArgs = @(
         "compose",
         "--project-directory", $script:ProjectRoot,
         "-f", $script:ComposeFile,
         "run",
+<<<<<<< HEAD
         "--rm"
     )
 
@@ -125,6 +148,9 @@ function Invoke-DjangoRun([string[]]$CommandArgs, [string]$ErrorText) {
     }
 
     $dockerArgs += @(
+=======
+        "--rm",
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         "--no-deps",
         "--entrypoint",
         "python",
@@ -171,7 +197,11 @@ function Wait-AppHealth([int]$TimeoutSec = 300) {
 
 function Backup-Database {
     $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+<<<<<<< HEAD
     $backupFile = Join-Path (Split-Path -Parent $PSCommandPath) "scmdpro-backup-$timestamp.sql"
+=======
+    $backupFile = Join-Path (Split-Path -Parent $PSCommandPath) "scmderp-backup-$timestamp.sql"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     Write-Step "0/5" "Backup PostgreSQL truoc khi reset"
 
     & docker compose --project-directory $script:ProjectRoot -f $script:ComposeFile up -d $script:DbService | Out-Null
@@ -212,10 +242,17 @@ try {
     Set-Content -Path $script:LogFile -Value ("[{0}] RESET START" -f (Get-Date -Format "yyyy-MM-dd HH:mm:ss")) -Encoding UTF8
     Assert-Project
 
+<<<<<<< HEAD
     Write-Header "SCMD Pro - Factory reset"
     Write-Host ""
     Write-Host "  Project root: $script:ProjectRoot" -ForegroundColor White
     Write-Host "  Canh bao: lenh nay se xoa volumes Docker va rebuild stack SCMD Pro." -ForegroundColor Yellow
+=======
+    Write-Header "SCMDERP - FACTORY RESET"
+    Write-Host ""
+    Write-Host "  Project root: $script:ProjectRoot" -ForegroundColor White
+    Write-Host "  Canh bao: lenh nay se xoa volumes Docker va rebuild stack SCMDERP." -ForegroundColor Yellow
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     Read-Host "Nhan Enter de tiep tuc, hoac Ctrl+C de huy" | Out-Null
 
     $backupChoice = Read-Host "Backup database truoc khi reset? (y/n)"
@@ -223,7 +260,11 @@ try {
         Backup-Database
     }
 
+<<<<<<< HEAD
     Write-Step "0.5/5" "Validate stack SCMD Pro"
+=======
+    Write-Step "0.5/5" "Validate stack SCMDERP"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     Invoke-Compose -ComposeArgs @("config")
     Write-Ok "Compose hop le."
 
@@ -256,9 +297,15 @@ try {
     Wait-AppHealth -TimeoutSec 300
 
     Write-Header "RESET THANH CONG"
+<<<<<<< HEAD
     Write-Host "  SCMD Pro san sang tai $script:AppUrl" -ForegroundColor Green
     Write-Host "  Tai khoan admin: $script:AdminUsername" -ForegroundColor Green
     Write-Host "  Mat khau admin : da dong bo tu cau hinh moi truong" -ForegroundColor Green
+=======
+    Write-Host "  SCMDERP san sang tai $script:AppUrl" -ForegroundColor Green
+    Write-Host "  Tai khoan admin: $script:AdminUsername" -ForegroundColor Green
+    Write-Host "  Mat khau admin : $script:AdminPassword" -ForegroundColor Green
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     Write-Host "  Log file: $script:LogFile" -ForegroundColor Green
 } catch {
     Write-Header "RESET THAT BAI"

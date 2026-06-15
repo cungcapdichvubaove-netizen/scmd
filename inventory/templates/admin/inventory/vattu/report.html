@@ -1,16 +1,73 @@
 {% extends "admin/base_site.html" %}
 {% block content %}
+<<<<<<< HEAD
 
 <div id="print-section">
     <div class="scmd-inventory-report-header">
         <h2>{{ COMPANY.display_name|default:"CÔNG TY DỊCH VỤ BẢO VỆ SCMD" }}</h2>
         <p>Địa chỉ: {{ COMPANY.dia_chi|default:"Chưa cấu hình địa chỉ công ty" }}</p>
         <p>Email: {{ COMPANY.email|default:"Chưa cấu hình email" }} | SĐT: {{ COMPANY.contact_phone|default:"Chưa cấu hình số điện thoại" }}</p>
+=======
+<style>
+    @media print {
+        body * {
+            visibility: hidden;
+        }
+        #print-section, #print-section * {
+            visibility: visible;
+        }
+        #print-section {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+        }
+        .no-print {
+            display: none;
+        }
+    }
+    .report-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+    .report-header h1 {
+        margin: 0;
+        color: #333;
+    }
+    .report-header p {
+        margin: 5px 0;
+        color: #666;
+    }
+    #result_list {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    #result_list th, #result_list td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+    #result_list thead th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+    #result_list tbody tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+</style>
+
+<div id="print-section">
+    <div class="report-header">
+        <h2>CÔNG TY TNHH DỊCH VỤ BẢO VỆ XYZ</h2>
+        <p>Địa chỉ: Số 1, Đường ABC, Quận Ba Đình, Hà Nội</p>
+        <p>Email: contact@xyzsecurity.com | SĐT: 0123.456.789</p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         <hr>
         <h1>BÁO CÁO TỒN KHO VẬT TƯ</h1>
         <p><em>Ngày xuất báo cáo: {% now "H:i, d/m/Y" %}</em></p>
     </div>
     
+<<<<<<< HEAD
     <table id="result_list" class="scmd-inventory-report-table">
         <thead>
             <tr>
@@ -18,11 +75,21 @@
                 <th class="scmd-col-50">Tên Vật tư</th>
                 <th class="scmd-col-20">Đơn vị tính</th>
                 <th class="scmd-col-20">Số lượng Tồn kho</th>
+=======
+    <table id="result_list">
+        <thead>
+            <tr>
+                <th style="width: 10%;">STT</th>
+                <th style="width: 50%;">Tên Vật tư</th>
+                <th style="width: 20%;">Đơn vị tính</th>
+                <th style="width: 20%;">Số lượng Tồn kho</th>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             </tr>
         </thead>
         <tbody>
             {% for item in vat_tu_list %}
             <tr class="{% cycle 'row1' 'row2' %}">
+<<<<<<< HEAD
                 <td class="scmd-text-center">{{ forloop.counter }}</td>
                 <td>{{ item.ten_vat_tu }}</td>
                 <td class="scmd-text-center">{{ item.don_vi_tinh }}</td>
@@ -31,13 +98,27 @@
             {% empty %}
             <tr>
                 <td colspan="4" class="scmd-text-center">Không có dữ liệu.</td>
+=======
+                <td style="text-align: center;">{{ forloop.counter }}</td>
+                <td>{{ item.ten_vat_tu }}</td>
+                <td style="text-align: center;">{{ item.don_vi_tinh }}</td>
+                <td style="text-align: center;">{{ item.so_luong_ton_kho }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center;">Không có dữ liệu.</td>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             </tr>
             {% endfor %}
         </tbody>
     </table>
 </div>
 
+<<<<<<< HEAD
 <p class="no-print scmd-mt-lg">
+=======
+<p class="no-print" style="margin-top: 20px;">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     <button onclick="window.print();">In Báo cáo</button>
 </p>
 {% endblock %}

@@ -1,4 +1,5 @@
 param(
+<<<<<<< HEAD
     [switch]$SkipCheck,
     [string]$SecretKey = $env:SECRET_KEY,
     [string]$FieldEncryptionKey = $env:FIELD_ENCRYPTION_KEY,
@@ -7,21 +8,28 @@ param(
     [string]$RedisUrl = $env:REDIS_URL,
     [string]$CorsAllowedOrigins = $env:CORS_ALLOWED_ORIGINS,
     [string]$FcmServerKey = $env:FCM_SERVER_KEY
+=======
+    [switch]$SkipCheck
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 )
 
 $ErrorActionPreference = "Stop"
 
 # Force UTF-8 for this session to avoid encoding issues on Windows
 $OutputEncoding = [System.Text.Encoding]::UTF8
+<<<<<<< HEAD
 [Console]::InputEncoding = [System.Text.Encoding]::UTF8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 try { chcp 65001 > $null } catch {}
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 $env:PYTHONUTF8 = 1
 
 $projectRoot = Split-Path -Parent $PSScriptRoot
 $venvPython = Join-Path $projectRoot "venv\Scripts\python.exe"
 $envFile = Join-Path $projectRoot ".env"
 
+<<<<<<< HEAD
 function Test-WindowsGisRuntime {
     if ($env:OS -ne "Windows_NT") {
         return $true
@@ -112,6 +120,18 @@ CORS_ALLOWED_ORIGINS=$CorsAllowedOrigins
 FCM_SERVER_KEY=$FcmServerKey
 FIELD_ENCRYPTION_KEY=$FieldEncryptionKey
 EXCEL_EXPORT_PASSWORD=$ExcelExportPassword
+=======
+if (-not (Test-Path $envFile)) {
+@"
+SECRET_KEY=scmd-bootstrap-local-secret-key
+DEBUG=True
+ALLOWED_HOSTS=127.0.0.1,localhost
+CSRF_TRUSTED_ORIGINS=http://127.0.0.1:8000,http://localhost:8000
+DATABASE_URL=sqlite:///db.sqlite3
+REDIS_URL=redis://localhost:6379/0
+CORS_ALLOWED_ORIGINS=http://localhost:3000
+FCM_SERVER_KEY=
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 "@ | Set-Content -Path $envFile -Encoding UTF8
 }
 
@@ -129,8 +149,11 @@ if (-not (Test-Path $venvPython)) {
     python -m venv (Join-Path $projectRoot "venv")
 }
 
+<<<<<<< HEAD
 [void](Test-WindowsGisRuntime)
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 Write-Host "Updating pip and installing dependencies..." -ForegroundColor Cyan
 & $venvPython -m pip install --upgrade pip --quiet
 & $venvPython -m pip install -r (Join-Path $projectRoot "requirements-dev.txt") --no-cache-dir

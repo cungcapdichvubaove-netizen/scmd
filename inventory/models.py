@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -15,20 +19,31 @@ NOTICE: This file is part of a proprietary system.
 Unauthorized copying of this file, via any medium is strictly prohibited.
 """
 
+<<<<<<< HEAD
 from django.conf import settings
 from django.db import models, transaction
+=======
+from django.db import models
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.utils import timezone
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from users.models import NhanVien
 from clients.models import MucTieu
+<<<<<<< HEAD
 from inventory.models_ledger import InventoryLedgerEntry
 from core.managers import TenantAwareManager, TenantScopedModel
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 # --- 1. DANH MỤC VẬT TƯ ---
 
+<<<<<<< HEAD
 class LoaiVatTu(TenantScopedModel):
+=======
+class LoaiVatTu(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Phân loại vật tư: Đồng phục, CCHT, Thiết bị an ninh..."""
     ten_loai = models.CharField(_("Tên loại vật tư"), max_length=100)
     mo_ta = models.TextField(_("Mô tả danh mục"), blank=True, default="")
@@ -36,6 +51,7 @@ class LoaiVatTu(TenantScopedModel):
     def __str__(self):
         return str(self.ten_loai)
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
     class Meta:
@@ -45,6 +61,14 @@ class LoaiVatTu(TenantScopedModel):
 
 
 class VatTu(TenantScopedModel):
+=======
+    class Meta:
+        verbose_name = _("1. Loại vật tư")
+        verbose_name_plural = _("1. Loại vật tư")
+
+
+class VatTu(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Danh mục vật tư và Công cụ hỗ trợ (CCHT) chi tiết"""
     loai_vat_tu = models.ForeignKey(
         LoaiVatTu, 
@@ -69,8 +93,11 @@ class VatTu(TenantScopedModel):
     so_luong_ton = models.IntegerField(_("Tồn kho hiện tại"), default=0)
     hinh_anh = models.ImageField(_("Ảnh minh họa"), upload_to="vattu/", null=True, blank=True)
     muc_canh_bao = models.IntegerField(_("Mức cảnh báo tồn tối thiểu"), default=10)
+<<<<<<< HEAD
 
     objects = TenantAwareManager()
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     def __str__(self):
         return f"{self.ten_vat_tu} (Tồn: {self.so_luong_ton})"
@@ -78,11 +105,15 @@ class VatTu(TenantScopedModel):
     class Meta:
         verbose_name = _("2. Vật tư & CCHT")
         verbose_name_plural = _("2. Kho Tổng")
+<<<<<<< HEAD
         indexes = [models.Index(fields=["tenant_id", "so_luong_ton"])]
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 # --- 2. QUẢN LÝ CÔNG CỤ TẠI MỤC TIÊU ---
 
+<<<<<<< HEAD
 class CongCuTaiMucTieu(TenantScopedModel):
     """Theo dõi số lượng CCHT thực tế đang bàn giao cho từng Mục tiêu bảo vệ"""
     # Rule 6.4: Chống xóa cascade để bảo vệ dữ liệu kiểm toán tồn kho tại mục tiêu.
@@ -97,11 +128,23 @@ class CongCuTaiMucTieu(TenantScopedModel):
 
     objects = TenantAwareManager()
 
+=======
+class CongCuTaiMucTieu(models.Model):
+    """Theo dõi số lượng CCHT thực tế đang bàn giao cho từng Mục tiêu bảo vệ"""
+    muc_tieu = models.ForeignKey(MucTieu, on_delete=models.CASCADE, verbose_name=_("Mục tiêu bảo vệ"))
+    vat_tu = models.ForeignKey(VatTu, on_delete=models.CASCADE, verbose_name=_("Tên công cụ"))
+    so_luong_dang_giu = models.PositiveIntegerField(_("Số lượng thực tế tại MT"), default=0)
+    ngay_cap_gan_nhat = models.DateField(_("Ngày cập nhật gần nhất"), auto_now=True)
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     class Meta:
         unique_together = ('muc_tieu', 'vat_tu')
         verbose_name = _("3. Công cụ tại Mục tiêu")
         verbose_name_plural = _("3. Công cụ tại Mục tiêu")
+<<<<<<< HEAD
         indexes = [models.Index(fields=["tenant_id", "muc_tieu"], name="inv_cctmt_tenant_mt_idx")]
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     def __str__(self):
         return f"{self.muc_tieu} - {self.vat_tu} (SL: {self.so_luong_dang_giu})"
@@ -109,6 +152,7 @@ class CongCuTaiMucTieu(TenantScopedModel):
 
 # --- 3. PHIẾU NHẬP KHO ---
 
+<<<<<<< HEAD
 class PhieuNhap(TenantScopedModel):
     """Hồ sơ nhập kho vật tư từ nhà cung cấp hoặc thu hồi"""
     class TrangThai(models.TextChoices):
@@ -116,6 +160,10 @@ class PhieuNhap(TenantScopedModel):
         POSTED = "POSTED", _("Đã ghi sổ")
         VOIDED = "VOIDED", _("Đã hủy")
 
+=======
+class PhieuNhap(models.Model):
+    """Hồ sơ nhập kho vật tư từ nhà cung cấp hoặc thu hồi"""
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ma_phieu = models.CharField(_("Mã số phiếu nhập"), max_length=50, unique=True)
     nguoi_nhap = models.ForeignKey(
         NhanVien, 
@@ -124,6 +172,7 @@ class PhieuNhap(TenantScopedModel):
         verbose_name=_("Thủ kho thực hiện")
     )
     ngay_nhap = models.DateTimeField(_("Ngày giờ nhập kho"), default=timezone.now)
+<<<<<<< HEAD
     trang_thai = models.CharField(
         _("Trạng thái chứng từ"),
         max_length=20,
@@ -135,6 +184,10 @@ class PhieuNhap(TenantScopedModel):
 
     objects = TenantAwareManager()
 
+=======
+    ghi_chu = models.TextField(_("Ghi chú nhập"), blank=True)
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def __str__(self):
         time_str = self.ngay_nhap.astimezone().strftime('%d/%m/%Y')
         return f"Nhập: {self.ma_phieu} ({time_str})"
@@ -142,6 +195,7 @@ class PhieuNhap(TenantScopedModel):
     class Meta:
         verbose_name = _("4. Phiếu Nhập kho")
         verbose_name_plural = _("4. Quản lý Nhập kho")
+<<<<<<< HEAD
         indexes = [models.Index(fields=["tenant_id", "trang_thai", "ngay_nhap"], name="inv_pn_tenant_state_dt_idx")]
 
     @property
@@ -185,6 +239,17 @@ class ChiTietPhieuNhap(TenantScopedModel):
 
     objects = TenantAwareManager()
 
+=======
+
+
+class ChiTietPhieuNhap(models.Model):
+    """Chi tiết danh sách vật tư trong một phiếu nhập"""
+    phieu_nhap = models.ForeignKey(PhieuNhap, related_name='chi_tiet', on_delete=models.CASCADE)
+    vat_tu = models.ForeignKey(VatTu, on_delete=models.CASCADE, verbose_name=_("Vật tư"))
+    so_luong = models.PositiveIntegerField(_("Số lượng nhập"))
+    don_gia = models.DecimalField(_("Đơn giá nhập thực tế"), max_digits=12, decimal_places=0, default=0)
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     @property
     def thanh_tien(self): 
         sl = self.so_luong if self.so_luong else 0
@@ -195,6 +260,7 @@ class ChiTietPhieuNhap(TenantScopedModel):
         verbose_name = _("Chi tiết phiếu nhập")
         verbose_name_plural = _("Chi tiết phiếu nhập")
 
+<<<<<<< HEAD
     def clean(self):
         super().clean()
         if self.phieu_nhap_id and self.phieu_nhap.trang_thai != PhieuNhap.TrangThai.DRAFT:
@@ -222,6 +288,13 @@ class PhieuXuat(TenantScopedModel):
         POSTED = "POSTED", _("Đã ghi sổ")
         VOIDED = "VOIDED", _("Đã hủy")
 
+=======
+
+# --- 4. PHIẾU XUẤT KHO ---
+
+class PhieuXuat(models.Model):
+    """Hồ sơ xuất kho: Cấp phát định mức, bán trừ lương hoặc cấp cho mục tiêu"""
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     LOAI_XUAT = [
         ('CAP_PHAT', _('Cấp phát (Miễn phí/Định mức)')),
         ('BAN_TRU_LUONG', _('Bán (Khấu trừ vào lương tháng)')),
@@ -268,6 +341,7 @@ class PhieuXuat(TenantScopedModel):
         default=0, 
         editable=False
     )
+<<<<<<< HEAD
     trang_thai = models.CharField(
         _("Trạng thái chứng từ"),
         max_length=20,
@@ -277,6 +351,8 @@ class PhieuXuat(TenantScopedModel):
     )
 
     objects = TenantAwareManager()
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def clean(self):
         """Kiểm tra logic nghiệp vụ khi lập phiếu xuất"""
@@ -301,6 +377,7 @@ class PhieuXuat(TenantScopedModel):
     class Meta:
         verbose_name = _("5. Phiếu Xuất kho")
         verbose_name_plural = _("5. Quản lý Xuất kho")
+<<<<<<< HEAD
         indexes = [models.Index(fields=["tenant_id", "trang_thai", "ngay_xuat"], name="inv_px_tenant_state_dt_idx")]
 
     @property
@@ -339,11 +416,20 @@ class ChiTietPhieuXuat(TenantScopedModel):
     vat_tu = models.ForeignKey(
         VatTu, on_delete=models.PROTECT, verbose_name=_("Vật tư/CCHT")
     )
+=======
+
+
+class ChiTietPhieuXuat(models.Model):
+    """Chi tiết danh sách vật tư trong một phiếu xuất"""
+    phieu_xuat = models.ForeignKey(PhieuXuat, related_name='chi_tiet', on_delete=models.CASCADE)
+    vat_tu = models.ForeignKey(VatTu, on_delete=models.CASCADE, verbose_name=_("Vật tư/CCHT"))
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     so_luong = models.PositiveIntegerField(_("Số lượng xuất"))
     
     # Lưu giá bán tại thời điểm xuất để tránh biến động giá danh mục sau này
     don_gia_ban = models.DecimalField(_("Đơn giá áp dụng"), max_digits=12, decimal_places=0, default=0)
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
     def save(self, *args, **kwargs):
@@ -352,11 +438,16 @@ class ChiTietPhieuXuat(TenantScopedModel):
         if self.phieu_xuat_id and self.phieu_xuat.trang_thai != PhieuXuat.TrangThai.DRAFT:
             raise ValidationError(_("Không được sửa dòng vật tư khi phiếu xuất đã ghi sổ hoặc đã hủy."))
             
+=======
+    def save(self, *args, **kwargs):
+        """Tự động lấy đơn giá bán và cập nhật tổng tiền công nợ của phiếu xuất"""
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         # 1. Tự động áp đơn giá từ danh mục nếu chưa có
         if self.don_gia_ban == 0 and self.vat_tu:
             self.don_gia_ban = self.vat_tu.gia_ban
             
         super().save(*args, **kwargs)
+<<<<<<< HEAD
 
     def delete(self, *args, **kwargs):
         # Rule 6.4: Ngăn chặn xóa liên đới hoặc xóa trực tiếp dòng vật tư đã chốt
@@ -602,3 +693,35 @@ class BienBanMatHongVatTu(TenantScopedModel):
             update_fields.extend(["nguoi_duyet", "ngay_duyet"])
         self.save(update_fields=update_fields)
         return self.record_status_transition(actor=actor, old_status=old_status, new_status=new_status, note=note)
+=======
+        
+        # 2. Đồng bộ hóa tổng tiền phải thu cho PhieuXuat (Chỉ dành cho loại BÁN)
+        try:
+            from django.db import transaction
+            with transaction.atomic():
+                if self.phieu_xuat.loai_xuat == 'BAN_TRU_LUONG':
+                    # Khóa bản ghi PhieuXuat để tránh race condition
+                    p_xuat = PhieuXuat.objects.select_for_update().get(pk=self.phieu_xuat.pk)
+                    total = sum(item.so_luong * item.don_gia_ban for item in p_xuat.chi_tiet.all())
+                    PhieuXuat.objects.filter(pk=p_xuat.pk).update(tong_tien_phai_thu=total)
+        except Exception:
+            pass
+
+    def clean(self):
+        """Kiểm tra tồn kho thực tế trước khi xuất"""
+        if not self.so_luong or not self.vat_tu:
+            return
+            
+        # Kiểm tra tồn kho đối với phiếu mới hoặc phiếu đang sửa tăng số lượng
+        ton_kho = self.vat_tu.so_luong_ton if self.vat_tu.so_luong_ton is not None else 0
+        if self.pk is None: # Phiếu mới
+            if ton_kho < self.so_luong:
+                raise ValidationError(_(f"Lỗi kho: Vật tư {self.vat_tu.ten_vat_tu} không đủ tồn (Hiện có: {ton_kho})"))
+        else:
+            # Đối với bản ghi cũ, kiểm tra độ chênh lệch nếu cần (logic này có thể mở rộng thêm)
+            pass
+
+    class Meta:
+        verbose_name = _("Chi tiết phiếu xuất")
+        verbose_name_plural = _("Chi tiết phiếu xuất")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

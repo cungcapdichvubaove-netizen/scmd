@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 {% load humanize %}
 {% block title %}Chấm công theo mục tiêu | SCMD Pro{% endblock %}
@@ -20,3 +21,96 @@
   {% else %}<div class="alert alert-info"><i class="fas fa-info-circle"></i><span>Hãy tìm và chọn một mục tiêu để xem báo cáo. Danh sách được giới hạn để tránh chậm khi có nhiều mục tiêu.</span></div>{% endif %}
 </div>
 {% endblock %}
+=======
+{# file: reports/templates/reports/cham_cong_muc_tieu.html #}
+{% extends "base.html" %}
+{% block title %}Báo cáo Mục tiêu{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    
+    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+            <div>
+                <h1 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-building text-indigo-600"></i> Tổng hợp theo Mục tiêu
+                </h1>
+                <p class="text-sm text-slate-500">Theo dõi tổng giờ phục vụ tại từng địa điểm.</p>
+            </div>
+        </div>
+
+        <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
+            <div class="form-control">
+                <label class="label text-xs font-bold text-slate-500 uppercase">Chọn mục tiêu</label>
+                <select name="muc_tieu_id" class="select select-sm select-bordered w-full bg-white" required onchange="this.form.submit()">
+                    <option value="">-- Chọn mục tiêu --</option>
+                    {% for mt in muc_tieu_list %}
+                        <option value="{{ mt.id }}" {% if selected_muc_tieu.id == mt.id %}selected{% endif %}>{{ mt.ten_muc_tieu }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-control">
+                <label class="label text-xs font-bold text-slate-500 uppercase">Tháng</label>
+                <select name="thang" class="select select-sm select-bordered w-full bg-white" onchange="this.form.submit()">
+                    {% for m in thang_range %}
+                    <option value="{{ m }}" {% if selected_thang == m %}selected{% endif %}>Tháng {{ m }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-control">
+                <label class="label text-xs font-bold text-slate-500 uppercase">Năm</label>
+                <select name="nam" class="select select-sm select-bordered w-full bg-white" onchange="this.form.submit()">
+                    <option value="{{ selected_nam }}">{{ selected_nam }}</option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    {% if selected_muc_tieu %}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-indigo-50 p-4 rounded-xl border border-indigo-100 flex items-center justify-between">
+            <div>
+                <p class="text-xs font-bold text-indigo-500 uppercase">Tổng giờ phục vụ</p>
+                <p class="text-2xl font-black text-indigo-700">{{ summary_data.tong_gio }}h</p>
+            </div>
+            <i class="fas fa-clock text-3xl text-indigo-200"></i>
+        </div>
+        </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+        <table class="table w-full">
+            <thead class="bg-slate-50 text-slate-500 text-xs uppercase">
+                <tr>
+                    <th class="pl-6">Ngày</th>
+                    <th>Ca trực</th>
+                    <th>Nhân viên</th>
+                    <th class="text-center">Check-in</th>
+                    <th class="text-center">Check-out</th>
+                    <th class="text-right pr-6">Số giờ</th>
+                </tr>
+            </thead>
+            <tbody class="text-sm divide-y divide-slate-50">
+                {% for cc in report_data %}
+                <tr class="hover:bg-slate-50 transition-colors">
+                    <td class="pl-6 font-bold text-slate-700">{{ cc.ca_truc.ngay_truc|date:"d/m/Y" }}</td>
+                    <td>
+                        <div class="badge badge-ghost badge-sm">{{ cc.ca_truc.ca_lam_viec.ten_ca }}</div>
+                    </td>
+                    <td>
+                        <div class="font-medium text-slate-800">{{ cc.ca_truc.nhan_vien.ho_ten }}</div>
+                        <div class="text-xs text-slate-400">{{ cc.ca_truc.nhan_vien.ma_nhan_vien }}</div>
+                    </td>
+                    <td class="text-center font-mono text-slate-500">{{ cc.thoi_gian_check_in|date:"H:i" }}</td>
+                    <td class="text-center font-mono text-slate-500">{{ cc.thoi_gian_check_out|date:"H:i" }}</td>
+                    <td class="text-right pr-6 font-bold text-indigo-600">{{ cc.duration }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center py-10 text-slate-400">Không có dữ liệu.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

@@ -1,6 +1,10 @@
 @echo off
 chcp 65001 >nul
+<<<<<<< HEAD
 title SCMD Pro - Health Check
+=======
+title SCMDERP - Health Check
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 :: Kiem tra PowerShell ton tai
 where powershell.exe >nul 2>&1

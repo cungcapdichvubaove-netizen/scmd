@@ -36,7 +36,11 @@ SCMD Pro giúp doanh nghiệp dịch vụ bảo vệ quản lý tập trung khá
 ## Checklist thay thế trong code/tài liệu
 
 ```bash
+<<<<<<< HEAD
 grep -RInE "War Room|WarRoom|Sentinel|Tactical|Cyber|SCMD ERP|ESP" -n templates static main dashboard users operations accounting clients *.md
+=======
+grep -R "SCMD ERP\|Security Command System\|Sentinel Command System\|War Room\|Tactical\|ESP" -n templates static main dashboard users operations accounting clients *.md
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 grep -R "SCMD Pro" -n templates static main dashboard users operations accounting clients *.md
 ```
 
@@ -54,6 +58,9 @@ grep -R "SCMD Pro" -n templates static main dashboard users operations accountin
 - Không dùng logo/hình ảnh tạo cảm giác công ty bảo vệ trực tiếp thay vì công ty phần mềm.
 - Không dùng war-room/cyber/neon/tactical language trên UI nghiệp vụ.
 - Không dùng `SCMD` lẫn `SCMD Pro` tùy tiện; luôn phân biệt công ty và sản phẩm.
+<<<<<<< HEAD
 Status note:
 - This is a migration/support guide for brand-normalization work.
 - Current source of truth remains `README.md`, `WHITEPAPER.md`, `DOCUMENTATION.md`, and `UI_SYSTEM_REFACTOR_SPEC.md`.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

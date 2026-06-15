@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # -*- coding: utf-8 -*-
 
 from datetime import datetime
@@ -200,3 +201,8 @@ class ReportAccessPolicyTest(TestCase):
 
         with self.assertRaises(PermissionDenied):
             tong_hop_cham_cong_thang_view(request)
+=======
+from django.test import TestCase
+
+# Create your tests here.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

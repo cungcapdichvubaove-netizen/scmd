@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -36,7 +40,11 @@ def create_user_profile(sender, instance, created, **kwargs):
                 user=instance,
                 defaults={
                     'ho_ten': instance.get_full_name() or instance.username,
+<<<<<<< HEAD
                     'email': instance.email or None
+=======
+                    'email': instance.email
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 }
             )
             if created_profile:

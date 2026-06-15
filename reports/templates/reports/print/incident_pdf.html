@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 {% load static %}
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -6,6 +9,7 @@
     <title>Biên bản sự cố</title>
     <style>
         @page { size: A4; margin: 2cm; }
+<<<<<<< HEAD
         body {
             font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif;
             font-size: 13px;
@@ -16,6 +20,9 @@
         .watermark { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; z-index: -1; }
         .watermark img { width: 72%; opacity: 0.055; transform: rotate(-35deg); }
         .header strong { font-size: 15px; }
+=======
+        body { font-family: "Times New Roman", serif; font-size: 14px; line-height: 1.5; }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
         .title { text-align: center; font-size: 18px; font-weight: bold; margin: 20px 0; text-transform: uppercase; }
         .section { margin-bottom: 15px; }
@@ -27,6 +34,7 @@
     </style>
 </head>
 <body>
+<<<<<<< HEAD
     <div class="watermark"><img src="{% static 'img/brand/report-watermark-symbol.png' %}" alt="" aria-hidden="true"></div>
     <div class="header">
         {% if company_info.logo_path %}
@@ -36,6 +44,9 @@
         {% else %}
             <img src="{% static 'img/brand/report-header-logo.png' %}" class="report-logo" alt="SCMD Pro"><br>
         {% endif %}
+=======
+    <div class="header">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         <strong>{{ company_info.name }}</strong><br>
         Địa chỉ: {{ company_info.address }}<br>
         Hotline: {{ company_info.hotline }}

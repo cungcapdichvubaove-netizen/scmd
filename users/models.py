@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
@@ -14,13 +18,17 @@ Description: Model quản lý cấu trúc nhân sự, định danh và hồ sơ 
 """
 
 import logging
+<<<<<<< HEAD
 import uuid
 from datetime import timedelta
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.db import models, transaction, IntegrityError
 from django.contrib.auth.models import Group, User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
+<<<<<<< HEAD
 from django.core.validators import MinValueValidator, RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -29,6 +37,13 @@ from django.utils.translation import gettext_lazy as _ # noqa: F401
 from core.infrastructure.security import decrypt_aes256
 from core.managers import TenantAwareManager, TenantScopedModel, organization_id
 from core.workflow_transition_policy import WorkflowTransitionPolicy
+=======
+from django.core.validators import RegexValidator
+from django.core.exceptions import ValidationError
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
+from core.infrastructure.security import decrypt_aes256
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # Logger cho hệ thống SCMD
 logger = logging.getLogger(__name__)
@@ -41,6 +56,7 @@ phone_validator = RegexValidator(
 
 
 # --- MANAGERS TỐI ƯU HÓA TRUY VẤN ---
+<<<<<<< HEAD
 class NhanVienManager(TenantAwareManager):
     """Organization-scoped employee manager safe for read and write paths.
 
@@ -68,6 +84,12 @@ class NhanVienManager(TenantAwareManager):
             if getattr(obj, "email", None) == "":
                 obj.email = None
         return super().bulk_create(objs, *args, **kwargs)
+=======
+class NhanVienManager(models.Manager):
+    """Tối ưu hóa hiệu suất bằng cách tự động join các bảng liên quan."""
+    def get_queryset(self):
+        return super().get_queryset().select_related('phong_ban', 'chuc_danh', 'user')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 class LichSuCongTacManager(models.Manager):
@@ -110,20 +132,32 @@ class ChucDanh(models.Model):
     class Meta:
         verbose_name = _("Chức danh")
         verbose_name_plural = _("1. Danh mục Chức danh")
+<<<<<<< HEAD
     
 
 class PhongBan(TenantScopedModel):
+=======
+
+
+class PhongBan(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ten_phong_ban = models.CharField(_("Tên phòng ban"), max_length=100, unique=True)
     mo_ta = models.TextField(_("Mô tả"), blank=True, null=True)
     nhom_quyen = models.ForeignKey(
         Group, 
         on_delete=models.SET_NULL, 
         null=True, 
+<<<<<<< HEAD
         blank=True,
         verbose_name=_("Nhóm quyền mặc định")
     )
 
     objects = TenantAwareManager()
+=======
+        blank=True, 
+        verbose_name=_("Nhóm quyền mặc định")
+    )
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     def __str__(self):
         return self.ten_phong_ban
@@ -134,7 +168,11 @@ class PhongBan(TenantScopedModel):
 
 
 # --- MODEL NHÂN VIÊN (CORE ENTITY) ---
+<<<<<<< HEAD
 class NhanVien(TenantScopedModel):
+=======
+class NhanVien(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     class GioiTinh(models.TextChoices):
         NAM = "M", _("Nam")
         NU = "F", _("Nữ")
@@ -309,6 +347,7 @@ class NhanVien(TenantScopedModel):
         return mark_safe(f'<img src="{self.avatar_url}" width="50" height="50" style="border-radius:50%; object-fit:cover; border: 1px solid #ddd;" />')
     avatar_tag.short_description = _('Ảnh hồ sơ')
 
+<<<<<<< HEAD
     def get_active_labor_contract(self, day=None):
         """Trả về HĐLĐ có hiệu lực từ model HopDongLaoDong, không dùng loai_hop_dong legacy."""
         day = day or timezone.localdate()
@@ -328,6 +367,10 @@ class NhanVien(TenantScopedModel):
         self.tenant_id = organization_id()
         if self.email == "":
             self.email = None
+=======
+    def save(self, *args, **kwargs):
+        """Xử lý logic tự động hóa trước khi lưu."""
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         # Sinh mã nhân viên nếu chưa có (Trường hợp tạo từ Signal hoặc Admin)
         if not self.ma_nhan_vien:
             try:
@@ -347,6 +390,7 @@ class NhanVien(TenantScopedModel):
         super().save(*args, **kwargs)
 
 
+<<<<<<< HEAD
 ACTIVE_EMPLOYEE_STATUSES = [
     NhanVien.TrangThaiLamViec.CHINH_THUC,
     NhanVien.TrangThaiLamViec.THU_VIEC,
@@ -1001,6 +1045,8 @@ class HoSoBaoHiem(TenantScopedModel):
         self.save(update_fields=update_fields)
         return self.record_status_transition(actor=actor, old_status=old_status, new_status=new_status, note=note)
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 # --- MODEL HỖ TRỢ HỒ SƠ ---
 class HocVan(models.Model):
     nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, related_name="cac_hoc_van")
@@ -1028,7 +1074,11 @@ class BangCapChungChi(models.Model):
         verbose_name_plural = _("Bằng cấp & Chứng chỉ")
 
 
+<<<<<<< HEAD
 class LichSuCongTac(TenantScopedModel):
+=======
+class LichSuCongTac(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     nhan_vien = models.ForeignKey(NhanVien, on_delete=models.CASCADE, related_name="cac_lich_su_cong_tac")
     muc_tieu = models.ForeignKey("clients.MucTieu", on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Mục tiêu bảo vệ"))
     chuc_danh_kiem_nhiem = models.ForeignKey(ChucDanh, on_delete=models.SET_NULL, null=True, blank=True, verbose_name=_("Chức danh kiêm nhiệm"))
@@ -1036,7 +1086,11 @@ class LichSuCongTac(TenantScopedModel):
     ngay_bat_dau = models.DateField(_("Ngày bắt đầu"), db_index=True)
     ngay_ket_thuc = models.DateField(_("Ngày kết thúc"), null=True, blank=True)
     
+<<<<<<< HEAD
     objects = TenantAwareManager()
+=======
+    objects = LichSuCongTacManager()
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     class Meta:
         verbose_name = _("Lịch sử công tác")
@@ -1071,4 +1125,7 @@ def cap_nhat_quyen_tu_dong(sender, instance, created, **kwargs):
                     user.save()
         except Exception as e:
             logger.error(f"Lỗi đồng bộ quyền cho {instance.ma_nhan_vien}: {str(e)}")
+<<<<<<< HEAD
 from .models_assignment import NhanVienRegionAssignment, Region  # noqa: E402,F401
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

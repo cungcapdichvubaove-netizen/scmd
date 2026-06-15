@@ -1,5 +1,9 @@
 {# file: inspection/templates/inspection/mobile/lap_bien_ban.html #}
+<<<<<<< HEAD
 {% extends "mobile/base.html" %}
+=======
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 {% load static %}
 
 {% block title %}Lập Biên Bản{% endblock %}
@@ -7,7 +11,11 @@
 {% block content %}
 <div class="space-y-4 fade-in">
     <div class="flex items-center gap-4 bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+<<<<<<< HEAD
         <a href="{% url 'operations:mobile_tuan_tra_list' %}" class="btn btn-circle btn-ghost btn-sm"><i class="fas fa-arrow-left"></i></a>
+=======
+        <a href="{% url 'inspection:mobile_tuan_tra_list' %}" class="btn btn-circle btn-ghost btn-sm"><i class="fas fa-arrow-left"></i></a>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         <h1 class="text-lg font-bold text-red-600">Lập Biên Bản Vi Phạm</h1>
     </div>
 

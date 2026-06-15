@@ -1,18 +1,28 @@
 # WHITEPAPER.md — SCMD Pro Architecture & Product Contract
 
 Version: 3.5.0
+<<<<<<< HEAD
 Release date: 2026-06-12
 Status: **Authoritative target contract**
 
 Shared vocabulary: `docs/GLOSSARY.md`
 
+=======
+Release date: 2026-06-03
+Status: **Authoritative target contract**
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 Tài liệu này là contract chiến lược và kiến trúc mục tiêu cho SCMD/SCMD Pro. Khi code và tài liệu lệch nhau, đội phát triển phải xử lý bằng một trong hai cách: sửa code để tuân thủ contract, hoặc cập nhật contract bằng quyết định có lý do, changelog và owner chịu trách nhiệm.
 
 Patch note 3.5.0:
 - Chuẩn hóa kiến trúc thương hiệu mới: **SCMD** là công ty/thương hiệu mẹ; **SCMD Pro** là sản phẩm phần mềm thương mại bán cho doanh nghiệp dịch vụ bảo vệ.
 - Dòng định vị sản phẩm chính thức: **SCMD Pro — Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp**.
 - `ERP` không còn là tên thương hiệu chính; chỉ được dùng như năng lực/chức năng quản trị doanh nghiệp bên trong SCMD Pro.
+<<<<<<< HEAD
 - Public authentication surfaces (`homepage.html`, `login.html`) phải dùng local Tailwind build qua `{% tailwind_css %}` và brand tokens của SCMD Pro; không được nạp `Tailwind CDN`.
+=======
+- Public authentication surfaces (`homepage.html`, `login.html`) phải dùng local Tailwind build qua `{% tailwind_css %}` và brand tokens của SCMD Pro; không được nạp `cdn.tailwindcss.com`.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 - Attendance và payroll application use cases phải có regression coverage tối thiểu cho các nhánh integrity quan trọng của check-in/check-out và payroll audit.
 
 ---
@@ -105,16 +115,23 @@ Definition of Done:
 | Subsystem | SSOT mục tiêu | Ghi chú |
 |---|---|---|
 | Audit Log | `main.models.AuditLog` | Legacy re-export phải bị loại bỏ theo roadmap |
+<<<<<<< HEAD
 | Company Information | `main.models.CompanyInfo` | Nguồn dữ liệu công ty/pháp lý/liên hệ cho mọi mẫu biểu xuất ra |
 | Access Delegation | Planned `delegation.models.AccessDelegation` | Target contract only; chưa deployed trong bản hiện tại nên không được xem là implemented |
 | Staff Region Assignment | `users.models_assignment.NhanVienRegionAssignment` | Historical and multi-region staff-to-region assignment scope |
 | Payroll Adjustment | `accounting.models.PayrollAdjustment` | Retroactive payroll adjustment after lock/paid status |
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 | Worker Health | `main.models.WorkerHeartbeat` | Theo dõi worker/Celery/runtime health |
 | Alive Check | `operations.models.KiemTraQuanSo` | Không tạo model alive-check song song |
 | Attendance API | `operations.api_views` + application use cases | Mobile contract phải ổn định |
 | Organization Scope | `core.managers.OrganizationScopedManager` hoặc tên hiện tại `TenantAwareManager` tập trung | `tenant_id` là legacy naming, không phải SaaS tenant |
+<<<<<<< HEAD
 | Payroll Calculation | `accounting.application.payroll_use_cases.CalculatePayrollUseCase` + `PayrollSourceReconciliationUseCase` | Phải có reconciliation, lock policy và snapshot nguồn |
 | Business Workflow A→F | `docs/BUSINESS_WORKFLOW_A_TO_F_SYSTEM_CONTRACT.md` | HĐLĐ, nghỉ phép, đổi ca, thanh toán khách hàng, công nợ, thu hồi tài sản |
+=======
+| Payroll Calculation | `accounting.application.payroll_use_cases.CalculatePayrollUseCase` | Phải có reconciliation và lock policy |
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 | Incident Identity | `operations.models.BaoCaoSuCo.ma_su_co` | Model-level guard, không generate rải rác |
 | Frontend Tokens | `static/common/css/brand_system.css` + `tailwind.config.js` | Không dùng CDN Tailwind production |
 | UI Brand Language | `UI_SYSTEM_REFACTOR_SPEC.md` | SCMD là tên thương hiệu duy nhất trong user-facing UI |
@@ -148,6 +165,7 @@ Các model trung tâm:
 
 Quy tắc sản phẩm: SCMD là **operations-led security management platform**. Finance/payroll phải lấy dữ liệu từ vận hành đã đối soát, không nhập tay rời rạc như một finance-led ERP.
 
+<<<<<<< HEAD
 
 Business-domain workflows added through Phase A→F extend this core chain with dedicated source records:
 
@@ -170,6 +188,8 @@ PhieuXuat -> PhieuThuHoi -> InventoryLedgerEntry / BienBanMatHongVatTu -> KhoanK
 
 These records are not optional decoration. They are the source documents used to explain legal, salary, inventory, customer-receivable, and offboarding outcomes.
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ---
 
 ## 6. Data Integrity & Reconciliation Contract
@@ -186,6 +206,7 @@ These records are not optional decoration. They are the source documents used to
 ### 6.2 Payroll reconciliation
 
 - `ChiTietLuong` phải lưu đủ dữ liệu snapshot cần thiết để giải thích kết quả tại thời điểm tính: giờ công, đơn giá, phụ cấp, tạm ứng, khấu trừ, vi phạm, đồng phục, bảo hiểm, đền bù.
+<<<<<<< HEAD
 - Với thay đổi đơn giá hồi tố trong cùng kỳ lương, payroll phải resolve đơn giá theo `ngày trực`, không được áp một mức giá cố định cho toàn tháng nếu đã có lịch sử hiệu lực.
 - SSOT cho đơn giá hồi tố của mục tiêu là lịch sử đơn giá effective-dated gắn với `clients.MucTieu`; mỗi dòng snapshot attendance trong `ChiTietLuong` phải lưu tối thiểu `đơn giá`, `ngày hiệu lực từ` và định danh nguồn đơn giá để đối soát.
 - Nếu đã bật lịch sử đơn giá nhưng thiếu baseline hiệu lực trước ngày công đầu tiên cần tính, hệ thống phải chặn tính lương và trả lỗi cấu hình thay vì silently fallback.
@@ -203,18 +224,31 @@ These records are not optional decoration. They are the source documents used to
 - Report totals must distinguish open receivable, collected allocation, and remaining open receivable.
 
 ### 6.4 Incident reconciliation
+=======
+- Tính lại lương phải phân biệt rõ: recalculation draft, reviewed, locked, paid.
+- Kỳ lương đã `LOCKED` hoặc `PAID` không được sửa trực tiếp nếu không có quyền đặc biệt và audit.
+- Bất kỳ thay đổi nào làm đổi thực lãnh phải có reconciliation note.
+
+### 6.3 Incident reconciliation
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 - Sự cố đã đóng không được sửa nội dung chính mà không có reopen/audit.
 - Thiệt hại, đền bù hoặc khấu trừ liên quan sự cố phải trace được sang payroll/accounting.
 - `ma_su_co` là identity bất biến sau khi tạo.
+<<<<<<< HEAD
 - Incident lifecycle SSOT is `docs/INCIDENT_LIFECYCLE_CONTRACT.md`; `DA_XU_LY` is not a terminal closed state, while `HOAN_TAT` and `HUY` are terminal.
 
 ### 6.5 Inventory reconciliation
+=======
+
+### 6.4 Inventory reconciliation
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 - Phiếu xuất/nhập đã xác nhận không được xóa vật lý nếu đã ảnh hưởng tồn kho.
 - Điều chỉnh tồn kho phải có phiếu điều chỉnh hoặc audit record.
 - Cấp phát đồng phục/vật tư cho nhân viên/mục tiêu phải trace được khi tính khấu trừ hoặc thu hồi.
 
+<<<<<<< HEAD
 
 Phase F asset-recovery rules:
 
@@ -223,6 +257,8 @@ Phase F asset-recovery rules:
 - Lost/damaged/missing quantity creates `BienBanMatHongVatTu` and may create `KhoanKhauTruNhanVien`; it must not directly mutate `ChiTietLuong`.
 - Offboarding completion must be blocked while issued assets remain outstanding or damage/loss reports remain unresolved.
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ---
 
 ## 7. State Machine mục tiêu
@@ -268,6 +304,7 @@ DRAFT -> CONFIRMED -> POSTED -> VOIDED
 
 `VOIDED` không xóa lịch sử; phải tạo reverse effect nếu đã post tồn kho.
 
+<<<<<<< HEAD
 
 ### 7.5 Business source-record states A→F
 
@@ -285,6 +322,8 @@ BienBanMatHongVatTu: DRAFT -> PENDING_APPROVAL -> APPROVED -> APPLIED / CANCELLE
 
 Direct status mutation is not allowed in production workflow code outside sanctioned transition/use-case paths.
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ---
 
 ## 8. Permission & Audit Governance
@@ -316,10 +355,13 @@ Direct status mutation is not allowed in production workflow code outside sancti
 - reason/note đối với sửa dữ liệu nhạy cảm,
 - request metadata nếu có: IP, user agent, device.
 
+<<<<<<< HEAD
 ### 8.4 Access Scope cross-reference
 
 Chi tiết authorization model, object-scope contract, temporary delegation, historical scope, override policy và contextual deny UX xem tại `docs/access_scope/ACCESS_SCOPE_AUTHORIZATION_CONTRACT.md`.
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ---
 
 ## 9. Organization Scope Contract
@@ -369,17 +411,35 @@ SCMD là nền tảng chỉ huy và quản trị vận hành nội bộ, không 
 
 Tên user-facing của sản phẩm: **SCMD Pro**. Tên công ty/thương hiệu mẹ: **SCMD**. Dòng mô tả chính thức: **Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp**.
 
+<<<<<<< HEAD
 Không dùng trên UI sản phẩm các brand/copy cũ kiểu cyber-console, tên thử nghiệm, hoặc cách gọi biến SCMD/ERP thành tên sản phẩm chính. Chỉ dùng SCMD Pro cho sản phẩm và dùng thuật ngữ vận hành nghiệp vụ rõ nghĩa.
 
 ### 10.2 Asset contract
 
 - Không dùng `Tailwind CDN` trong production template.
+=======
+Không dùng trên UI sản phẩm:
+
+- SCMD ERP như tên sản phẩm chính
+- SCMD như tên sản phẩm bán hàng chính
+- Security Command System
+- Sentinel Command System
+- War Room
+- Tactical
+- Command Center nếu không được Việt hóa thành “Bảng điều hành vận hành” hoặc “Trung tâm điều hành SCMD Pro”
+- ESP như tên sản phẩm chính
+
+### 10.2 Asset contract
+
+- Không dùng `cdn.tailwindcss.com` trong production template.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 - Tailwind phải build local qua `theme/static_src/src/styles.css`, `tailwind.config.js`, compiled output được kiểm soát.
 - Color token dùng từ brand system, không hardcode neon/cyber color trên surface nội bộ.
 - Trạng thái nghiệp vụ có màu riêng nhưng màu chỉ dùng khi có ý nghĩa: success, warning, danger, info, neutral.
 
 ---
 
+<<<<<<< HEAD
 ## 11. Data Retention & Archive Contract
 
 SCMD Pro phải lưu giữ dữ liệu theo giá trị pháp lý/nghiệp vụ và tối ưu hiệu năng vận hành. Không được xóa âm thầm dữ liệu kiểm toán nhạy cảm.
@@ -400,6 +460,9 @@ Archive strategy must preserve referential traceability for payroll, incident, i
 ---
 
 ## 12. Production Deployment Contract
+=======
+## 11. Production Deployment Contract
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 Production deployment phải deterministic.
 
@@ -410,7 +473,10 @@ Bắt buộc:
 - Static build rõ ràng, không phụ thuộc CDN development.
 - Web/worker/beat không tự chạy migration ngầm nếu chưa có release plan.
 - Post-deploy phải kiểm tra health, worker heartbeat, task queue, static files, login, dashboard, admin.
+<<<<<<< HEAD
 - **Cấm tuyệt đối** các script reset dữ liệu hoặc xóa migrations (`reset_project.py`, v.v.) trong production image.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 Không được dùng production default cho:
 
@@ -419,14 +485,23 @@ Không được dùng production default cho:
 - `FIELD_ENCRYPTION_KEY`,
 - export password,
 - admin password,
+<<<<<<< HEAD
 - `CORS_ALLOWED_ORIGINS` (Rule 12.4),
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 - external service credentials.
 
 ---
 
+<<<<<<< HEAD
 ## 13. Release Governance
 
 ### 13.1 SemVer policy
+=======
+## 12. Release Governance
+
+### 12.1 SemVer policy
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 | Loại release | Được phép |
 |---|---|
@@ -434,9 +509,15 @@ Không được dùng production default cho:
 | Minor | Thêm use case, thêm màn hình, refactor có migration path, thêm contract không phá dữ liệu |
 | Major | Đổi data model hoặc business flow có breaking change, đổi state machine quan trọng |
 
+<<<<<<< HEAD
 ### 13.2 Release checklist
 
 Mỗi release phải có checklist trong `RELEASE_CHECKLIST.md` và các nội dung sau:
+=======
+### 12.2 Release checklist
+
+Mỗi release phải có:
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 - changelog,
 - migration plan nếu có migration,
@@ -446,7 +527,11 @@ Mỗi release phải có checklist trong `RELEASE_CHECKLIST.md` và các nội d
 - screenshot hoặc QA note cho UI thay đổi lớn,
 - xác nhận không có secret/default production mới.
 
+<<<<<<< HEAD
 ### 13.3 Documentation update rule
+=======
+### 12.3 Documentation update rule
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 Nếu thay đổi một trong các phần sau, phải cập nhật tài liệu cùng PR/release:
 
@@ -462,7 +547,11 @@ Nếu thay đổi một trong các phần sau, phải cập nhật tài liệu c
 
 ---
 
+<<<<<<< HEAD
 ## 14. Technical debt đã xác nhận
+=======
+## 13. Technical debt đã xác nhận
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ### P0 — Bảo mật / lộ source / layout nguy hiểm
 
@@ -487,12 +576,20 @@ Nếu thay đổi một trong các phần sau, phải cập nhật tài liệu c
 |---|---|---|
 | Cyber/war-room language | Lệch định vị ERP | Đổi copy và naming |
 | Tailwind CDN | Lệch frontend contract | Build local |
+<<<<<<< HEAD
 | Mojibake trong file nội bộ | Giảm chất lượng Việt hóa | Chuẩn hóa UTF-8 bằng chiến lược Forward-fix; không rewrite migration history. |
+=======
+| Mojibake trong file nội bộ | Giảm chất lượng Việt hóa | Chuẩn hóa UTF-8 |
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 | Màu neon/cyber | Lệch brand system | Chuyển về navy/blue/neutral + state colors |
 
 ---
 
+<<<<<<< HEAD
 ## 15. Điều kiện trước khi mở rộng lớn
+=======
+## 14. Điều kiện trước khi mở rộng lớn
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 Không bàn nghiêm túc multi-tenant thật, service split hoặc event choreography cho đến khi đạt các điều kiện:
 
@@ -502,14 +599,24 @@ Không bàn nghiêm túc multi-tenant thật, service split hoặc event choreog
 - Payroll reconciliation và lock policy rõ.
 - Attendance correction có audit.
 - Dashboard KPI có source và scope rõ.
+<<<<<<< HEAD
 - Frontend không phụ thuộc CDN production; verify bằng grep runtime templates/static trước release.
 - Brand cũ/cyber/war-room được loại khỏi UI chính; nếu grep chỉ còn tên file legacy hoặc tài liệu lịch sử thì phân loại rõ trong VERIFY_REPORT.md.
 - Test tối thiểu cho attendance, payroll, incident, dashboard pass trên môi trường có dependency. Không claim runtime PASS nếu chưa chạy được lệnh thật.
+=======
+- Frontend không phụ thuộc CDN production.
+- Brand cũ/cyber/war-room được loại khỏi UI chính.
+- Test tối thiểu cho attendance, payroll, incident, dashboard pass.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 - Release process có migration/rollback discipline.
 
 ---
 
+<<<<<<< HEAD
 ## 16. Changelog
+=======
+## 15. Changelog
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ### 3.3.0 — Strategy contract hardening
 
@@ -525,7 +632,11 @@ Không bàn nghiêm túc multi-tenant thật, service split hoặc event choreog
 
 - Xác nhận layered monolith.
 - Xác nhận operational truth làm trục sản phẩm.
+<<<<<<< HEAD
 - Ghi nhận debt lịch sử: wildcard facade, duplicate manager, Tailwind CDN, brand cũ, mojibake. Các mục này chỉ được xem là current debt khi có bằng chứng scan/log trên source hiện tại; nếu scan sạch, giữ dưới dạng checklist chống tái phát trước release.
+=======
+- Ghi nhận debt: wildcard facade, duplicate manager, Tailwind CDN, brand cũ, mojibake.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ### 3.0.0 — Monolith stabilization
 
@@ -554,6 +665,7 @@ Không bàn nghiêm túc multi-tenant thật, service split hoặc event choreog
 - Chốt tagline sản phẩm: `Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp`.
 - Giữ bản chất operations-led và các năng lực ERP, nhưng không dùng `ERP` làm tên sản phẩm chính.
 - Cập nhật language contract để UI, tài liệu, admin, PWA, print/export và checklist QA đồng bộ theo SCMD Pro.
+<<<<<<< HEAD
 
 
 ## Access Scope companion contracts
@@ -573,3 +685,5 @@ Django Admin/Jazzmin, sensitive exports, migration/backfill and UI surface chang
 ### Production surface hardening contract
 
 See `docs/PRODUCTION_SURFACE_HARDENING_CONTRACT.md` for `/media/` authorization, HTTPS edge contract, disabled backup/restore web UI and release ZIP hygiene.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

@@ -1,18 +1,28 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
 File: accounting/views.py
 Author: Mr. Anh
 Created Date: 2025-12-04
+<<<<<<< HEAD
 Updated Date: 2026-06-03
 Version: v3.5.0
+=======
+Updated Date: 2026-04-28
+Version: v1.1.0
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 Description: Views xử lý logic Kế toán & Lương.
              UPDATED: Bổ sung Data cho Dashboard KTT (KPIs, Charts).
 """
 
+<<<<<<< HEAD
 import logging
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
@@ -30,6 +40,17 @@ import json
 from typing import Any, cast, TYPE_CHECKING
 from django.core.cache import cache
 from .cache_utils import ACCOUNTING_DASHBOARD_UI_VERSION, build_accounting_dashboard_cache_key
+=======
+from django.shortcuts import render, get_object_or_404, redirect, HttpResponse
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.exceptions import PermissionDenied
+from django.utils import timezone
+from django.db import transaction
+from django.db.models import Sum, Count, Q
+from datetime import timedelta
+import json
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from openpyxl import Workbook
 from openpyxl.styles import PatternFill, Font
 
@@ -38,6 +59,7 @@ from .models_soquy import SoQuy
 from inventory.models import PhieuXuat
 from .services.payroll import PayrollService
 from accounting.application.reports_use_cases import DeductionAuditUseCase
+<<<<<<< HEAD
 from rolepermissions.checkers import has_role
 from django.conf import settings
 
@@ -47,6 +69,11 @@ if TYPE_CHECKING:
     from core.managers import TenantAwareManager
 
 logger = logging.getLogger(__name__)
+=======
+from django.conf import settings
+from rolepermissions.checkers import has_role
+from main.models import AuditLog
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 EXPORT_ALLOWED_ROLES = ['ban_giam_doc', 'ke_toan']
 
@@ -54,6 +81,7 @@ EXPORT_ALLOWED_ROLES = ['ban_giam_doc', 'ke_toan']
 def _enforce_export_access(request):
     if request.user.is_superuser or has_role(request.user, EXPORT_ALLOWED_ROLES):
         return
+<<<<<<< HEAD
     raise PermissionDenied("Bạn không có quyền xuất dữ liệu lương nhạy cảm.")
 # --- WEB ADMIN VIEWS (KTT/KTV) ---
 
@@ -450,6 +478,82 @@ def dashboard_accounting(request):
     recent_voucher_rows = recent_vouchers[:6]
     context = {
         # Biến cũ giữ tương thích.
+=======
+    raise PermissionDenied("Ban khong co quyen xuat du lieu luong nhay cam.")
+
+
+def _get_client_ip(request):
+    forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR", "")
+    if forwarded_for:
+        return forwarded_for.split(",")[0].strip()
+    return request.META.get("REMOTE_ADDR")
+
+
+def _log_export(request, model_name, note, changes=None, object_id=None):
+    AuditLog.objects.create(
+        user=request.user,
+        tenant_id=getattr(settings, 'SCMD_ORGANIZATION_ID', None),
+        action=AuditLog.Action.EXECUTE,
+        module='accounting',
+        model_name=model_name,
+        object_id=str(object_id) if object_id is not None else None,
+        changes=changes or {},
+        ip_address=_get_client_ip(request),
+        user_agent=request.META.get("HTTP_USER_AGENT", ""),
+        note=note,
+        status='SUCCESS'
+    )
+
+# --- WEB ADMIN VIEWS (KTT/KTV) ---
+
+@login_required
+def dashboard_accounting(request):
+    """
+    Dashboard Kế toán trưởng - The Financial Cockpit
+    """
+    today = timezone.now()
+    first_day_month = today.replace(day=1)
+    
+    # 1. KPIs Tháng này
+    tong_thu = SoQuy.objects.filter(
+        loai_phieu='THU', ngay_lap__gte=first_day_month, trang_thai='DA_DUYET'
+    ).aggregate(Sum('so_tien'))['so_tien__sum'] or 0
+    
+    tong_chi = SoQuy.objects.filter(
+        loai_phieu='CHI', ngay_lap__gte=first_day_month, trang_thai='DA_DUYET'
+    ).aggregate(Sum('so_tien'))['so_tien__sum'] or 0
+    
+    so_du_tam_tinh = tong_thu - tong_chi
+
+    # 2. Pending Approvals (Cần duyệt ngay)
+    phieu_cho_duyet = SoQuy.objects.filter(trang_thai='CHO_DUYET').count()
+    luong_cho_phat_hanh = BangLuongThang.objects.filter(trang_thai='CHO_DUYET').count()
+
+    # 3. Chart Data (6 tháng gần nhất) - Dòng tiền
+    chart_labels = []
+    data_thu = []
+    data_chi = []
+    
+    for i in range(5, -1, -1):
+        month_date = today - timedelta(days=i*30)
+        month = month_date.month
+        year = month_date.year
+        chart_labels.append(f"T{month}")
+        
+        thu = SoQuy.objects.filter(loai_phieu='THU', trang_thai='DA_DUYET', ngay_lap__month=month, ngay_lap__year=year).aggregate(Sum('so_tien'))['so_tien__sum'] or 0
+        chi = SoQuy.objects.filter(loai_phieu='CHI', trang_thai='DA_DUYET', ngay_lap__month=month, ngay_lap__year=year).aggregate(Sum('so_tien'))['so_tien__sum'] or 0
+        
+        data_thu.append(float(thu))
+        data_chi.append(float(chi))
+
+    # 4. Danh sách Bảng lương
+    bang_luongs = (
+        BangLuongThang.objects.for_tenant(settings.SCMD_ORGANIZATION_ID)
+        .order_by('-nam', '-thang')[:12]
+    )
+
+    context = {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         'kpi_thu': tong_thu,
         'kpi_chi': tong_chi,
         'kpi_so_du': so_du_tam_tinh,
@@ -459,6 +563,7 @@ def dashboard_accounting(request):
         'data_thu': json.dumps(data_thu),
         'data_chi': json.dumps(data_chi),
         'bang_luongs': bang_luongs,
+<<<<<<< HEAD
         'today': now,
 
         # Biến mới cho dashboard kế toán.
@@ -496,6 +601,10 @@ def dashboard_accounting(request):
 
     # Lưu vào cache trong 1 giờ (Sẽ bị invalidated tự động khi có signal thay đổi dữ liệu)
     cache.set(cache_key, context, 3600)
+=======
+        'today': today
+    }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     return render(request, 'accounting/dashboard.html', context)
 
 @login_required
@@ -519,6 +628,7 @@ def chi_tiet_bang_luong(request, pk):
 
 @login_required
 def chot_luong_view(request, pk):
+<<<<<<< HEAD
     """
     View chốt bảng lương.
     Refactor: Chuyển logic nghiệp vụ vào LockPayrollUseCase để đảm bảo Audit/Permission (P1).
@@ -543,17 +653,36 @@ def chot_luong_view(request, pk):
         logger.exception("Unexpected system error in chot_luong_view for payroll %s", pk)
         messages.error(request, "Có lỗi hệ thống xảy ra khi chốt lương. Vui lòng liên hệ quản trị.")
 
+=======
+    bl = get_object_or_404(BangLuongThang, pk=pk)
+    if bl.trang_thai != 'DA_PHAT_HANH':
+        try:
+            with transaction.atomic():
+                bl.trang_thai = 'DA_PHAT_HANH'
+                bl.save()
+
+                success, msg = PayrollService.lock_related_records(bl)
+                messages.success(request, f"Đã phát hành bảng lương tháng {bl.thang}/{bl.nam}. {msg}")
+        except Exception as e:
+            messages.error(request, f"Lỗi khi chốt lương: {str(e)}")
+            
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     return redirect('accounting:dashboard')
 
 @login_required
 def bao_cao_doi_soat_khau_tru(request, pk):
     """View hiển thị báo cáo đối soát khấu trừ lương vs Sổ quỹ"""
+<<<<<<< HEAD
     tenant_id = str(getattr(settings, 'SCMD_ORGANIZATION_ID', ''))
+=======
+    tenant_id = getattr(settings, 'SCMD_ORGANIZATION_ID', None)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     report_data = DeductionAuditUseCase.execute(pk, tenant_id)
     
     return render(request, 'accounting/reports/deduction_audit.html', {'report': report_data})
 
 @login_required
+<<<<<<< HEAD
 @export_audit_log(
     module="accounting",
     model_name="BangLuongThang",
@@ -565,6 +694,12 @@ def export_doi_soat_khau_tru_excel(request, pk):
     """Xuất file Excel báo cáo đối soát khấu trừ lương"""
     _enforce_export_access(request)
     tenant_id = str(getattr(settings, 'SCMD_ORGANIZATION_ID', ''))
+=======
+def export_doi_soat_khau_tru_excel(request, pk):
+    """Xuất file Excel báo cáo đối soát khấu trừ lương"""
+    _enforce_export_access(request)
+    tenant_id = getattr(settings, 'SCMD_ORGANIZATION_ID', None)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     report = DeductionAuditUseCase.execute(pk, tenant_id)
     
     if report['status'] == 'error':
@@ -573,9 +708,13 @@ def export_doi_soat_khau_tru_excel(request, pk):
 
     # Khởi tạo Workbook
     wb = Workbook()
+<<<<<<< HEAD
     ws = wb.active # type: ignore
     if ws is None:
         return HttpResponse("Lỗi khởi tạo Excel.", status=500)
+=======
+    ws = wb.active
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ws.title = "Doi Soat Khau Tru"
 
     # Định dạng header
@@ -598,7 +737,11 @@ def export_doi_soat_khau_tru_excel(request, pk):
     ws.column_dimensions['F'].width = 20
 
     # Thêm dữ liệu
+<<<<<<< HEAD
     for i, item in enumerate(cast(list[dict[str, Any]], report['data']), 1):
+=======
+    for i, item in enumerate(report['data'], 1):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         ws.append([
             i,
             item['nhan_vien'],
@@ -619,14 +762,22 @@ def export_doi_soat_khau_tru_excel(request, pk):
 
     # Thêm dòng tổng kết
     ws.append([])
+<<<<<<< HEAD
     summary = cast(dict[str, Any], report.get('summary', {}))
     ws.append(['', '', 'TỔNG BIẾN ĐỘNG:', '', '', summary.get('total_variance', 0)])
+=======
+    ws.append(['', '', 'TỔNG BIẾN ĐỘNG:', '', '', report['summary']['total_variance']])
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     # Định dạng cho ô tổng chênh lệch ở cột F
     total_variance_cell = ws.cell(row=ws.max_row, column=6)
     total_variance_cell.number_format = currency_format
     
     # Nếu tổng biến động khác 0, cũng tô màu cảnh báo
+<<<<<<< HEAD
     if summary.get('total_variance', 0) != 0:
+=======
+    if report['summary']['total_variance'] != 0:
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         total_variance_cell.fill = warning_fill
         total_variance_cell.font = warning_font
         total_variance_cell.font = Font(color='9C0006', bold=True, size=12) # Nhấn mạnh thêm cho dòng tổng
@@ -644,6 +795,16 @@ def export_doi_soat_khau_tru_excel(request, pk):
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     
     wb.save(response)
+<<<<<<< HEAD
+=======
+    _log_export(
+        request,
+        'BangLuongThang',
+        'Export Excel doi soat khau tru',
+        changes={'bang_luong_id': pk, 'ky_luong': report.get('ky_luong')},
+        object_id=pk,
+    )
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     return response
 
 # --- MOBILE VIEWS (CHO BẢO VỆ) ---
@@ -655,10 +816,14 @@ def mobile_phieu_luong_list(request):
     
     phieu_luongs = ChiTietLuong.objects.filter(
         nhan_vien=nv, 
+<<<<<<< HEAD
         bang_luong__trang_thai__in=[
             BangLuongThang.TrangThai.LOCKED,
             BangLuongThang.TrangThai.PAID,
         ]
+=======
+        bang_luong__trang_thai='DA_PHAT_HANH'
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ).select_related('bang_luong').order_by('-bang_luong__nam', '-bang_luong__thang')
     
     return render(request, 'accounting/mobile/phieu_luong_list.html', {'phieu_luongs': phieu_luongs})

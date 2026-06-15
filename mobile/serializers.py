@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
@@ -11,7 +15,10 @@ Description: Serializers for SCMD Mobile Application.
              Ensures data is formatted for mobile display and adheres to security rules.
 """
 
+<<<<<<< HEAD
 from django.conf import settings
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from rest_framework import serializers
 from users.models import NhanVien
 from operations.models import PhanCongCaTruc, ChamCong, BaoCaoSuCo, ViTriChot, CaLamViec
@@ -107,14 +114,22 @@ class MobileBaoCaoSuCoSerializer(serializers.ModelSerializer):
     muc_tieu = MobileMucTieuSerializer(read_only=True)
     muc_tieu_id = serializers.PrimaryKeyRelatedField(
         source='muc_tieu',
+<<<<<<< HEAD
         queryset=MucTieu.objects.none(),  # Khởi tạo rỗng, sẽ điền vào __init__
+=======
+        queryset=MucTieu.objects.all(),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         write_only=True,
         required=False,
         allow_null=True
     )
     ca_truc_id = serializers.PrimaryKeyRelatedField(
         source='ca_truc',
+<<<<<<< HEAD
         queryset=PhanCongCaTruc.objects.none(), # Khởi tạo rỗng
+=======
+        queryset=PhanCongCaTruc.objects.all(),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         write_only=True,
         required=False,
         allow_null=True
@@ -135,6 +150,7 @@ class MobileBaoCaoSuCoSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request')
+<<<<<<< HEAD
         tenant_id = settings.SCMD_ORGANIZATION_ID
 
         # Rule: Mặc định không trả về dữ liệu nếu không có request context
@@ -162,3 +178,20 @@ class MobileBaoCaoSuCoSerializer(serializers.ModelSerializer):
 
         self.fields['ca_truc_id'].queryset = assigned_shifts
         self.fields['muc_tieu_id'].queryset = MucTieu.objects.for_tenant(tenant_id).filter(id__in=assigned_target_ids)
+=======
+        if not request or not getattr(request, 'user', None) or not request.user.is_authenticated:
+            self.fields['muc_tieu_id'].queryset = MucTieu.objects.none()
+            self.fields['ca_truc_id'].queryset = PhanCongCaTruc.objects.none()
+            return
+
+        nhan_vien = getattr(request.user, 'nhan_vien', None)
+        if nhan_vien is None:
+            self.fields['muc_tieu_id'].queryset = MucTieu.objects.none()
+            self.fields['ca_truc_id'].queryset = PhanCongCaTruc.objects.none()
+            return
+
+        assigned_shifts = PhanCongCaTruc.objects.filter(nhan_vien=nhan_vien).select_related('vi_tri_chot__muc_tieu')
+        assigned_target_ids = assigned_shifts.values_list('vi_tri_chot__muc_tieu_id', flat=True).distinct()
+        self.fields['ca_truc_id'].queryset = assigned_shifts
+        self.fields['muc_tieu_id'].queryset = MucTieu.objects.filter(id__in=assigned_target_ids)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

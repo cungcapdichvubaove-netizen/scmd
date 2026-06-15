@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% load static %}
 {% load tailwind_tags %}
 <!DOCTYPE html>
@@ -263,6 +264,188 @@
                 usernameInput.focus();
             }
         });
+=======
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập SCMD Pro</title>
+    <link rel="icon" type="image/png" href="{% static 'img/logo_moi.png' %}">
+    <meta name="theme-color" content="#0f172a">
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Saira:wght@600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background:
+                radial-gradient(circle at top right, rgba(96, 165, 250, 0.22), transparent 28%),
+                linear-gradient(135deg, #0f172a 0%, #16233a 45%, #29456f 100%);
+        }
+
+        .scmd-display {
+            font-family: 'Saira', 'Be Vietnam Pro', sans-serif;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white">
+    <div class="flex min-h-screen">
+        <section class="relative hidden overflow-hidden lg:flex lg:w-3/5">
+            <img
+                src="{% static 'img/nen_moi.jpg' %}"
+                alt="Nền SCMD Pro"
+                class="absolute inset-0 h-full w-full object-cover opacity-25"
+            >
+            <div class="absolute inset-0 bg-gradient-to-br from-brand-950 via-brand-900/95 to-brand-700/90"></div>
+            <div class="relative z-10 flex max-w-3xl flex-col justify-center px-14 py-16 xl:px-20">
+                <p class="mb-5 inline-flex w-fit items-center gap-2 rounded-full border border-blue-300/30 bg-blue-400/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.22em] text-blue-200">
+                    <i class="fas fa-building-shield"></i>
+                    <span>SCMD Pro</span>
+                </p>
+                <h1 class="scmd-display text-5xl font-extrabold leading-tight text-white xl:text-6xl">
+                    Cổng truy cập vào hệ thống vận hành nội bộ.
+                </h1>
+                <p class="mt-6 max-w-2xl text-base leading-8 text-slate-200 xl:text-lg">
+                    Dành cho điều phối, nhân sự, kế toán, thanh tra và quản lý hiện trường.
+                    Mọi dữ liệu truy cập tại đây đều phục vụ kiểm soát ca trực, chấm công, sự cố và lương.
+                </p>
+
+                <div class="mt-10 grid gap-4 sm:grid-cols-2">
+                    <div class="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                        <div class="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-400/15 text-blue-200">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <h2 class="text-sm font-semibold uppercase tracking-[0.16em] text-slate-100">Dữ liệu vận hành</h2>
+                        <p class="mt-2 text-sm leading-6 text-slate-300">Theo dõi check-in, check-out, quân số, sự cố và xử lý hiện trường trên cùng một hệ thống.</p>
+                    </div>
+                    <div class="rounded-[24px] border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
+                        <div class="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-blue-400/15 text-blue-200">
+                            <i class="fas fa-scale-balanced"></i>
+                        </div>
+                        <h2 class="text-sm font-semibold uppercase tracking-[0.16em] text-slate-100">Đối soát minh bạch</h2>
+                        <p class="mt-2 text-sm leading-6 text-slate-300">Lương, phụ cấp và khấu trừ được tính từ dữ liệu nghiệp vụ có thể kiểm tra lại.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="flex w-full items-center justify-center px-6 py-10 lg:w-2/5">
+            <div class="w-full max-w-md rounded-[32px] border border-white/10 bg-white/95 p-8 text-slate-900 shadow-2xl shadow-slate-950/20">
+                <div class="text-center">
+                    <img
+                        src="{% static 'img/logo_moi.png' %}"
+                        alt="Logo SCMD Pro"
+                        class="mx-auto mb-5 h-20 w-auto object-contain"
+                    >
+                    <p class="text-xs font-semibold uppercase tracking-[0.22em] text-blue-700">SCMD Pro</p>
+                    <h2 class="scmd-display mt-3 text-3xl font-bold text-slate-900">Đăng nhập</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Truy cập nền tảng chỉ huy và quản trị vận hành của doanh nghiệp.</p>
+                </div>
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                        <p class="font-semibold">{{ message }}</p>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
+                {% if form.errors %}
+                <div class="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    <p class="font-semibold">Vui lòng kiểm tra lại tài khoản và mật khẩu.</p>
+                </div>
+                {% endif %}
+
+                <form method="post" class="mt-8 space-y-5">
+                    {% csrf_token %}
+                    <label class="block">
+                        <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Tài khoản</span>
+                        <div class="relative">
+                            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+                                <i class="fas fa-id-badge"></i>
+                            </span>
+                            <input
+                                type="text"
+                                name="username"
+                                required
+                                autocomplete="username"
+                                placeholder="Mã nhân sự hoặc tên đăng nhập"
+                                class="block w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-12 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none"
+                            >
+                        </div>
+                    </label>
+
+                    <label class="block">
+                        <span class="mb-2 block text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Mật khẩu</span>
+                        <div class="relative">
+                            <button
+                                type="button"
+                                onclick="togglePasswordVisibility()"
+                                class="absolute inset-y-0 left-0 z-10 flex items-center pl-4 text-slate-400 transition hover:text-blue-600"
+                                title="Hiện hoặc ẩn mật khẩu"
+                            >
+                                <i id="toggleIcon" class="fas fa-eye"></i>
+                            </button>
+                            <input
+                                type="password"
+                                name="password"
+                                id="id_password"
+                                required
+                                autocomplete="current-password"
+                                placeholder="Nhập mật khẩu"
+                                class="block w-full rounded-2xl border border-slate-200 bg-white py-3.5 pl-12 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:border-blue-500 focus:outline-none"
+                            >
+                        </div>
+                    </label>
+
+                    <div class="flex items-center justify-between gap-4 text-sm text-slate-600">
+                        <label class="inline-flex items-center gap-2">
+                            <input type="checkbox" class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                            <span>Ghi nhớ thiết bị</span>
+                        </label>
+                        <a href="{% url 'main:password_reset' %}" class="font-semibold text-blue-700 transition hover:text-blue-500">
+                            Quên mật khẩu?
+                        </a>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="flex w-full items-center justify-center gap-3 rounded-2xl bg-blue-600 px-4 py-3.5 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-blue-500"
+                    >
+                        <i class="fas fa-right-to-bracket"></i>
+                        <span>Truy cập hệ thống</span>
+                    </button>
+                </form>
+
+                <div class="mt-8 border-t border-slate-200 pt-5 text-center text-xs tracking-[0.16em] text-slate-500">
+                    <p>SCMD Pro v3.3</p>
+                    <p class="mt-2 uppercase">Phần mềm chỉ huy và quản trị vận hành</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('id_password');
+            const toggleIcon = document.getElementById('toggleIcon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     </script>
 </body>
 </html>

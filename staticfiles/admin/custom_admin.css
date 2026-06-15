@@ -1,0 +1,35 @@
+/* file: static/admin/custom_admin.css */
+
+/* Bo tròn các góc thẻ */
+.card {
+    border-radius: 8px !important;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05) !important;
+}
+
+/* Avatar tròn trong bảng */
+td img[style*="border-radius"] {
+    transition: transform 0.2s;
+}
+td img[style*="border-radius"]:hover {
+    transform: scale(1.5);
+    z-index: 10;
+    cursor: pointer;
+}
+
+/* Màu nền header bảng dịu mắt hơn */
+.table thead th {
+    background-color: #f4f6f9 !important;
+    color: #495057 !important;
+    border-bottom: 2px solid #dee2e6 !important;
+}
+
+/* Button hành động nổi bật hơn */
+.btn-success {
+    background-color: #10b981 !important; /* Màu xanh ngọc hiện đại */
+    border-color: #10b981 !important;
+}
+
+/* Badge trạng thái đẹp hơn */
+span[style*="background-color"] {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

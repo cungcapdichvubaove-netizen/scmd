@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
 File: config/settings.py
 Author: Mr. Anh (CTO) & AI Assistant
 Updated Date: 2026-03-24
+<<<<<<< HEAD
 Description: Cau hinh trung tam (Core Settings).
+=======
+Description: Cấu hình trung tâm (Core Settings).
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
              UPGRADE PHASE 12.2: 
              - Fix lỗi 'NoneType' Channel Layer (Real-time).
              - Tích hợp cấu hình Celery & Redis đồng bộ Docker.
@@ -22,7 +30,10 @@ import shutil
 import sys
 import urllib.parse
 import uuid
+<<<<<<< HEAD
 from typing import cast
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from pathlib import Path
 from datetime import timedelta
 
@@ -40,6 +51,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+<<<<<<< HEAD
 def _find_first_existing_path(candidates):
     for candidate in candidates:
         if candidate and os.path.exists(candidate):
@@ -182,12 +194,28 @@ def get_required_secret(name, *, aliases=(), insecure_defaults=()):
             value = config(alias, default=None)
             if value is not None:
                 break
+=======
+def get_required_secret(name, *, insecure_defaults=()):
+    value = config(name, default=None)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     if DEBUG:
         if value is None and insecure_defaults:
             return insecure_defaults[0]
         return value
 
+<<<<<<< HEAD
     return require_production_safe_value(name, value, insecure_defaults=insecure_defaults)
+=======
+    if value is None:
+        logger.critical("BAO MAT: %s chua duoc thiet lap trong moi truong Production.", name)
+        raise ImproperlyConfigured(f"BAO MAT: {name} phai duoc thiet lap trong moi truong Production.")
+
+    if value in insecure_defaults:
+        logger.critical("BAO MAT: %s dang dung gia tri mac dinh khong an toan trong Production.", name)
+        raise ImproperlyConfigured(f"BAO MAT: {name} khong duoc dung gia tri mac dinh trong moi truong Production.")
+
+    return value
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # ==============================================================================
 # 1. CẤU HÌNH CƠ BẢN & BẢO MẬT
@@ -198,6 +226,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SCMD PRO sẽ nạp biến này động từ request, bản ERP hiện tại dùng cấu hình cứng.
 SCMD_ORGANIZATION_ID = config("SCMD_ORGANIZATION_ID", default="d8f89835-f716-419b-9800-47b74403387c", cast=uuid.UUID)
 
+<<<<<<< HEAD
 ENVIRONMENT = config("ENVIRONMENT", default="development")
 SCMD_DOCKER_COMPOSE = config("SCMD_DOCKER_COMPOSE", default="")
 SCMD_DOCKER_PROD_MODE = str(SCMD_DOCKER_COMPOSE).strip().lower() in {"prod", "production", "demo"}
@@ -205,6 +234,11 @@ SCMD_DOCKER_PROD_MODE = str(SCMD_DOCKER_COMPOSE).strip().lower() in {"prod", "pr
 DEBUG = config("DEBUG", default="False", cast=bool)
 
 # Quản lý SECRET_KEY an toàn. Production fail-fast nếu thiếu hoặc dùng key mẫu/dev.
+=======
+DEBUG = config("DEBUG", default=False, cast=bool)
+
+# Quản lý SECRET_KEY an toàn
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 try:
     SECRET_KEY = config("SECRET_KEY")
 except UndefinedValueError:
@@ -213,6 +247,7 @@ except UndefinedValueError:
         logger.warning("BẢO MẬT: Sử dụng SECRET_KEY ngẫu nhiên trong chế độ DEBUG.")
     else:
         logger.critical("BẢO MẬT: SECRET_KEY chưa được thiết lập trong môi trường Production.")
+<<<<<<< HEAD
         raise ImproperlyConfigured("BẢO MẬT: SECRET_KEY phải được thiết lập trong môi trường Production.")
 else:
     SECRET_KEY = require_production_safe_value(
@@ -224,6 +259,9 @@ else:
             "change-me",
         ),
     )
+=======
+        raise ValueError("BẢO MẬT: SECRET_KEY phải được thiết lập trong môi trường Production.")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1,localhost", cast=Csv())
 if DEBUG:
@@ -246,7 +284,11 @@ if DEBUG:
             f"http://{my_lan_ip}:8000",
         ]
         # Chuyển thành list để thao tác nếu cần
+<<<<<<< HEAD
         current_origins = list(CSRF_TRUSTED_ORIGINS)  # type: ignore
+=======
+        current_origins = list(CSRF_TRUSTED_ORIGINS)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         for origin in debug_origins:
             if origin not in current_origins:
                 current_origins.append(origin)
@@ -255,10 +297,13 @@ if DEBUG:
         logger.warning(f"Không thể thiết lập debug_origins: {e}")
 
 # Cấu hình bảo mật HTTPS/SSL
+<<<<<<< HEAD
 # Admin related-object editing uses same-origin modal iframes in Jazzmin.
 # Keep cross-origin framing blocked while allowing those in-admin flows.
 X_FRAME_OPTIONS = config("X_FRAME_OPTIONS", default="SAMEORIGIN")
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 if DEBUG:
     SECURE_SSL_REDIRECT = False
     SESSION_COOKIE_SECURE = False
@@ -266,32 +311,48 @@ if DEBUG:
     CSRF_COOKIE_HTTPONLY = False
 else:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+<<<<<<< HEAD
     SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default="True", cast=bool)
+=======
+    SECURE_SSL_REDIRECT = config("SECURE_SSL_REDIRECT", default=True, cast=bool)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     CSRF_COOKIE_HTTPONLY = True  
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+<<<<<<< HEAD
+=======
+    X_FRAME_OPTIONS = "DENY"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # --- CẤU HÌNH EXPORT ---
 # Mật khẩu bảo vệ file Excel xuất ra (Security by Design)
 EXCEL_EXPORT_PASSWORD = get_required_secret(
     "EXCEL_EXPORT_PASSWORD",
+<<<<<<< HEAD
     insecure_defaults=(
         "SCMD@Audit2026",
         "strong-export-password-required-in-production",
     ),
+=======
+    insecure_defaults=("SCMD@Audit2026",),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 )
 
 # --- CẤU HÌNH MÃ HÓA DỮ LIỆU (AES-256) ---
 # Khóa mã hóa phải là 32 bytes (base64 encoded). Không được làm mất khóa này.
 FIELD_ENCRYPTION_KEY = get_required_secret(
     "FIELD_ENCRYPTION_KEY",
+<<<<<<< HEAD
     aliases=("ENCRYPTION_KEY",),
     insecure_defaults=(
         "YmFzZTY0LWVuY29kZWQtMzItYnl0ZS1rZXktZ2VuZXJhdGVk",
         "base64-encoded-32-byte-key-required-in-production",
     ),
+=======
+    insecure_defaults=("YmFzZTY0LWVuY29kZWQtMzItYnl0ZS1rZXktZ2VuZXJhdGVk",),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 )
 
 # ==============================================================================
@@ -311,7 +372,10 @@ INSTALLED_APPS = [
     "cloudinary_storage", 
     "cloudinary",          
     "rest_framework",
+<<<<<<< HEAD
     "rest_framework_simplejwt.token_blacklist",
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     "corsheaders",
     "import_export",
     "rolepermissions",       
@@ -354,12 +418,16 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+<<<<<<< HEAD
     "main.middleware.DashboardPerformanceInstrumentationMiddleware",
     "main.middleware.AccessDeniedExperienceMiddleware",
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+<<<<<<< HEAD
 SCMD_PERF_INSTRUMENTATION = config("SCMD_PERF_INSTRUMENTATION", default=DEBUG, cast=bool)
 SCMD_PERF_INSTRUMENTATION_PATH_PREFIXES = (
     "/admin/",
@@ -378,6 +446,8 @@ SCMD_PRO_CACHE_VERSION = config(
     default=config("RELEASE_VERSION", default="2026-06-14-demo-hardening"),
 )
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ROOT_URLCONF = "config.urls"
 WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
@@ -397,7 +467,10 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "main.context_processors.company_info",
+<<<<<<< HEAD
                 "main.context_processors.notification_context",
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             ],
             "loaders": [
                 ('django.template.loaders.cached.Loader', [
@@ -413,6 +486,7 @@ TEMPLATES = [
 ]
 
 # Cấu hình Database (Mặc định PostGIS)
+<<<<<<< HEAD
 def _database_host_from_url(database_url):
     try:
         parsed = urllib.parse.urlparse(database_url)
@@ -471,10 +545,14 @@ def _validate_compose_database_engine(database_config):
 
 DATABASE_URL: str | None = cast(str | None, config("DATABASE_URL", default=None))
 _validate_compose_database_contract(DATABASE_URL)
+=======
+DATABASE_URL = config("DATABASE_URL", default=None)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 if DATABASE_URL:
     try:
         DATABASES = {
             "default": dj_database_url.config(
+<<<<<<< HEAD
                 default=DATABASE_URL,
                 conn_max_age=600,
                 ssl_require=config("DB_SSL_REQUIRE", default="False", cast=bool),  # type: ignore
@@ -493,6 +571,24 @@ if DATABASE_URL:
 else:
     if not DEBUG or SCMD_DOCKER_PROD_MODE:
         raise ImproperlyConfigured("DATABASE_URL must be set in production/demo Docker environment.")
+=======
+                default=DATABASE_URL, 
+                conn_max_age=600, 
+                ssl_require=config("DB_SSL_REQUIRE", default=False, cast=bool),
+                engine='django.contrib.gis.db.backends.postgis'
+            )
+        }
+    except Exception as e:
+        if not DEBUG:
+            logger.critical(f"PRODUCTION DATABASE ERROR: {e}")
+            raise ImproperlyConfigured("Database connection failed in production.")
+        else:
+            logger.error(f"Lỗi kết nối DB: {e}. Chuyển hướng sang SQLite dự phòng.")
+            DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": str(BASE_DIR / "db.sqlite3")}}
+else:
+    if not DEBUG:
+        raise ImproperlyConfigured("DATABASE_URL must be set in production environment.")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     DATABASES = {"default": {"ENGINE": "django.db.backends.sqlite3", "NAME": str(BASE_DIR / "db.sqlite3")}}
 
 # --- API SECURITY (Rule 10 SSOT) ---
@@ -515,6 +611,7 @@ REST_FRAMEWORK = {
     }
 }
 
+<<<<<<< HEAD
 # --- ATTENDANCE POLICY DEFAULTS (Operations integrity contract) ---
 # Check-in is allowed from `shift_start - ATTENDANCE_CHECKIN_EARLY_MINUTES`
 # until `shift_end + ATTENDANCE_CHECKIN_LATE_MINUTES`.
@@ -578,6 +675,14 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',
     'SIGNING_KEY': SIMPLE_JWT_SIGNING_KEY,
+=======
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=24),
+    'ROTATE_REFRESH_TOKENS': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 }
 
 # Explicit CORS Origins (Rule 12.4)
@@ -585,6 +690,7 @@ CORS_ALLOWED_ORIGINS = config("CORS_ALLOWED_ORIGINS", default="http://localhost:
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+<<<<<<< HEAD
 # Map tile provider is configurable so operations dashboard can use OSM by
 # default, or an internal/proxy tile service in production without JS changes.
 SCMD_MAP_TILE_URL = config("SCMD_MAP_TILE_URL", default="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png")
@@ -614,6 +720,12 @@ CACHES = {
         "KEY_PREFIX": "scmd_pro",
     }
 }
+=======
+# ==============================================================================
+# 5. REDIS & CELERY & CHANNELS (Real-time Core)
+# ==============================================================================
+REDIS_URL = config("REDIS_URL", default="redis://redis:6379/0")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # Cấu hình Channels (Sửa lỗi NoneType cho simulation)
 CHANNEL_LAYERS = {
@@ -633,6 +745,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = "Asia/Ho_Chi_Minh"
 
+<<<<<<< HEAD
 # --- CELERY RELIABILITY & MONITORING ---
 CELERY_TASK_ACKS_LATE = True  # Chỉ xác nhận đã xong sau khi xử lý thành công (chống mất task khi worker crash)
 CELERY_WORKER_PREFETCH_MULTIPLIER = 1  # Tránh việc worker ôm quá nhiều task gây nghẽn
@@ -641,42 +754,72 @@ CELERY_TASK_SEND_SENT_EVENT = True # Cho phép các công cụ monitoring (như 
 CELERY_TASK_TRACK_STARTED = True
 CELERY_WORKER_SEND_TASK_EVENTS = True
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 # Cấu hình lịch trình tác vụ định kỳ (Celery Beat)
 CELERY_BEAT_SCHEDULE = {
     'accounting_calculate_monthly_payroll': { # Corrected task name
         'task': 'accounting.tasks.accounting_calculate_monthly_payroll',
         'schedule': crontab(hour=1, minute=0, day_of_month='1'),
+<<<<<<< HEAD
         'description': 'Tự động tính lương cho tháng trước vào 1 giờ sáng ngày đầu tháng.',
+=======
+        'desc': 'Tự động tính lương cho tháng trước vào 1 giờ sáng ngày đầu tháng.',
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     },
     'auto_lock_resigned_employees_daily': {
         'task': 'users.tasks.auto_lock_resigned_employees_task',
         'schedule': crontab(hour=2, minute=0),
+<<<<<<< HEAD
         'description': 'Tự động khóa hồ sơ nhân sự nghỉ việc sau 30 ngày (chạy 2h sáng hàng ngày).',
+=======
+        'desc': 'Tự động khóa hồ sơ nhân sự nghỉ việc sau 30 ngày (chạy 2h sáng hàng ngày).',
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     },
     'monitor_target_stability_daily': {
         'task': 'operations.tasks.check_target_stability_daily_task',
         'schedule': crontab(hour=4, minute=0),
+<<<<<<< HEAD
         'description': 'Kiểm tra tỷ lệ đổi ca bất thường tại các mục tiêu (chạy 4h sáng hàng ngày).',
+=======
+        'desc': 'Kiểm tra tỷ lệ đổi ca bất thường tại các mục tiêu (chạy 4h sáng hàng ngày).',
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     },
     'celery_worker_heartbeat_ping': {
         'task': 'operations.tasks.update_worker_heartbeat_task',
         'schedule': timedelta(minutes=1),
+<<<<<<< HEAD
         'description': 'Workers tự báo cáo trạng thái mỗi phút.',
+=======
+        'desc': 'Workers tự báo cáo trạng thái mỗi phút.',
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     },
     'celery_health_monitor_broadcast': {
         'task': 'operations.tasks.monitor_worker_health_and_broadcast_task',
         'schedule': timedelta(minutes=2),
+<<<<<<< HEAD
         'description': 'Quét trạng thái rủi ro của workers và cập nhật bảng điều hành vận hành.',
+=======
+        'desc': 'Quét trạng thái rủi ro của Workers và cập nhật War Room.',
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     },
     'operations_mark_expired_alive_checks': {
         'task': 'operations.tasks.operations_mark_expired_alive_checks',
         'schedule': timedelta(minutes=5), # Run every 5 minutes
+<<<<<<< HEAD
         'description': 'Tự động đánh dấu quá hạn cho các yêu cầu Alive Check không phản hồi.',
+=======
+        'desc': 'Tự động đánh dấu quá hạn cho các yêu cầu Alive Check không phản hồi.',
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     },
     'operations_check_late_checkout_daily': {
         'task': 'operations.tasks.check_late_checkout_task',
         'schedule': crontab(hour=5, minute=0), # Run daily at 5 AM
+<<<<<<< HEAD
         'description': 'Quét và đánh dấu các ca trực chưa check-out quá 2 giờ sau giờ kết thúc.',
+=======
+        'desc': 'Quét và đánh dấu các ca trực chưa check-out quá 2 giờ sau giờ kết thúc.',
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     },
 }
 
@@ -691,16 +834,20 @@ USE_I18N = True
 USE_TZ = True
 USE_L10N = False 
 
+<<<<<<< HEAD
 # Date/time display contract for SCMD Pro UI/admin/export surfaces.
 # Database/API protocol values may still use ISO-8601 where required by HTML5 inputs, URLs,
 # JSON clients or backup filenames; user-facing display must use Vietnamese format.
 FORMAT_MODULE_PATH = ["config.formats"]
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 DATE_FORMAT = "d/m/Y"
 DATETIME_FORMAT = "d/m/Y H:i"
 SHORT_DATE_FORMAT = "d/m/Y"
 SHORT_DATETIME_FORMAT = "d/m/Y H:i"
 TIME_FORMAT = "H:i"
+<<<<<<< HEAD
 YEAR_MONTH_FORMAT = "m/Y"
 MONTH_DAY_FORMAT = "d/m"
 FIRST_DAY_OF_WEEK = 1
@@ -717,15 +864,22 @@ DATETIME_INPUT_FORMATS = [
     "%Y-%m-%dT%H:%M",  # HTML5 datetime-local compatibility.
     "%Y-%m-%d %H:%M:%S",
 ]
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # ==============================================================================
 # 7. STATIC & MEDIA
 # ==============================================================================
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+<<<<<<< HEAD
 STATIC_ROOT = Path(config("STATIC_ROOT", default=str(BASE_DIR / "staticfiles")))
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 TAILWIND_APP_NAME = "theme"
+=======
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
@@ -735,11 +889,19 @@ MEDIA_ROOT = BASE_DIR / "media"
 # ==============================================================================
 EMAIL_BACKEND = config("EMAIL_BACKEND", default="django.core.mail.backends.smtp.EmailBackend")
 EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
+<<<<<<< HEAD
 EMAIL_PORT = config("EMAIL_PORT", default="587", cast=int)
 EMAIL_USE_TLS = config("EMAIL_USE_TLS", default="True", cast=bool)
 EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="SCMD <no-reply@scmd.vn>")
+=======
+EMAIL_PORT = config("EMAIL_PORT", default=587, cast=int)
+EMAIL_USE_TLS = config("EMAIL_USE_TLS", default=True, cast=bool)
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
+DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL", default="SCMD ERP <noreply@scmd.vn>")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 FCM_SERVER_KEY = config("FCM_SERVER_KEY", default="")
 
@@ -756,9 +918,37 @@ except ImportError:
 # ==============================================================================
 # 10. GIS CONFIGURATION (DOCKER/WINDOWS ADAPTIVE)
 # ==============================================================================
+<<<<<<< HEAD
 if os.name == "nt":
     GDAL_LIBRARY_PATH = configure_windows_gis_runtime()
 else:
+=======
+if os.name == 'nt':
+    # --- WINDOWS DEVELOPMENT ---
+    BASE_OSGEO4W = config("OSGEO4W_ROOT", default=r"C:\OSGeo4W") 
+    OSGEO4W_BIN = os.path.join(BASE_OSGEO4W, "bin")
+    
+    if os.path.exists(OSGEO4W_BIN):
+        os.environ['PATH'] = OSGEO4W_BIN + os.pathsep + os.environ['PATH']
+        try:
+            os.add_dll_directory(OSGEO4W_BIN)
+        except (AttributeError, Exception):
+            pass
+        
+        try:
+            available_dlls = [f for f in os.listdir(OSGEO4W_BIN) if f.startswith('gdal') and f.endswith('.dll')]
+            if available_dlls:
+                target_dll = 'gdal308.dll' if 'gdal308.dll' in available_dlls else available_dlls[0]
+                GDAL_LIBRARY_PATH = os.path.join(OSGEO4W_BIN, target_dll)
+        except Exception as e:
+            logger.warning(f"Lỗi quét thư mục GDAL trên Windows: {e}")
+            
+        PROJ_LIB = os.path.join(BASE_OSGEO4W, 'share', 'proj')
+        if os.path.exists(PROJ_LIB):
+            os.environ['PROJ_LIB'] = PROJ_LIB
+else:
+    # --- DOCKER/LINUX ---
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     # Django PostGIS engine tự động nhận diện GDAL trên Linux
     pass
 

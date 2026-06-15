@@ -10,9 +10,13 @@ class CapPhatCaNhanForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-select'})
     )
     nguoi_nhan = forms.ModelChoiceField(
+<<<<<<< HEAD
         # Tối ưu: Chỉ lấy nhân viên đang hoạt động để giảm tải dropdown (P2)
         # Scoping: Đảm bảo tuân thủ ranh giới nhân sự của tổ chức.
         queryset=NhanVien.objects.filter(user__is_active=True).order_by('ho_ten'),
+=======
+        queryset=NhanVien.objects.all().order_by('ho_ten'),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         label="Nhân viên nhận",
         widget=forms.Select(attrs={'class': 'form-select'})
     )

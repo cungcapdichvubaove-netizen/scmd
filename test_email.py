@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro - SMTP Connection Tester
+=======
+SCMD ERP - SMTP Connection Tester
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ---------------------------------
 Script này dùng để kiểm tra cấu hình Email trong settings.py và .env.
 Cách chạy: python test_email.py
@@ -23,7 +27,11 @@ from django.conf import settings
 
 def run_test():
     print("="*50)
+<<<<<<< HEAD
     print("🚀 SCMD Pro - SMTP tester")
+=======
+    print("🚀 SCMD ERP - SMTP TESTER")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     print("="*50)
     print(f"Backend: {settings.EMAIL_BACKEND}")
     print(f"Host:    {settings.EMAIL_HOST}:{settings.EMAIL_PORT}")
@@ -33,8 +41,13 @@ def run_test():
     recipient = input("👉 Nhập địa chỉ email người nhận để thử nghiệm: ")
     
     try:
+<<<<<<< HEAD
         subject = "SCMD Pro - Kiểm tra kết nối SMTP"
         message = "Nếu bạn nhận được email này, cấu hình SMTP của hệ thống SCMD Pro đã hoạt động chính xác!"
+=======
+        subject = "SCMD ERP - Kiểm tra kết nối SMTP"
+        message = "Nếu bạn nhận được email này, cấu hình SMTP của hệ thống SCMD ERP đã hoạt động chính xác!"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         
         send_mail(
             subject=subject,

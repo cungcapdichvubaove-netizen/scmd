@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 {% extends "mobile/base.html" %}
+=======
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 {% load static humanize %}
 
 {% block title %}Phiếu lương T{{ salary.bang_luong.thang }}/{{ salary.bang_luong.nam }}{% endblock %}
@@ -12,7 +16,11 @@
     </a>
 
     <div class="text-center flex-1">
+<<<<<<< HEAD
       <div class="text-[12px] font-semibold">Phiếu lương điện tử</div>
+=======
+      <div class="text-[12px] font-semibold">PHIẾU LƯƠNG ĐIỆN TỬ</div>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
       <div class="text-[11px] text-slate-500">Tháng {{ salary.bang_luong.thang }}/{{ salary.bang_luong.nam }}</div>
     </div>
 
@@ -85,7 +93,11 @@
     </div>
 
     <div class="flex justify-between">
+<<<<<<< HEAD
       <div class="text-[12px]">Thưởng và khác</div>
+=======
+      <div class="text-[12px]">Thưởng & Khác</div>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
       <div class="font-medium">{{ salary.tong_thu_nhap_khac|default:"0"|intcomma }}</div>
     </div>
 
@@ -100,7 +112,11 @@
     </div>
 
     <div class="flex justify-between">
+<<<<<<< HEAD
       <div class="text-[12px]">Phạt và khác</div>
+=======
+      <div class="text-[12px]">Phạt & Khác</div>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
       <div class="font-medium">{{ salary.cac_khoan_tru_khac|default:"0"|intcomma }}</div>
     </div>
 
@@ -111,6 +127,14 @@
     </div>
   </div>
 
+<<<<<<< HEAD
+=======
+  <!-- footer note (tiny) -->
+  <p class="text-[11px] text-slate-400 mt-4">
+    Phiếu lương được tạo tự động bởi hệ thống SCMD.<br>
+            Mọi thắc mắc vui lòng liên hệ phòng Kế toán.
+  </p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 </main>
 
 <!-- print styles: hide interactive UI -->

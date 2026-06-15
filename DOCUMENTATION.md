@@ -2,6 +2,7 @@
 
 Status: **Technical reference for implementation**
 Version: 3.5.0
+<<<<<<< HEAD
 Updated: 2026-06-12
 
 Tài liệu này mô tả kỹ thuật triển khai sản phẩm SCMD Pro thuộc thương hiệu/công ty SCMD. `WHITEPAPER.md` là contract chiến lược/kiến trúc; file này là reference để developer, operator và reviewer kiểm tra code, runtime, module map, flow nghiệp vụ và deployment.
@@ -14,14 +15,23 @@ Documentation map:
 - `cursorrules.md` and `.cursorrules`: AI/tooling compatibility rules, subordinate to the documents above
 - `CHANGELOG.md`, release reports, patch notes, and hardening reports: historical records, not current source-of-truth contracts unless explicitly promoted here
 
+=======
+Updated: 2026-06-03
+
+Tài liệu này mô tả kỹ thuật triển khai sản phẩm SCMD Pro thuộc thương hiệu/công ty SCMD. `WHITEPAPER.md` là contract chiến lược/kiến trúc; file này là reference để developer, operator và reviewer kiểm tra code, runtime, module map, flow nghiệp vụ và deployment.
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 Patch note 3.5.0:
 - Chuẩn hóa kiến trúc thương hiệu: **SCMD** là công ty/thương hiệu mẹ; **SCMD Pro** là sản phẩm phần mềm thương mại.
 - Tagline sản phẩm chính thức: **Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp**.
 - `ERP` chỉ còn là nhóm năng lực quản trị nội bộ trong SCMD Pro, không phải tên brand user-facing.
 - Public auth templates phải chạy trên local Tailwind build và `static/common/css/brand_system.css`, không dùng Tailwind CDN runtime.
 - Regression coverage tối thiểu hiện bao gồm attendance application use cases (`CheckInUseCase`, `CheckOutUseCase`, `CalculateWorkHoursUseCase`) và payroll audit use case (`AuditPayrollUseCase`).
+<<<<<<< HEAD
 - Business workflow A→F đã chuẩn hóa các hồ sơ nguồn có vòng đời riêng: HĐLĐ, nghỉ phép, đổi ca, payroll reconciliation, thanh toán khách hàng/công nợ, thu hồi tài sản/offboarding inventory. Xem `docs/BUSINESS_WORKFLOW_A_TO_F_SYSTEM_CONTRACT.md`.
 - AI rules path contract: canonical Markdown source là `cursorrules.md`; file `.cursorrules` chỉ là compatibility mirror cho Cursor; không dùng path `.cursorrules/cursorrules.md`.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ---
 
@@ -116,11 +126,19 @@ INSTALLED_APPS = [
 | Module | Vai trò | Model/Surface chính |
 |---|---|---|
 | `main` | Core config, audit, worker health | `AuditLog`, `WorkerHeartbeat`, `CompanyInfo` |
+<<<<<<< HEAD
 | `users` | Nhân sự | `NhanVien`, `ChucDanh`, `PhongBan`, `NhanVienRegionAssignment`, `HopDongLaoDong`, `PhuLucHopDongLaoDong`, `DonNghiPhep`, `QuyetDinhNghiViec`, `OffboardingChecklist`, `HoSoBaoHiem` |
 | `clients` | CRM/hợp đồng/mục tiêu/công nợ khách hàng | `KhachHangTiemNang`, `HopDong`, `MucTieu`, `PhuLucHopDongDichVu`, `BienBanNghiemThu`, `HoaDon`, `CongNo`, `ThanhToanKhachHang`, `PhanBoThanhToanHoaDon` |
 | `operations` | Vận hành hiện trường | `PhanCongCaTruc`, `ChamCong`, `BaoCaoSuCo`, `KiemTraQuanSo`, `ShiftChangeRequest` |
 | `accounting` | Lương, phụ cấp, tạm ứng, khấu trừ, sổ quỹ | `BangLuongThang`, `ChiTietLuong`, `PayrollAdjustment`, `TamUngLuong`, `KhoanKhauTruNhanVien`, `CauHinhLuong`, `SoQuy` |
 | `inventory` | Kho vật tư/đồng phục/thu hồi tài sản | `VatTu`, `PhieuNhap`, `PhieuXuat`, `PhieuThuHoi`, `ChiTietPhieuThuHoi`, `BienBanMatHongVatTu`, `InventoryLedgerEntry` |
+=======
+| `users` | Nhân sự | `NhanVien`, `ChucDanh`, `PhongBan` |
+| `clients` | CRM/hợp đồng/mục tiêu | `KhachHangTiemNang`, `HopDong`, `MucTieu` |
+| `operations` | Vận hành hiện trường | `PhanCongCaTruc`, `ChamCong`, `BaoCaoSuCo`, `KiemTraQuanSo` |
+| `accounting` | Lương, phụ cấp, khấu trừ, sổ quỹ | `BangLuongThang`, `ChiTietLuong`, `CauHinhLuong`, `SoQuy` |
+| `inventory` | Kho vật tư/đồng phục | `VatTu`, `PhieuNhap`, `PhieuXuat` |
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 | `inspection` | Thanh tra/tuần tra | `LichThanhTra`, `BienBanViPham` |
 | `workflow` | Đề xuất/phê duyệt/công việc | `Proposal`, `Task` |
 | `notifications` | Push/realtime notification | Consumers, tasks, FCM integration |
@@ -141,6 +159,7 @@ Rules:
 - Legacy re-export chỉ được tồn tại tạm thời.
 - Mọi sửa dữ liệu nhạy cảm phải ghi audit theo `WHITEPAPER.md`.
 
+<<<<<<< HEAD
 ### 4.2 Company Information
 
 SSOT: `main.models.CompanyInfo`.
@@ -154,17 +173,25 @@ Rules:
 - Mẫu biểu có logo phải ưu tiên `COMPANY.logo`/`COMPANY_INFO.logo_url` hoặc `logo_path`, fallback về brand logo tĩnh nếu chưa upload logo công ty. Export service không có request phải gọi `main.company_info.get_company_report_context()`.
 
 ### 4.3 Worker Health
+=======
+### 4.2 Worker Health
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 SSOT: `main.models.WorkerHeartbeat`.
 
 Worker heartbeat dùng để theo dõi Celery/worker runtime. Dashboard/system health không được tự tạo cơ chế heartbeat riêng nếu chưa có lý do kiến trúc.
 
+<<<<<<< HEAD
 ### 4.4 Alive Check
+=======
+### 4.3 Alive Check
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 SSOT: `operations.models.KiemTraQuanSo`.
 
 Không tạo model alive-check song song trong file khác. Nếu còn re-export legacy như `operations.models_alive_check`, phải lên kế hoạch loại bỏ.
 
+<<<<<<< HEAD
 Alive check policy/runtime:
 
 - Phản hồi alive check phải kiểm tra đúng ownership của user với `ca_truc.nhan_vien.user_id`.
@@ -173,6 +200,9 @@ Alive check policy/runtime:
 - `device_id` nên được lưu ở field riêng để phục vụ audit/reconciliation; không nên chỉ nhét trong chuỗi tọa độ xác thực.
 
 ### 4.5 Organization Scope
+=======
+### 4.4 Organization Scope
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 SSOT mục tiêu: `core.managers.OrganizationScopedManager` hoặc tên hiện tại `TenantAwareManager` nhưng chỉ định nghĩa một lần.
 
@@ -184,7 +214,11 @@ Rules:
 - Model không có scope trực tiếp phải document scope gián tiếp qua parent model.
 - Dashboard và payroll query phải được rà soát scope.
 
+<<<<<<< HEAD
 ### 4.6 Mobile Attendance API
+=======
+### 4.5 Mobile Attendance API
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 SSOT interface: `operations.api_views` + application use cases liên quan attendance.
 
@@ -196,7 +230,11 @@ API contract tối thiểu:
 - Check-out phải validate đã check-in và chưa check-out.
 - Mọi override/manual correction phải audit.
 
+<<<<<<< HEAD
 ### 4.7 Payroll Calculation
+=======
+### 4.6 Payroll Calculation
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 SSOT: `accounting.application.payroll_use_cases.CalculatePayrollUseCase`.
 
@@ -217,6 +255,7 @@ ChamCong verified
 Rules:
 
 - Không tính lương từ nhập tay rời rạc nếu đã có dữ liệu vận hành.
+<<<<<<< HEAD
 - Đơn giá mục tiêu phải được resolve theo `ngày trực` khi tồn tại lịch sử đơn giá effective-dated; không được dùng một đơn giá duy nhất cho cả tháng trong case hồi tố.
 - Lịch sử đơn giá payroll của mục tiêu dùng SSOT `clients.MucTieuDonGiaHistory`; mỗi record mang `ngày hiệu lực`, `lương khoán bảo vệ`, `số giờ một ngày`.
 - Snapshot attendance trong `ChiTietLuong.nguon_du_lieu_snapshot` phải lưu thêm `don_gia_hieu_luc_tu`, `nguon_don_gia`, `rate_record_id` khi có để phục vụ audit/reconciliation.
@@ -225,6 +264,12 @@ Rules:
 - Tính lại lương phải có reconciliation note nếu làm đổi thực lãnh.
 
 ### 4.8 Incident Identity
+=======
+- Kỳ lương locked/paid không sửa trực tiếp.
+- Tính lại lương phải có reconciliation note nếu làm đổi thực lãnh.
+
+### 4.7 Incident Identity
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 SSOT: `operations.models.BaoCaoSuCo.ma_su_co`.
 
@@ -234,6 +279,7 @@ Rules:
 - Không generate mã sự cố trong template/view tùy tiện.
 - Mã sự cố không đổi sau khi tạo.
 
+<<<<<<< HEAD
 
 ### 4.8.1 Incident status language contract
 
@@ -318,6 +364,8 @@ Rules:
 - Temporary delegation must be modeled explicitly; do not implement it via shared passwords, temporary superuser status, or permanent role escalation.
 - Denied actions must return contextual `PolicyResult` with stable error code and user-friendly business message.
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ---
 
 ## 5. Core Data Flow
@@ -359,6 +407,7 @@ Failure cases phải trả lỗi rõ:
 - đã check-in/check-out trước đó,
 - ca đã khóa payroll.
 
+<<<<<<< HEAD
 Attendance window policy runtime:
 
 - `ATTENDANCE_CHECKIN_EARLY_MINUTES`: số phút cho phép check-in sớm trước giờ bắt đầu ca.
@@ -368,6 +417,8 @@ Attendance window policy runtime:
 - `ATTENDANCE_CHECKOUT_EARLY_MINUTES` và `ATTENDANCE_CHECKOUT_LATE_MINUTES` điều khiển cửa sổ check-out tương ứng.
 - `ATTENDANCE_REQUIRE_IMAGE_CHECKIN` và `ATTENDANCE_REQUIRE_IMAGE_CHECKOUT` là default policy; ca/vị trí/mục tiêu có thể override nếu model có cờ riêng.
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ### 5.3 Payroll Flow
 
 ```text
@@ -405,6 +456,7 @@ CLOSED -> REOPENED -> IN_PROGRESS
 Rules:
 
 - Reopen phải có reason.
+<<<<<<< HEAD
 - Lifecycle guard đã được enforce ở `operations.application.incident_transition_policy.IncidentTransitionPolicy` và `operations.admin.BaoCaoSuCoAdminForm`; closed incident không được sửa trực tiếp nội dung chính nếu chưa reopen hợp lệ.
 - Incident liên quan đền bù/khấu trừ phải trace sang payroll/accounting.
 - Incident export phải audit nếu chứa dữ liệu nhạy cảm.
@@ -438,6 +490,11 @@ PhieuXuat / ChiTietPhieuXuat
 
 These flows are operational source-of-truth paths. Do not replace them with generic proposals, manually edited result fields, or fake inventory/payroll documents.
 
+=======
+- Incident liên quan đền bù/khấu trừ phải trace sang payroll/accounting.
+- Incident export phải audit nếu chứa dữ liệu nhạy cảm.
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ---
 
 ## 6. Interface Contracts
@@ -481,14 +538,22 @@ Rules:
 - Query phải organization-scoped hoặc document single-org exception.
 - Không hardcode số liệu demo vào dashboard production.
 - Màu trạng thái phải mang meaning nghiệp vụ.
+<<<<<<< HEAD
 - Quyền truy cập dashboard phải đi qua `main.dashboard_router.DashboardRouter` và decorator `dashboard_access_required()`; không tự rải role/group checks ở từng dashboard view nếu có thể dùng policy tập trung.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ### 6.3 Authentication `/login/`
 
 Rules:
 
+<<<<<<< HEAD
 - Không dùng `Tailwind CDN`.
 - Không dùng brand/copy cũ kiểu cyber-console; chỉ dùng SCMD Pro và ngôn ngữ vận hành nghiệp vụ.
+=======
+- Không dùng `cdn.tailwindcss.com`.
+- Không dùng brand cũ `Sentinel`, `Security Command`, `War Room`.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 - Login là cổng vào ERP nội bộ, không phải marketing/cyber landing page.
 - Copy phải rõ, tiếng Việt chuẩn UTF-8.
 
@@ -563,15 +628,22 @@ docker compose up --build
 docker compose -f docker-compose.prod.yml up -d --build
 ```
 
+<<<<<<< HEAD
 Production/demo Docker rules:
+=======
+Production rules:
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 - Không dùng default secret.
 - Không tự chạy destructive migration.
 - Phải có backup trước migration dữ liệu nhạy cảm.
 - Phải có smoke test sau deploy.
+<<<<<<< HEAD
 - Compose production/demo phải dùng PostGIS thật: `DATABASE_URL=postgis://<SQL_USER>:<SQL_PASSWORD>@db:5432/<SQL_DATABASE>`.
 - Compose production/demo phải dùng Redis service host: `REDIS_URL=redis://redis:6379/0`.
 - SQLite chỉ được phép cho local development có chủ đích; `docker-compose.prod.yml` sẽ fail-fast nếu thiếu `DATABASE_URL`, dùng SQLite, hoặc trỏ DB/Redis về `localhost`.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 ### 8.5 GIS Configuration
 
@@ -587,7 +659,10 @@ Minimum rules:
 - Object-level permission cho ca trực/chấm công/lương/sự cố.
 - Không trả dữ liệu GPS/ảnh/lương nếu user không có quyền.
 - Rate limit hoặc guard cho endpoint mobile nhạy cảm.
+<<<<<<< HEAD
 - Explicit CORS Origins (Rule 12.4) bắt buộc cấu hình cho các domain tin cậy.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 - SimpleJWT token lifetime phải phù hợp môi trường vận hành.
 - Export/report endpoint phải audit.
 
@@ -638,6 +713,7 @@ Rules:
 - Không xóa field dữ liệu nhạy cảm trong cùng release với việc migrate sang field mới nếu chưa có verification.
 - Rollback plan phải ghi rõ: rollback schema, rollback data hoặc forward-fix.
 
+<<<<<<< HEAD
 ### 11.1 Chiến lược xử lý Mojibake (Encoding)
 
 Tuân thủ chiến lược **Forward-fix** để bảo vệ tính toàn vẹn của production:
@@ -646,13 +722,18 @@ Tuân thủ chiến lược **Forward-fix** để bảo vệ tính toàn vẹn c
 3. **Data Correction**: Với dữ liệu seed hoặc dữ liệu nghiệp vụ bị lỗi encoding trong DB, sử dụng migration `RunPython` để thực hiện lệnh `UPDATE` sửa lỗi trên các bản ghi cụ thể.
 4. **Enforcement**: Đảm bảo IDE/Editor luôn lưu file ở định dạng **UTF-8 (No BOM)**. Kiểm tra bằng lệnh `file -i` trước khi commit.
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ---
 
 ## 12. Verification Checklist
 
+<<<<<<< HEAD
 See also: `RELEASE_CHECKLIST.md` for the standalone pre-merge/release checklist that can be copied into CI or PR templates.
 
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 Trước khi merge/release:
 
 ```bash
@@ -661,8 +742,13 @@ python manage.py test
 python manage.py showmigrations --plan
 find static/ -name "*.py"
 find . -path "*/templates/*" -name "*.py"
+<<<<<<< HEAD
 grep -R "Tailwind CDN" -n .
 grep -RInE "War Room|WarRoom|Sentinel|Tactical|Cyber|SCMD ERP|ESP" -n templates static main dashboard users operations accounting clients
+=======
+grep -R "cdn.tailwindcss.com" -n .
+grep -R "SCMD Pro\|Security Command System\|Sentinel Command\|War Room\|Tactical" -n templates static dashboard main users operations accounting clients
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 grep -R "from .* import \*" -n */application/*.py
 ```
 
@@ -711,6 +797,7 @@ Không triển khai các hướng sau trước khi hoàn tất hardening trong `
 - Wildcard-only facades removed from active `application/` modules; application imports now resolve to real use-case implementations.
 - Legacy root use-case modules are compatibility wrappers only and should be removed after the import transition is complete.
 - UTF-8 cleanup in this patch is intentionally scoped to runtime/admin/application files with the highest operational value.
+<<<<<<< HEAD
 
 
 ## Dashboard/admin language hardening
@@ -739,3 +826,5 @@ Phase 1 hardening uses these standalone contracts:
 - `UI_SYSTEM_REFACTOR_SPEC.md`
 
 These files must be read before modifying staff visibility, site visibility, scheduling, dispatch, admin actions, imports, sensitive exports, payroll adjustments or migration/backfill logic.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

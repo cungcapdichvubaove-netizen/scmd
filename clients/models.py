@@ -1,13 +1,23 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro - Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ
 ------------------------------
 Copyright (c) 2026 SCMD. All Rights Reserved.
+=======
+Security Command (SCMD) System
+------------------------------
+Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 File: clients/models.py
 Author: Mr. Anh
 Created Date: 2025-11-30
+<<<<<<< HEAD
 Description: Phân hệ quản lý Khách hàng, Hợp đồng & Mục tiêu bảo vệ.
+=======
+Description: Model quản lý Khách hàng, Hợp đồng & Mục tiêu.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
              Đã nâng cấp: Cấu hình Lương ĐỘNG theo số ngày thực tế của tháng.
 
 NOTICE: This file is part of a proprietary system. 
@@ -15,15 +25,22 @@ Unauthorized copying of this file, via any medium is strictly prohibited.
 """
 
 import uuid
+<<<<<<< HEAD
 import logging
 from datetime import timedelta
 from decimal import Decimal
 from typing import TYPE_CHECKING, Optional
+=======
+import calendar  # Thư viện để tính ngày trong tháng
+import logging
+from datetime import timedelta
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.db import models
 from django.utils import timezone
 from django.core.validators import MinValueValidator
 from django.conf import settings
 from django.core.exceptions import ValidationError, ImproperlyConfigured
+<<<<<<< HEAD
 from core.managers import TenantAwareManager, MucTieuManager, TenantScopedModel
 from clients.application.contract_transition_policy import ContractTransitionPolicy
 from core.workflow_transition_policy import WorkflowTransitionPolicy
@@ -34,6 +51,13 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 class KhachHangTiemNang(TenantScopedModel):
+=======
+from core.managers import TenantAwareManager
+
+logger = logging.getLogger(__name__)
+
+class KhachHangTiemNang(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Quản lý thông tin khách hàng tiềm năng và các đầu mối (Leads) của SCMD"""
     NGUON_DEN = [
         ('WEBSITE', 'Website/Google'),
@@ -49,6 +73,11 @@ class KhachHangTiemNang(TenantScopedModel):
         ('HUY', 'Khách hủy/Thất bại'),
     ]
 
+<<<<<<< HEAD
+=======
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+    
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     ten_cong_ty = models.CharField(
         "Tên công ty/Khách hàng", 
         max_length=255, 
@@ -100,7 +129,22 @@ class KhachHangTiemNang(TenantScopedModel):
         default=timezone.now
     )
 
+<<<<<<< HEAD
     objects: "TenantAwareManager" = TenantAwareManager()
+=======
+    objects = TenantAwareManager()
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def __str__(self):
         return f"{self.ten_cong_ty} ({self.get_trang_thai_display()})"
@@ -111,7 +155,11 @@ class KhachHangTiemNang(TenantScopedModel):
         ordering = ['-ngay_tao']
 
 
+<<<<<<< HEAD
 class CoHoiKinhDoanh(TenantScopedModel):
+=======
+class CoHoiKinhDoanh(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Quản lý Pipeline cơ hội kinh doanh từ khách hàng tiềm năng"""
     class TrangThai(models.TextChoices):
         MOI = "MOI", "Mới tiếp nhận"
@@ -121,6 +169,11 @@ class CoHoiKinhDoanh(TenantScopedModel):
         THANH_CONG = "THANHCONG", "Chốt hợp đồng (Thắng)"
         THAT_BAI = "THATBAI", "Thất bại (Thua)"
 
+<<<<<<< HEAD
+=======
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     khach_hang_tiem_nang = models.ForeignKey(
         KhachHangTiemNang, 
         on_delete=models.CASCADE, 
@@ -156,6 +209,7 @@ class CoHoiKinhDoanh(TenantScopedModel):
         "Ngày tạo cơ hội",
         auto_now_add=True
     )
+<<<<<<< HEAD
     region = models.ForeignKey(
         "users.Region",
         on_delete=models.SET_NULL,
@@ -167,6 +221,21 @@ class CoHoiKinhDoanh(TenantScopedModel):
     )
 
     objects: "TenantAwareManager" = TenantAwareManager()
+=======
+
+    objects = TenantAwareManager()
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     class Meta:
         verbose_name = "Cơ hội Kinh doanh"
@@ -176,7 +245,11 @@ class CoHoiKinhDoanh(TenantScopedModel):
         return f"{self.ten_co_hoi} - {self.get_trang_thai_display()}"
 
 
+<<<<<<< HEAD
 class HopDong(TenantScopedModel):
+=======
+class HopDong(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """Quản lý hợp đồng dịch vụ bảo vệ chính thức của SCMD"""
     TRANG_THAI_HD = [
         ('HIEU_LUC', 'Đang hiệu lực'),
@@ -184,6 +257,11 @@ class HopDong(TenantScopedModel):
         ('DA_THANH_LY', 'Đã thanh lý/Hết hạn'),
     ]
 
+<<<<<<< HEAD
+=======
+    tenant_id = models.UUIDField("Tenant ID", db_index=True, default=uuid.uuid4, editable=False)
+    
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     co_hoi = models.OneToOneField(
         CoHoiKinhDoanh, 
         on_delete=models.CASCADE, 
@@ -243,6 +321,7 @@ class HopDong(TenantScopedModel):
         db_index=True
     )
 
+<<<<<<< HEAD
     objects: "TenantAwareManager" = TenantAwareManager()
 
     if TYPE_CHECKING:
@@ -286,6 +365,25 @@ class HopDong(TenantScopedModel):
                 },
             )
 
+=======
+    objects = TenantAwareManager()
+
+    def clean(self):
+        if hasattr(settings, 'SCMD_ORGANIZATION_ID') and self.tenant_id != settings.SCMD_ORGANIZATION_ID:
+            raise ValidationError(f"Tenant ID must be {settings.SCMD_ORGANIZATION_ID}")
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        """
+        Infrastructure Layer only: Persist model data.
+        Business logic for status calculation moved to Application Layer (Background Jobs).
+        """
+        if not hasattr(settings, 'SCMD_ORGANIZATION_ID'):
+            raise ImproperlyConfigured("SCMD_ORGANIZATION_ID required.")
+        self.tenant_id = settings.SCMD_ORGANIZATION_ID
+        super().save(*args, **kwargs)
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     class Meta:
         verbose_name = "Hợp đồng Dịch vụ"
         verbose_name_plural = "3. Quản lý Hợp đồng"
@@ -296,10 +394,13 @@ class HopDong(TenantScopedModel):
 
 class MucTieu(models.Model):
     """Điểm trực và cấu hình nghiệp vụ tại mục tiêu bảo vệ cụ thể"""
+<<<<<<< HEAD
     # SSOT: Sử dụng TenantAwareManager tập trung để tránh duplicate logic quản lý tổ chức.
     # Scope của MucTieu được truy xuất gián tiếp qua HopDong.
     objects: "MucTieuManager" = MucTieuManager()
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     hop_dong = models.ForeignKey(
         HopDong,
         on_delete=models.CASCADE,
@@ -346,6 +447,7 @@ class MucTieu(models.Model):
     )
     
     # THAY ĐỔI: Chuyển từ Giờ/Tháng sang Giờ/Ngày để tính tự động
+<<<<<<< HEAD
     so_gio_mot_ngay = models.DecimalField(
         "Định mức giờ trực/ngày", 
         max_digits=5,
@@ -353,6 +455,12 @@ class MucTieu(models.Model):
         default=Decimal("12.00"),
         validators=[MinValueValidator(Decimal("0.25"))],
         help_text="Số giờ ca trực tiêu chuẩn. Hệ thống sẽ tự nhân với số ngày trong tháng."
+=======
+    so_gio_mot_ngay = models.FloatField(
+        "Định mức giờ trực/ngày", 
+        default=12.0, 
+        help_text="Số giờ ca trực tiêu chuẩn. Hệ thống sẽ tự nhân với số ngày trong tháng (28/30/31)."
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     )
     
     # Hệ thống tính điểm Chuyên cần (Bậc thang khấu trừ)
@@ -417,16 +525,20 @@ class MucTieu(models.Model):
         verbose_name="Quản lý vùng phụ trách (Regional Manager)"
     )
 
+<<<<<<< HEAD
     if TYPE_CHECKING:
         # Type hints cho quan hệ ngược và ID tự sinh
         lich_su_don_gia: models.Manager["MucTieuDonGiaHistory"]
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     class Meta:
         verbose_name = "Mục tiêu Bảo vệ"
         verbose_name_plural = "4. Danh sách Mục tiêu"
 
     def __str__(self):
         return self.ten_muc_tieu
+<<<<<<< HEAD
 
     def _get_effective_payroll_rate_record(self, ngay_truc):
         from accounting.domain.payroll_rate import resolve_effective_rate_record
@@ -1229,3 +1341,22 @@ class MucTieuDonGiaHistory(TenantScopedModel):
 
     def __str__(self):
         return f"{self.muc_tieu.ten_muc_tieu} - {self.ngay_hieu_luc:%d/%m/%Y}"
+=======
+    
+    def get_don_gia_gio_thuc_te(self, thang, nam):
+        """
+        Hàm tính đơn giá giờ dựa trên số ngày thực tế của tháng/năm đó.
+        Nghiệp vụ: Đơn giá = Lương khoán / (Số ngày tháng thực tế * Số giờ ca trực).
+        Ví dụ: Tháng 2/2025 (28 ngày) trực ca 12h -> Tổng giờ chuẩn = 336h.
+        """
+        try:
+            # monthrange trả về (thứ ngày đầu tiên, tổng số ngày trong tháng)
+            _, so_ngay_trong_thang = calendar.monthrange(int(nam), int(thang))
+            tong_gio_chuan = float(so_ngay_trong_thang) * float(self.so_gio_mot_ngay)
+            
+            if tong_gio_chuan > 0:
+                return float(self.luong_khoan_bao_ve) / tong_gio_chuan
+            return 0
+        except (TypeError, ValueError, ZeroDivisionError, calendar.IllegalMonthError):
+            return 0
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

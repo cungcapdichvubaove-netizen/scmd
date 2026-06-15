@@ -1,5 +1,6 @@
 from collections import OrderedDict
 from datetime import timedelta
+<<<<<<< HEAD
 from urllib.parse import urlencode
 
 from django import template
@@ -7,20 +8,31 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import connections
 from django.urls import NoReverseMatch, reverse
+=======
+
+from django import template
+from django.contrib.auth import get_user_model
+from django.db import connections
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.utils import timezone
 
 from django_celery_beat.models import PeriodicTask
 from django_celery_results.models import TaskResult
 
+<<<<<<< HEAD
 from main.application.admin_dashboard_summary import build_admin_dashboard_summary
 from main.models import AuditLog, WorkerHeartbeat
 from main.services.operations_ux import AdminOperationsUXProvider
+=======
+from main.models import AuditLog, WorkerHeartbeat
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 register = template.Library()
 
 
 APP_GROUPS = OrderedDict(
     [
+<<<<<<< HEAD
         ("Nhân sự", {"users"}),
         ("Khách hàng & mục tiêu", {"clients"}),
         ("Vận hành", {"operations", "inspection"}),
@@ -105,6 +117,18 @@ def _ordered_workspace_sections(sections, user=None):
     return sorted(sections, key=lambda section: order_map.get(section["title"], 99))
 
 
+=======
+        ("CORE MASTER DATA", {"users", "clients"}),
+        ("ACCESS & SECURITY", {"auth", "main", "sessions"}),
+        ("OPERATIONS DATA", {"operations"}),
+        ("INSPECTION DATA", {"inspection"}),
+        ("FINANCE DATA", {"accounting"}),
+        ("SYSTEM AUTOMATION", {"django_celery_beat", "django_celery_results", "notifications"}),
+        ("MAINTENANCE", {"backup_restore", "reports", "inventory", "workflow"}),
+    ]
+)
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 CRITICAL_MODEL_BADGES = {
     "User": ["critical", "permission"],
     "Group": ["critical", "permission"],
@@ -117,16 +141,20 @@ CRITICAL_MODEL_BADGES = {
     "ChamCong": ["critical", "gps", "payroll"],
     "BangLuongThang": ["critical", "payroll"],
     "ChiTietLuong": ["critical", "payroll"],
+<<<<<<< HEAD
     "SoQuy": ["critical", "payroll"],
     "VatTu": ["critical", "config"],
     "PhieuNhap": ["critical", "config"],
     "PhieuXuat": ["critical", "payroll"],
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     "AuditLog": ["critical", "config"],
     "PeriodicTask": ["critical", "config"],
     "WorkerHeartbeat": ["config"],
 }
 
 BADGE_LABELS = {
+<<<<<<< HEAD
     "critical": ("Trọng yếu", "warning"),
     "permission": ("Quyền", "lock"),
     "payroll": ("Lương/Tiền", "payroll"),
@@ -265,6 +293,33 @@ def admin_console_metrics(user=None):
         active_sessions = _bounded_count(Session.objects.filter(expire_date__gte=now))
     except Exception:
         active_sessions = 0
+=======
+    "critical": ("Critical", "warning"),
+    "permission": ("Permission-sensitive", "lock"),
+    "payroll": ("Payroll-sensitive", "payroll"),
+    "gps": ("GPS-sensitive", "gps"),
+    "config": ("Config-sensitive", "config"),
+}
+
+
+@register.simple_tag
+def admin_console_metrics():
+    now = timezone.now()
+    heartbeat_threshold = now - timedelta(minutes=3)
+    recent_audit_logs = AuditLog.objects.select_related("user").order_by("-timestamp")[:5]
+    worker_qs = WorkerHeartbeat.objects.order_by("hostname")
+    recent_task_results = TaskResult.objects.order_by("-date_done")[:5]
+    user_model = get_user_model()
+    enabled_periodic = PeriodicTask.objects.filter(enabled=True)
+    task_alerts = TaskResult.objects.exclude(status="SUCCESS")
+    recent_error_count = AuditLog.objects.exclude(status="SUCCESS").count()
+    worker_total = worker_qs.count()
+    worker_active = worker_qs.filter(is_active=True, last_ping__gte=heartbeat_threshold).count()
+    worker_stale = worker_qs.filter(is_active=True, last_ping__lt=heartbeat_threshold).count()
+    periodic_total = PeriodicTask.objects.count()
+    periodic_enabled = enabled_periodic.count()
+    task_result_total = TaskResult.objects.count()
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     try:
         connections["default"].ensure_connection()
@@ -272,6 +327,7 @@ def admin_console_metrics(user=None):
     except Exception:
         db_status = "offline"
 
+<<<<<<< HEAD
     allowed_hosts = getattr(settings, "ALLOWED_HOSTS", []) or []
     debug_enabled = bool(getattr(settings, "DEBUG", False))
     wildcard_hosts = "*" in allowed_hosts
@@ -312,6 +368,36 @@ def admin_console_metrics(user=None):
 
     system_ok = db_status == "online" and worker_stale == 0 and recent_error_count == 0 and task_alert_count == 0
 
+=======
+    system_ok = db_status == "online" and worker_stale == 0 and recent_error_count == 0
+    quick_links = [
+        {
+            "label": "Người dùng & Nhóm quyền",
+            "url": "/admin/auth/user/",
+            "icon": "fas fa-users-cog",
+            "badge": user_model.objects.filter(is_staff=True).count(),
+        },
+        {
+            "label": "Nhật ký hệ thống",
+            "url": "/admin/main/auditlog/",
+            "icon": "fas fa-clipboard-list",
+            "badge": recent_error_count,
+        },
+        {
+            "label": "Giám sát worker",
+            "url": "/admin/main/workerheartbeat/",
+            "icon": "fas fa-heartbeat",
+            "badge": worker_active,
+        },
+        {
+            "label": "Lịch tác vụ",
+            "url": "/admin/django_celery_beat/periodictask/",
+            "icon": "fas fa-calendar-alt",
+            "badge": periodic_enabled,
+        },
+    ]
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     return {
         "db_status": db_status,
         "worker_total": worker_total,
@@ -321,6 +407,7 @@ def admin_console_metrics(user=None):
         "periodic_enabled": periodic_enabled,
         "task_result_total": task_result_total,
         "recent_errors": recent_error_count,
+<<<<<<< HEAD
         "audit_log_total": _bounded_count(AuditLog.objects.all()),
         "staff_count": staff_count,
         "superuser_count": superuser_count,
@@ -378,6 +465,28 @@ def admin_sidebar_runtime(user=None):
     return {
         "periodic_enabled": _bounded_count(PeriodicTask.objects.filter(enabled=True)),
         "task_alerts": _bounded_count(TaskResult.objects.exclude(status="SUCCESS")),
+=======
+        "audit_log_total": AuditLog.objects.count(),
+        "staff_count": user_model.objects.filter(is_staff=True).count(),
+        "superuser_count": user_model.objects.filter(is_superuser=True).count(),
+        "recent_audit_logs": recent_audit_logs,
+        "recent_task_results": recent_task_results,
+        "recent_workers": worker_qs[:5],
+        "task_alerts": task_alerts.count(),
+        "system_ok": system_ok,
+        "status_label": "Toàn hệ thống ổn định" if system_ok else "Cần theo dõi",
+        "status_tone": "good" if system_ok else "warn",
+        "last_updated_label": "Cập nhật theo runtime hiện tại",
+        "quick_links": quick_links,
+    }
+
+
+@register.simple_tag
+def admin_sidebar_runtime():
+    return {
+        "periodic_enabled": PeriodicTask.objects.filter(enabled=True).count(),
+        "task_alerts": TaskResult.objects.exclude(status="SUCCESS").count(),
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     }
 
 
@@ -394,7 +503,11 @@ def group_admin_apps(app_list):
 
     leftovers = [app for app in app_list if app["app_label"] not in assigned_labels]
     if leftovers:
+<<<<<<< HEAD
         grouped.append({"title": "Khu vực hệ thống khác", "apps": leftovers})
+=======
+        grouped.append({"title": "OTHER SYSTEM AREAS", "apps": leftovers})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     return grouped
 
@@ -404,6 +517,7 @@ def model_badges(model):
     object_name = model.get("object_name")
     badge_keys = CRITICAL_MODEL_BADGES.get(object_name, [])
     return [BADGE_LABELS[key] for key in badge_keys]
+<<<<<<< HEAD
 
 
 def _safe_reverse_url(name, args=None, kwargs=None, fallback="#"):
@@ -599,3 +713,5 @@ def admin_account_context(request):
         "my_activity_url": my_activity_url,
         "technical_links": technical_links,
     }
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -96,11 +100,17 @@ class Command(BaseCommand):
 
     def reset_daily_data(self):
         self.stdout.write(self.style.WARNING("\n[1/3] 🧹 Resetting operational data..."))
+<<<<<<< HEAD
         today = timezone.localdate()
         start_at = timezone.make_aware(datetime.combine(today, datetime.min.time()), timezone.get_current_timezone())
         end_at = start_at + timedelta(days=1)
         BaoCaoSuCo.objects.filter(created_at__gte=start_at, created_at__lt=end_at).delete()
         ChamCong.objects.filter(thoi_gian_check_in__gte=start_at, thoi_gian_check_in__lt=end_at).delete()
+=======
+        today = timezone.now().date()
+        BaoCaoSuCo.objects.filter(created_at__date=today).delete()
+        ChamCong.objects.filter(thoi_gian_check_in__date=today).delete()
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.stdout.write(self.style.SUCCESS("   ✅ Data cleaned."))
 
     def generate_shifts_today(self):

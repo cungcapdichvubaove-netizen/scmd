@@ -1,3 +1,139 @@
+<<<<<<< HEAD
 {# Legacy compatibility shim. Do not add new mobile templates here. #}
 {# Canonical SCMD Pro mobile shell: mobile/templates/mobile/base.html, addressed as "mobile/base.html". #}
 {% extends "mobile/base.html" %}
+=======
+{# file: operations/templates/operations/mobile/base_mobile_revamped.html #}
+{# -*- coding: utf-8 -*- #}
+{# Security Command (SCMD) System #}
+{# Author: Mr. Anh #}
+{# Created Date: 2025-12-05 #}
+{# Description: Base Template - FIXED: Bottom Nav "Cá nhân" link points to Mobile Profile. #}
+
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="vi" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>{% block title %}SCMD Mobile{% endblock %}</title>
+    
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/logo_moi.png' %}">
+    <meta name="theme-color" content="#ffffff">
+
+    {% tailwind_css %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/nprogress@0.2.0/nprogress.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/nprogress@0.2.0/nprogress.css" />
+
+    <style>
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            background-color: #F3F4F6; 
+            color: #1F2937; 
+            padding-bottom: 90px;
+            -webkit-tap-highlight-color: transparent; 
+            user-select: none; 
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        #nprogress .bar { background: #DC2626 !important; height: 3px !important; }
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .nav-safe-overflow { overflow: visible !important; }
+        
+        /* Toast Animation */
+        .toast-slide-in { animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .toast-slide-out { animation: slideOut 0.4s ease-in forwards; }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body class="min-h-screen relative" hx-boost="true" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+    <div id="network-toast" class="hidden fixed top-0 left-0 w-full z-[100] bg-gray-800 text-white font-medium text-center py-2 text-xs shadow-md">
+        <i class="fas fa-wifi-slash mr-2"></i> Mất kết nối mạng
+    </div>
+
+    <div class="container mx-auto max-w-md min-h-screen flex flex-col">
+        <main class="flex-1 p-4 pt-6" id="main-content"> 
+            {% if messages %}
+                <div id="django-messages" class="fixed top-4 left-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
+                    {% for message in messages %}
+                        <div class="toast-slide-in alert {% if message.tags == 'error' %}bg-red-50 text-red-700 border-red-100{% elif message.tags == 'success' %}bg-green-50 text-green-700 border-green-100{% endif %} shadow-lg rounded-xl text-sm font-medium flex justify-between items-center border py-3 pointer-events-auto">
+                            <div class="flex items-center gap-2">
+                                <i class="fas {% if message.tags == 'error' %}fa-exclamation-circle{% else %}fa-check-circle{% endif %}"></i>
+                                <span>{{ message }}</span>
+                            </div>
+                            <button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
+                        </div>
+                    {% endfor %}
+                    <script>
+                        setTimeout(() => { 
+                            const msgs = document.getElementById('django-messages');
+                            if(msgs) {
+                                Array.from(msgs.children).forEach(el => el.classList.add('toast-slide-out'));
+                                setTimeout(() => msgs.remove(), 400); 
+                            }
+                        }, 4000);
+                    </script>
+                </div>
+            {% endif %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 z-50 h-[68px] pb-safe shadow-[0_-4px_10px_rgba(0,0,0,0.03)] nav-safe-overflow" hx-preserve>
+        <div class="container mx-auto max-w-md h-full">
+            <div class="grid grid-cols-5 h-full items-end pb-2">
+                
+                <a href="{% url 'operations:mobile_dashboard' %}" class="flex flex-col items-center justify-end gap-1 group h-full pb-2 {% if request.resolver_match.url_name == 'mobile_dashboard' %}text-red-700{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+                    <i class="fas fa-home text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Trang chủ</span>
+                </a>
+
+                <a href="{% url 'operations:mobile_lich_truc' %}" class="flex flex-col items-center justify-end gap-1 group h-full pb-2 {% if request.resolver_match.url_name == 'mobile_lich_truc' %}text-red-700{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+                    <i class="fas fa-calendar-day text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Lịch trực</span>
+                </a>
+
+                <a href="{% url 'operations:bao_cao_su_co' %}" class="relative flex flex-col items-center justify-end h-full pb-2 group w-full">
+                    <div class="absolute -top-6 left-1/2 transform -translate-x-1/2 w-14 h-14 bg-red-600 rounded-full shadow-lg shadow-red-600/40 flex items-center justify-center border-4 border-white text-white transition-transform group-active:scale-95 z-50">
+                        <i class="fas fa-exclamation-triangle text-2xl"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-red-700 mt-8 z-50">Báo cáo</span>
+                </a>
+
+                <a href="{% url 'operations:mobile_de_xuat_list' %}" class="flex flex-col items-center justify-end gap-1 group h-full pb-2 {% if 'de_xuat' in request.path %}text-red-700{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+                    <i class="fas fa-file-signature text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Đề xuất</span>
+                </a>
+
+                <a href="{% url 'users:mobile_profile' %}" class="flex flex-col items-center justify-end gap-1 group h-full pb-2 {% if 'profile' in request.path %}text-red-700{% else %}text-gray-400 hover:text-gray-600{% endif %}">
+                    <i class="fas fa-user-circle text-xl mb-0.5"></i>
+                    <span class="text-[10px] font-semibold">Cá nhân</span>
+                </a>
+
+            </div>
+        </div>
+    </nav>
+
+    <script>
+        if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(console.error); }
+        window.addEventListener('online', () => document.getElementById('network-toast').classList.add('hidden'));
+        window.addEventListener('offline', () => document.getElementById('network-toast').classList.remove('hidden'));
+        document.body.addEventListener('htmx:beforeRequest', () => NProgress.start());
+        document.body.addEventListener('htmx:afterRequest', () => NProgress.done());
+        document.body.addEventListener('htmx:afterSwap', () => window.scrollTo(0, 0));
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

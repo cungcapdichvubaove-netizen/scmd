@@ -1,4 +1,5 @@
 {% load static %}
+<<<<<<< HEAD
 <div class="relative z-50 flex h-full select-none flex-col scmd-sidebar-shell transition-all duration-300" id="sidebar-content">
     <div class="scmd-sidebar-brand relative z-20 flex h-16 shrink-0 items-center overflow-hidden px-5">
         <a href="{% url 'dashboard:main' %}" class="relative z-10 flex w-full items-center gap-3 rounded-xl no-underline outline-none scmd-focus-ring">
@@ -26,12 +27,49 @@
                 </div>
                 <span class="tracking-wide">Bảng quản trị kỹ thuật</span>
                 <i class="fas fa-external-link-alt ml-auto text-[10px] opacity-0 transition-opacity group-hover:opacity-100"></i>
+=======
+<div class="flex flex-col h-full scmd-sidebar-shell transition-all duration-300 relative z-50 select-none" id="sidebar-content">
+    <div class="scmd-sidebar-brand h-20 flex items-center px-6 shrink-0 z-20 relative overflow-hidden">
+        <a href="{% url 'dashboard:main' %}" class="flex items-center gap-4 w-full outline-none relative z-10 no-underline scmd-focus-ring rounded-xl">
+            <img
+                src="{% static 'img/logo_moi.png' %}"
+                alt="Logo SCMD Pro"
+                class="scmd-sidebar-logo w-10 h-10 object-contain shrink-0 rounded-xl"
+            >
+
+            <div class="sidebar-text opacity-100 transition-all duration-300 whitespace-nowrap">
+                <h1 class="scmd-sidebar-title font-black text-xl tracking-tight leading-none">
+                    SCMD <span class="scmd-sidebar-accent">Pro</span>
+                </h1>
+                <p class="scmd-sidebar-tagline text-[9px] font-extrabold tracking-[0.25em] mt-1.5 uppercase">
+                    Chỉ huy và quản trị vận hành
+                </p>
+            </div>
+        </a>
+    </div>
+
+    <nav class="scmd-sidebar-nav flex-1 overflow-y-auto overflow-x-hidden py-8 space-y-2 px-4 relative z-10" id="sidebar-nav">
+        {% include "partials/sidebar_menu_items.html" %}
+
+        {% if user.is_staff %}
+        <div class="mt-10 pt-8 border-t border-white/10 sidebar-text pb-6 px-1">
+            <p class="scmd-sidebar-section px-3 text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-80">
+                Hệ thống lõi
+            </p>
+            <a href="/admin/" class="scmd-sidebar-admin-link scmd-focus-ring flex items-center gap-3 px-4 py-3.5 rounded-xl text-xs font-black transition-all duration-300 group">
+                <div class="w-6 h-6 flex items-center justify-center rounded-lg bg-white/10 transition-colors">
+                    <i class="fas fa-shield-alt transition-transform group-hover:scale-110"></i>
+                </div>
+                <span class="tracking-widest uppercase">Trang quản trị</span>
+                <i class="fas fa-external-link-alt ml-auto text-[10px] opacity-0 group-hover:opacity-100 transition-opacity"></i>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             </a>
         </div>
         {% endif %}
     </nav>
 
     {% if user.is_authenticated %}
+<<<<<<< HEAD
     <div class="scmd-sidebar-user z-30 p-3.5">
         <a
             href="{% if '/mobile/' in request.path %}{% url 'users:mobile_profile' %}{% else %}{% url 'users:profile' %}{% endif %}"
@@ -52,6 +90,31 @@
             </div>
 
             <i class="fas fa-chevron-right sidebar-text text-[10px] text-slate-500 transition-all group-hover:translate-x-1 group-hover:text-white"></i>
+=======
+    <div class="scmd-sidebar-user p-5 z-30">
+        <a
+            href="{% if '/mobile/' in request.path %}{% url 'users:mobile_profile' %}{% else %}{% url 'users:profile' %}{% endif %}"
+            class="scmd-user-card scmd-focus-ring flex items-center gap-3 w-full p-2.5 rounded-xl transition-all duration-300 text-left group outline-none"
+        >
+            <div class="scmd-user-card-avatar w-11 h-11 rounded-xl flex items-center justify-center text-white font-black shrink-0 overflow-hidden">
+                <span class="text-lg transition-transform group-hover:scale-110">{{ user.username|slice:":1"|upper }}</span>
+            </div>
+
+            <div class="sidebar-text flex-1 overflow-hidden">
+                <p class="text-sm font-black text-slate-100 truncate tracking-wide">
+                    {{ user.username }}
+                </p>
+                <div class="flex items-center gap-2 mt-1">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <p class="text-[9px] text-emerald-400 font-bold uppercase tracking-[0.15em]">Sẵn sàng</p>
+                </div>
+            </div>
+
+            <i class="fas fa-chevron-right text-[10px] text-slate-500 sidebar-text transition-all group-hover:translate-x-1 group-hover:text-white"></i>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         </a>
     </div>
     {% endif %}
@@ -65,6 +128,7 @@
             return;
         }
 
+<<<<<<< HEAD
         const arrow = document.getElementById("arrow-" + menuId);
         const isHidden = menu.classList.contains("hidden");
 
@@ -77,6 +141,20 @@
             });
 
             if (arrow) arrow.classList.add("rotate-90");
+=======
+        const arrow = document.getElementById('arrow-' + menuId);
+        const isHidden = menu.classList.contains('hidden');
+
+        if (isHidden) {
+            menu.classList.remove('hidden');
+            menu.style.opacity = '0';
+            requestAnimationFrame(() => {
+                menu.style.transition = 'opacity 0.3s ease-in-out';
+                menu.style.opacity = '1';
+            });
+
+            if (arrow) arrow.classList.add('rotate-90');
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
             setTimeout(() => {
                 let target = el;
@@ -84,12 +162,21 @@
                     target = menu.previousElementSibling;
                 }
                 if (target) {
+<<<<<<< HEAD
                     target.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
                 }
             }, 200);
         } else {
             menu.classList.add("hidden");
             if (arrow) arrow.classList.remove("rotate-90");
+=======
+                    target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
+                }
+            }, 200);
+        } else {
+            menu.classList.add('hidden');
+            if (arrow) arrow.classList.remove('rotate-90');
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         }
     }
 </script>

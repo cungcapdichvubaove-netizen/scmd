@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -11,6 +15,7 @@ Description: Cấu hình Admin Phân hệ Khách hàng (CRM) - Vertical Layout.
              UPGRADE: Tối ưu hiệu năng Query & Giao diện Trạng thái chuyên nghiệp.
 """
 
+<<<<<<< HEAD
 from django.contrib import admin, messages
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -32,6 +37,14 @@ from main.models import AuditLog
 from main.audit_utils import record_admin_audit_action
 from clients.application.customer_payment_permission_policy import CustomerPaymentPermissionPolicy
 from clients.application.customer_payment_use_cases import RecalculateReceivableStatusUseCase
+=======
+from django.contrib import admin
+from django.db import models
+from django.forms import TextInput, NumberInput, Textarea
+from django.utils.html import format_html
+from django.urls import reverse
+from .models import KhachHangTiemNang, CoHoiKinhDoanh, HopDong, MucTieu
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # --- CONFIG MÀU SẮC ĐỒNG BỘ HỆ THỐNG SCMD ---
 UI_COLORS = {
@@ -39,18 +52,25 @@ UI_COLORS = {
     'TIEM_NANG': '#f59e0b',     # Amber
     'CHOT_HOP_DONG': '#10b981', # Green
     'HUY': '#ef4444',           # Red
+<<<<<<< HEAD
     'LIENHE': '#0284c7',        # Sky
     'BAOGIA': '#7c3aed',        # Purple
     'THUONGLUONG': '#d97706',   # Amber/Orange
     'THANHCONG': '#10b981',     # Green
     'THATBAI': '#ef4444',       # Red
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     'HIEU_LUC': '#10b981',      # Emerald
     'SAP_HET_HAN': '#eab308',   # Yellow
     'DA_THANH_LY': '#64748b',   # Slate
 }
 
 def format_html_status(text, status_code):
+<<<<<<< HEAD
     """Định dạng badge trạng thái theo chuẩn SCMD Pro."""
+=======
+    """Định dạng Badge trạng thái theo chuẩn giao diện SCMD Erp"""
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     color = UI_COLORS.get(status_code, '#475569')
     return format_html(
         '<span style="background-color: {}; color: white; padding: 4px 10px; border-radius: 12px; '
@@ -59,6 +79,7 @@ def format_html_status(text, status_code):
         color, text
     )
 
+<<<<<<< HEAD
 
 def _safe_reverse(viewname, *, args=None, fallback="#"):
     """Reverse URL cho CTA trong admin, fallback an toàn nếu route chưa tồn tại."""
@@ -214,6 +235,8 @@ class HopDongQualityFilter(admin.SimpleListFilter):
             return queryset.annotate(_contract_target_count=Count("cac_muc_tieu", distinct=True)).filter(_contract_target_count__gt=0)
         return queryset
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 # --- 1. KHÁCH HÀNG TIỀM NĂNG ---
 class CoHoiInline(admin.TabularInline):
     model = CoHoiKinhDoanh
@@ -228,6 +251,7 @@ class CoHoiInline(admin.TabularInline):
 
 @admin.register(KhachHangTiemNang)
 class KhachHangTiemNangAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
     """Admin lead/khách hàng tiềm năng cho bộ phận kinh doanh.
 
     Mục tiêu: danh sách gọn, dễ lọc, CTA thật, không nhồi quá nhiều thông tin
@@ -265,6 +289,20 @@ class KhachHangTiemNangAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ("Thông tin khách hàng", {
+=======
+    list_display = ['ten_cong_ty', 'nguoi_lien_he', 'sdt', 'show_trang_thai', 'nguon', 'ngay_tao_vn']
+    list_filter = ['trang_thai', 'nguon', ('ngay_tao', admin.DateFieldListFilter)]
+    search_fields = ['ten_cong_ty', 'sdt', 'email', 'nguoi_lien_he']
+    inlines = [CoHoiInline]
+    save_on_top = True
+    list_per_page = 20
+    readonly_fields = ['ngay_tao']
+    search_help_text = "Tìm theo tên công ty, số điện thoại hoặc email khách hàng."
+
+    # LAYOUT DỌC (VERTICAL) - Đảm bảo căn chỉnh thẳng hàng
+    fieldsets = (
+        ("🏢 THÔNG TIN CHUNG", {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'description': "Thông tin pháp lý và định danh tổ chức khách hàng.",
             'fields': (
                 'ten_cong_ty',
@@ -274,15 +312,24 @@ class KhachHangTiemNangAdmin(admin.ModelAdmin):
                 'ngay_tao'
             )
         }),
+<<<<<<< HEAD
         ("Đầu mối liên hệ", {
             'description': "Người phụ trách liên hệ trực tiếp tại đơn vị khách hàng.",
+=======
+        ("👤 THÔNG TIN LIÊN HỆ", {
+            'description': "Đầu mối liên lạc trực tiếp tại đơn vị khách hàng.",
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'nguoi_lien_he',
                 'sdt',
                 'email',
             )
         }),
+<<<<<<< HEAD
         ("Ghi chú chăm sóc", {
+=======
+        ("📝 GHI CHÚ", {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'ghi_chu',
             )
@@ -290,6 +337,7 @@ class KhachHangTiemNangAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
+<<<<<<< HEAD
         qs = super().get_queryset(request)
         return qs.annotate(_opportunity_count=Count('cac_co_hoi_kinh_doanh', distinct=True))
 
@@ -377,6 +425,10 @@ class KhachHangTiemNangAdmin(admin.ModelAdmin):
             obj.pk,
         )
     row_actions.short_description = "Thao tác"
+=======
+        """Tối ưu hóa query tránh N+1 cho các trường liên quan nếu có"""
+        return super().get_queryset(request)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def ngay_tao_vn(self, obj):
         try:
@@ -391,6 +443,7 @@ class KhachHangTiemNangAdmin(admin.ModelAdmin):
             return "-"
         return format_html_status(obj.get_trang_thai_display(), obj.trang_thai)
     show_trang_thai.short_description = "Trạng thái"
+<<<<<<< HEAD
     show_trang_thai.admin_order_field = 'trang_thai'
 
     def mark_as_nurturing(self, request, queryset):
@@ -407,10 +460,13 @@ class KhachHangTiemNangAdmin(admin.ModelAdmin):
         updated = _apply_client_status_action(request, queryset, model_name='KhachHangTiemNang', target_status='HUY', note='Admin lead status to HUY')
         self.message_user(request, f"Đã đánh dấu {updated} khách hàng là Thất bại/Hủy.")
     mark_as_lost.short_description = "Đánh dấu Thất bại/Hủy"
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 # --- 2. CƠ HỘI KINH DOANH ---
 @admin.register(CoHoiKinhDoanh)
 class CoHoiKinhDoanhAdmin(admin.ModelAdmin):
+<<<<<<< HEAD
     """Admin pipeline/cơ hội kinh doanh.
 
     Mục tiêu: danh sách cơ hội phải giúp sales/admin nhận biết nhanh giai đoạn,
@@ -457,6 +513,17 @@ class CoHoiKinhDoanhAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Thông tin cơ hội", {
             'description': "Cơ hội kinh doanh là bước trung gian từ lead sang hợp đồng/mục tiêu bảo vệ.",
+=======
+    list_display = ['ten_co_hoi', 'link_khach_hang', 'show_gia_tri', 'show_trang_thai', 'nguoi_phu_trach', 'ngay_tao_vn']
+    list_filter = ['trang_thai', 'nguoi_phu_trach', 'ngay_tao']
+    search_fields = ['ten_co_hoi', 'khach_hang_tiem_nang__ten_cong_ty']
+    autocomplete_fields = ['khach_hang_tiem_nang']
+    save_on_top = True
+    readonly_fields = ['ngay_tao']
+
+    fieldsets = (
+        ("💎 CHI TIẾT CƠ HỘI", {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'ten_co_hoi',
                 'khach_hang_tiem_nang',
@@ -468,6 +535,7 @@ class CoHoiKinhDoanhAdmin(admin.ModelAdmin):
         }),
     )
 
+<<<<<<< HEAD
 
     def save_model(self, request, obj, form, change):
         obj._audit_user = request.user
@@ -562,11 +630,32 @@ class CoHoiKinhDoanhAdmin(admin.ModelAdmin):
         return format_html('<span class="scmd-opp-money">{} ₫</span>', f'{val:,.0f}')
     show_gia_tri.short_description = "Giá trị"
     show_gia_tri.admin_order_field = 'gia_tri_uoc_tinh'
+=======
+    def get_queryset(self, request):
+        """Sử dụng select_related để tối ưu hiệu suất truy vấn quan hệ"""
+        return super().get_queryset(request).select_related('khach_hang_tiem_nang', 'nguoi_phu_trach')
+
+    def link_khach_hang(self, obj):
+        if obj.khach_hang_tiem_nang:
+            try:
+                url = reverse("admin:clients_khachhangtiemnang_change", args=[obj.khach_hang_tiem_nang.id])
+                return format_html('<a href="{}" style="font-weight:bold; color:#3b82f6;">{}</a>', url, obj.khach_hang_tiem_nang.ten_cong_ty)
+            except Exception:
+                return obj.khach_hang_tiem_nang.ten_cong_ty
+        return "-"
+    link_khach_hang.short_description = "Khách hàng"
+
+    def show_gia_tri(self, obj):
+        val = obj.gia_tri_uoc_tinh or 0
+        return format_html('<span style="font-weight:600; color:#059669;">{:,.0f} ₫</span>', val)
+    show_gia_tri.short_description = "Giá trị dự kiến"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def show_trang_thai(self, obj):
         if not obj.trang_thai:
             return "-"
         return format_html_status(obj.get_trang_thai_display(), obj.trang_thai)
+<<<<<<< HEAD
     show_trang_thai.short_description = "Giai đoạn"
     show_trang_thai.admin_order_field = 'trang_thai'
 
@@ -585,12 +674,16 @@ class CoHoiKinhDoanhAdmin(admin.ModelAdmin):
             contract_cta,
         )
     row_actions.short_description = "Thao tác"
+=======
+    show_trang_thai.short_description = "Giai đoạn bán hàng"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def ngay_tao_vn(self, obj):
         return obj.ngay_tao.strftime('%d/%m/%Y') if obj.ngay_tao else "-"
     ngay_tao_vn.short_description = "Ngày tạo"
     ngay_tao_vn.admin_order_field = 'ngay_tao'
 
+<<<<<<< HEAD
     def mark_as_contacting(self, request, queryset):
         updated = _apply_client_status_action(request, queryset, model_name='CoHoiKinhDoanh', target_status=CoHoiKinhDoanh.TrangThai.LIEN_HE, note='Admin opportunity status to LIEN_HE')
         self.message_user(request, f"Đã chuyển {updated} cơ hội sang Đang liên hệ.")
@@ -616,6 +709,8 @@ class CoHoiKinhDoanhAdmin(admin.ModelAdmin):
         self.message_user(request, f"Đã đánh dấu {updated} cơ hội là Thất bại/Thua.")
     mark_as_lost.short_description = "Đánh dấu Thất bại"
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 # --- 3. HỢP ĐỒNG ---
 class MucTieuInline(admin.StackedInline):
     model = MucTieu
@@ -624,6 +719,7 @@ class MucTieuInline(admin.StackedInline):
     verbose_name = "Mục tiêu bảo vệ"
     verbose_name_plural = "📍 DANH SÁCH MỤC TIÊU THUỘC HỢP ĐỒNG"
 
+<<<<<<< HEAD
 class MucTieuDonGiaHistoryInline(admin.TabularInline):
     model = MucTieuDonGiaHistory
     extra = 0
@@ -692,6 +788,19 @@ class HopDongAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Thông tin hợp đồng", {
             'description': "Hợp đồng là điểm chuyển từ CRM sang vận hành mục tiêu, ca trực, đối soát và lương.",
+=======
+@admin.register(HopDong)
+class HopDongAdmin(admin.ModelAdmin):
+    list_display = ['so_hop_dong', 'khach_hang_info', 'ngay_hieu_luc_vn', 'ngay_het_han_vn', 'show_trang_thai']
+    list_filter = ['trang_thai', ('ngay_het_han', admin.DateFieldListFilter)]
+    search_fields = ['so_hop_dong', 'khach_hang_cu__ten_cong_ty']
+    inlines = [MucTieuInline]
+    autocomplete_fields = ['khach_hang_cu']
+    save_on_top = True
+
+    fieldsets = (
+        ("📜 THÔNG TIN HỢP ĐỒNG", {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'so_hop_dong',
                 'trang_thai',
@@ -701,7 +810,11 @@ class HopDongAdmin(admin.ModelAdmin):
                 'file_hop_dong'
             )
         }),
+<<<<<<< HEAD
         ("Thời hạn và hiệu lực", {
+=======
+        ("🕒 THỜI HẠN & HIỆU LỰC", {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'ngay_ky',
                 'ngay_hieu_luc',
@@ -710,6 +823,7 @@ class HopDongAdmin(admin.ModelAdmin):
         }),
     )
 
+<<<<<<< HEAD
 
     def save_model(self, request, obj, form, change):
         obj._audit_user = request.user
@@ -859,10 +973,20 @@ class HopDongAdmin(admin.ModelAdmin):
         return obj.khach_hang_cu.ten_cong_ty if obj.khach_hang_cu else "---"
     khach_hang_info.short_description = "Tên khách hàng"
 
+=======
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related('khach_hang_cu')
+
+    def khach_hang_info(self, obj): 
+        return obj.khach_hang_cu.ten_cong_ty if obj.khach_hang_cu else "---"
+    khach_hang_info.short_description = "Tên khách hàng"
+    
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def show_trang_thai(self, obj):
         if not obj.trang_thai:
             return "-"
         return format_html_status(obj.get_trang_thai_display(), obj.trang_thai)
+<<<<<<< HEAD
     show_trang_thai.short_description = "Trạng thái"
     show_trang_thai.admin_order_field = 'trang_thai'
 
@@ -870,15 +994,22 @@ class HopDongAdmin(admin.ModelAdmin):
         return obj.ngay_ky.strftime('%d/%m/%Y') if obj.ngay_ky else "-"
     ngay_ky_vn.short_description = "Ngày ký"
     ngay_ky_vn.admin_order_field = 'ngay_ky'
+=======
+    show_trang_thai.short_description = "Trạng thái hiệu lực"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def ngay_hieu_luc_vn(self, obj):
         return obj.ngay_hieu_luc.strftime('%d/%m/%Y') if obj.ngay_hieu_luc else "-"
     ngay_hieu_luc_vn.short_description = "Ngày hiệu lực"
+<<<<<<< HEAD
     ngay_hieu_luc_vn.admin_order_field = 'ngay_hieu_luc'
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def ngay_het_han_vn(self, obj):
         return obj.ngay_het_han.strftime('%d/%m/%Y') if obj.ngay_het_han else "-"
     ngay_het_han_vn.short_description = "Ngày hết hạn"
+<<<<<<< HEAD
     ngay_het_han_vn.admin_order_field = 'ngay_het_han'
 
     def _bulk_mark_status(self, request, queryset, target_status, success_label):
@@ -1243,6 +1374,20 @@ class MucTieuAdmin(admin.ModelAdmin):
 
     class Media:
         css = {'all': ('common/css/custom_admin.css', 'css/admin_tweaks.css')}
+=======
+
+# --- 4. MỤC TIÊU ---
+@admin.register(MucTieu)
+class MucTieuAdmin(admin.ModelAdmin):
+    list_display = ['ten_muc_tieu', 'hop_dong_link', 'quan_ly_muc_tieu', 'so_luong_nhan_vien', 'co_gps']
+    list_filter = ['quan_ly_muc_tieu', 'so_gio_mot_ngay']
+    search_fields = ['ten_muc_tieu', 'dia_chi', 'hop_dong__so_hop_dong']
+    autocomplete_fields = ['hop_dong', 'quan_ly_muc_tieu']
+    save_on_top = True
+
+    class Media:
+        css = { 'all': ('css/admin_tweaks.css',) }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     formfield_overrides = {
         models.FloatField: {'widget': NumberInput(attrs={'class': 'fix-gps-input', 'step': '0.000001'})},
@@ -1252,8 +1397,12 @@ class MucTieuAdmin(admin.ModelAdmin):
     }
 
     fieldsets = (
+<<<<<<< HEAD
         ("Cơ bản", {
             'description': "Thông tin định danh mục tiêu và người phụ trách triển khai vận hành.",
+=======
+        ("📌 CƠ BẢN", {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'hop_dong',
                 'ten_muc_tieu',
@@ -1262,16 +1411,26 @@ class MucTieuAdmin(admin.ModelAdmin):
                 'dia_chi'
             )
         }),
+<<<<<<< HEAD
         ("Cấu hình GPS", {
             'description': "Tọa độ và bán kính kiểm soát dùng cho check-in/check-out, tuần tra và đối soát GPS.",
+=======
+        ("📡 CẤU HÌNH GPS (GEOFENCING)", {
+            'description': "Thiết lập tọa độ địa lý để kiểm soát tuần tra (Check-in/Check-out).",
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'vi_do',
                 'kinh_do',
                 'ban_kinh_cho_phep'
             )
         }),
+<<<<<<< HEAD
         ("Chế độ và lương", {
             'description': "Thông số này ảnh hưởng trực tiếp đến tính lương, chuyên cần và khấu trừ. Cần đối soát trước khi khóa kỳ lương.",
+=======
+        ("💰 CHẾ ĐỘ & LƯƠNG", {
+            'description': "Cấu hình định mức lương và chế độ đặc thù tại mục tiêu.",
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'luong_khoan_bao_ve',
                 'so_gio_mot_ngay',
@@ -1281,7 +1440,11 @@ class MucTieuAdmin(admin.ModelAdmin):
                 'tru_nghi_3_ngay'
             )
         }),
+<<<<<<< HEAD
         ("Liên hệ tại mục tiêu", {
+=======
+        ("📞 LIÊN HỆ TẠI MỤC TIÊU", {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'fields': (
                 'nguoi_lien_he',
                 'sdt_lien_he'
@@ -1290,6 +1453,7 @@ class MucTieuAdmin(admin.ModelAdmin):
     )
 
     def get_queryset(self, request):
+<<<<<<< HEAD
         scoped_ids = SiteVisibilityPolicy.visible_sites(request.user).values_list("pk", flat=True)
         return (
             super()
@@ -1471,9 +1635,32 @@ class MucTieuAdmin(admin.ModelAdmin):
         if obj.hop_dong:
             url = _admin_change_url(obj.hop_dong, 'admin:clients_hopdong_change')
             return format_html('<a href="{}" style="font-weight:bold;">{}</a>', url, obj.hop_dong.so_hop_dong)
+=======
+        return super().get_queryset(request).select_related('hop_dong', 'quan_ly_muc_tieu')
+
+    def hop_dong_link(self, obj):
+        if obj.hop_dong:
+            try:
+                url = reverse("admin:clients_hopdong_change", args=[obj.hop_dong.id])
+                return format_html('<a href="{}" style="font-weight:bold;">{}</a>', url, obj.hop_dong.so_hop_dong)
+            except Exception:
+                return obj.hop_dong.so_hop_dong
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         return "-"
     hop_dong_link.short_description = "Hợp đồng kinh tế"
 
     def co_gps(self, obj):
+<<<<<<< HEAD
         return self.gps_summary(obj)
     co_gps.short_description = "Cấu hình GPS"
+=======
+        """Kiểm tra tình trạng cấu hình tọa độ mục tiêu"""
+        has_gps = obj.vi_do is not None and obj.kinh_do is not None
+        if has_gps:
+            return format_html(
+                '<b style="color: #10b981;"><i class="fas fa-map-marker-alt"></i> ✔ OK ({}m)</b>', 
+                obj.ban_kinh_cho_phep or 0
+            )
+        return format_html('<span style="color: #cbd5e1;">✘ Chưa có tọa độ</span>')
+    co_gps.short_description = "Cấu hình GPS"
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

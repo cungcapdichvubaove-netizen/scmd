@@ -3,6 +3,7 @@ register = template.Library()
 
 @register.filter
 def get_item(dictionary, key):
+<<<<<<< HEAD
     return dictionary.get(key)
 
 
@@ -23,3 +24,6 @@ def vn_weekday(value):
         return weekday_names[value.weekday()]
     except Exception:
         return ""
+=======
+    return dictionary.get(key)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

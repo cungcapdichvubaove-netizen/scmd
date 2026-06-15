@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 {% load static %}
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -7,7 +10,10 @@
     <style>
         body { font-family: "Times New Roman", serif; font-size: 14pt; line-height: 1.5; width: 210mm; margin: 0 auto; padding: 20mm; }
         .header { text-align: center; margin-bottom: 30px; }
+<<<<<<< HEAD
         .report-logo { max-height: 52px; max-width: 190px; object-fit: contain; margin-bottom: 10px; }
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         .header h3 { font-size: 16pt; font-weight: bold; margin: 0; }
         .signatures { margin-top: 50px; display: flex; justify-content: space-between; }
         .sig-block { text-align: center; width: 45%; }
@@ -19,8 +25,12 @@
         <button onclick="window.print()" style="padding:10px 20px; font-weight:bold;">🖨️ IN NGAY</button>
     </div>
     <div class="header">
+<<<<<<< HEAD
         <img src="{% static 'img/brand/logo-report-header.png' %}" class="report-logo" alt="SCMD Pro"><br>
         <strong>{{ COMPANY.display_name|default:"CÔNG TY DỊCH VỤ BẢO VỆ SCMD" }}</strong><br>{% if COMPANY.dia_chi %}<span style="font-size:11pt;">{{ COMPANY.dia_chi }}</span><br>{% endif %}{% if COMPANY.contact_phone %}<span style="font-size:11pt;">SĐT: {{ COMPANY.contact_phone }}</span><br>{% endif %}-----o0o-----<br><br>
+=======
+        <strong>CÔNG TY BẢO VỆ SCMD</strong><br>-----o0o-----<br><br>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         <h3>TỜ TRÌNH</h3>
         <p>V/v: {{ proposal.tieu_de }}</p>
     </div>

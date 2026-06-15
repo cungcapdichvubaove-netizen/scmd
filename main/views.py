@@ -1,4 +1,5 @@
 # file: main/views.py
+<<<<<<< HEAD
 import random
 from pathlib import PurePosixPath
 from urllib.parse import unquote
@@ -430,6 +431,15 @@ def _media_user_has_ops_or_inspection_access(user, relative_path):
             Q(hinh_anh_1=relative_path) | Q(hinh_anh_2=relative_path) | Q(file_ghi_am=relative_path)
         ).exists()
     return False
+=======
+from django.contrib import messages
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import AuthenticationForm
+from django.shortcuts import redirect, render
+
+from .dashboard_router import DashboardRouter
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 def homepage(request):
@@ -461,6 +471,7 @@ def central_hub(request):
     return redirect(decision.route_name)
 
 
+<<<<<<< HEAD
 @login_required
 def access_pending(request):
     """Safe landing page for authenticated users without a business role."""
@@ -619,6 +630,8 @@ def media_auth_view(request):
     return HttpResponse(status=403)
 
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 def login_view(request):
     """
     Xử lý đăng nhập.
@@ -626,6 +639,7 @@ def login_view(request):
     if request.user.is_authenticated:
         return redirect("main:central_hub")
 
+<<<<<<< HEAD
     submitted_username = _normalize_login_username(request.POST.get("username", "")) if request.method == "POST" else ""
     lock_until = _get_effective_login_lock_until(request, submitted_username)
     lock_message = _get_login_lock_message(lock_until) if lock_until else None
@@ -682,6 +696,27 @@ def login_view(request):
     )
     response["Cache-Control"] = "no-store"
     return response
+=======
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
+            user = authenticate(username=username, password=password)
+
+            if user is not None:
+                login(request, user)
+                next_url = request.GET.get("next", "main:central_hub")
+                return redirect(next_url)
+
+            messages.error(request, "Tài khoản hoặc mật khẩu không chính xác.")
+        else:
+            messages.error(request, "Vui lòng kiểm tra lại thông tin đăng nhập.")
+    else:
+        form = AuthenticationForm()
+
+    return render(request, "main/login.html", {"form": form})
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 def logout_view(request):
@@ -690,6 +725,7 @@ def logout_view(request):
     """
     logout(request)
     return redirect("main:login")
+<<<<<<< HEAD
 
 
 @require_GET
@@ -731,3 +767,5 @@ def healthcheck_view(request):
     )
     response["Cache-Control"] = "no-store"
     return response
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
@@ -21,3 +22,15 @@ __all__ = [
     "WorkerHeartbeat",
     "CompanyInfo",
 ]
+=======
+Compatibility exports for legacy imports.
+
+SSOT note:
+- `main.models.AuditLog` is the single authoritative audit model.
+- `main.models.WorkerHeartbeat` is the single authoritative worker monitor model.
+"""
+
+from main.models import AuditLog, WorkerHeartbeat
+
+__all__ = ["AuditLog", "WorkerHeartbeat"]
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -16,8 +20,13 @@ Description: Service xử lý logic Chấm công & Geofencing.
 from django.utils import timezone
 from django.contrib.gis.geos import Point
 # from django.contrib.gis.measure import Distance # Dùng khi query DB trực tiếp
+<<<<<<< HEAD
 from core.domain.geo import GeofenceEvaluator
 from operations.models import ChamCong, PhanCongCaTruc
+=======
+from operations.models import ChamCong, PhanCongCaTruc
+import math
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 class AttendanceService:
     """
@@ -33,6 +42,7 @@ class AttendanceService:
         if not point1 or not point2:
             return 0.0
         
+<<<<<<< HEAD
         try:
             return GeofenceEvaluator.calculate_distance_meters(
                 user_lat=point1.y,
@@ -40,6 +50,32 @@ class AttendanceService:
                 target_lat=point2.y,
                 target_lng=point2.x,
             )
+=======
+        # Nếu dùng srid=4326 (WGS84), distance trả về độ (degrees), cần tính toán lại
+        # Tuy nhiên, nếu model field có geography=True, DB sẽ xử lý.
+        # Ở tầng Python thuần (in-memory), ta có thể dùng tính toán thủ công hoặc thư viện geopy.
+        # Để đơn giản và không phụ thuộc lib ngoài chưa có trong requirements,
+        # ta giữ lại logic Haversine nhưng nhận input là Point object.
+        
+        # Lấy tọa độ từ Point (x=long, y=lat)
+        lon1, lat1 = point1.x, point1.y
+        lon2, lat2 = point2.x, point2.y
+        
+        # Haversine Formula
+        try:
+            R = 6371000  # Bán kính trái đất (mét)
+            phi1 = math.radians(lat1)
+            phi2 = math.radians(lat2)
+            delta_phi = math.radians(lat2 - lat1)
+            delta_lambda = math.radians(lon2 - lon1)
+
+            a = math.sin(delta_phi / 2.0) ** 2 + \
+                math.cos(phi1) * math.cos(phi2) * \
+                math.sin(delta_lambda / 2.0) ** 2
+            c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+            return R * c
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         except (ValueError, TypeError):
             return 0.0
 
@@ -147,4 +183,8 @@ class AttendanceService:
         
         return True, "Check-out thành công!", {
             "time": cham_cong.thoi_gian_check_out
+<<<<<<< HEAD
         }
+=======
+        }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

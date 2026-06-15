@@ -11,6 +11,7 @@
 
     <title>{% block title %}SCMD Pro{% endblock %}</title>
 
+<<<<<<< HEAD
     <link rel="icon" href="{% static 'img/brand/favicon.ico' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/brand/favicon-16x16.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/brand/favicon-32x32.png' %}">
@@ -30,6 +31,22 @@
     <style>
         body {
             font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+=======
+    <link rel="icon" type="image/png" href="{% static 'img/logo_moi.png' %}">
+    <meta name="theme-color" content="#0f172a">
+
+    {% tailwind_css %}
+    <link rel="stylesheet" href="{% static 'common/css/brand_system.css' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             -webkit-font-smoothing: antialiased;
         }
 
@@ -48,6 +65,7 @@
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
+<<<<<<< HEAD
         @keyframes pulseLoader {
             0%, 100% { transform: scale(1); opacity: 0.92; }
             50% { transform: scale(1.06); opacity: 1; }
@@ -109,6 +127,52 @@
         document.addEventListener("DOMContentLoaded", function () {
             const currentPath = window.location.pathname;
             if (currentPath.includes("logout")) {
+=======
+        .animate-enter {
+            animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="scmd-public-shell p-4 md:p-6">
+    <div id="global-loader" class="loader-overlay">
+        <div class="flex flex-col items-center">
+            <i class="fas fa-shield-halved fa-beat text-blue-400 text-4xl mb-4"></i>
+            <p class="text-white text-sm font-bold tracking-[0.2em]">HỆ THỐNG ĐANG XỬ LÝ</p>
+        </div>
+    </div>
+
+    <div class="w-full max-w-md animate-enter">
+        <header class="text-center mb-8">
+            <div class="inline-block relative">
+                <img src="{% static 'img/logo_moi.png' %}" alt="Logo" class="w-20 h-20 mx-auto mb-4 drop-shadow-2xl">
+                <div class="absolute inset-0 bg-blue-400/15 blur-2xl -z-10 rounded-full"></div>
+            </div>
+            <h1 class="text-3xl font-black text-white tracking-tight">SCMD Pro</h1>
+            <p class="scmd-public-kicker text-xs mt-1 uppercase tracking-[0.3em]">Phần mềm chỉ huy và quản trị vận hành</p>
+        </header>
+
+        <main class="scmd-public-card rounded-[2.5rem] p-8 md:p-10">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="text-center mt-12">
+            <p class="scmd-public-footer text-[10px] font-bold uppercase tracking-widest">
+                &copy; 2026 SCMD Pro
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.querySelectorAll('form').forEach(form => {
+            form.addEventListener('submit', function() {
+                document.getElementById('global-loader').style.display = 'flex';
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPath = window.location.pathname;
+            if (currentPath.includes('logout')) {
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 window.sessionStorage.clear();
                 window.localStorage.clear();
                 setTimeout(() => {
@@ -117,6 +181,9 @@
             }
         });
     </script>
+<<<<<<< HEAD
     <script defer src="{% static 'pwa/pwa-register.js' %}"></script>
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 </body>
 </html>

@@ -1,25 +1,41 @@
 # file: accounting/models_soquy.py
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
 File: accounting/models_soquy.py
 Author: Mr. Anh
 Created Date: 2025-11-30
+<<<<<<< HEAD
 Updated Date: 2026-06-03
 Version: v3.5.0
+=======
+Updated Date: 2026-04-28
+Version: v1.1.0
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 Description: Model quản lý Sổ Quỹ (Thu/Chi) với quy trình Duyệt.
 """
 
 from django.db import models
 from django.utils import timezone
+<<<<<<< HEAD
 from core.managers import TenantAwareManager, TenantScopedModel
 from users.models import NhanVien
 from clients.models import HopDong
 
 class SoQuy(TenantScopedModel):
+=======
+from users.models import NhanVien
+from clients.models import HopDong
+
+class SoQuy(models.Model):
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     LOAI_PHIEU = [('THU', 'Phiếu Thu'), ('CHI', 'Phiếu Chi')]
     HANG_MUC = [
         ('TAM_UNG', 'Chi tạm ứng lương'),
@@ -54,8 +70,12 @@ class SoQuy(TenantScopedModel):
     nguoi_lap = models.ForeignKey("users.NhanVien", on_delete=models.SET_NULL, null=True, blank=True, related_name="cac_phieu_lap", verbose_name="Người lập")
     nguoi_duyet = models.ForeignKey("users.NhanVien", on_delete=models.SET_NULL, null=True, blank=True, related_name="cac_phieu_duyet", verbose_name="Kế toán trưởng duyệt")
 
+<<<<<<< HEAD
     objects = TenantAwareManager()
 
 
     class Meta: verbose_name = "Sổ Thu Chi"; verbose_name_plural = "Sổ Quỹ Tiền Mặt/Ngân Hàng"; ordering = ['-ngay_lap']; indexes = [models.Index(fields=["tenant_id", "ngay_lap"])]
+=======
+    class Meta: verbose_name = "Sổ Thu Chi"; verbose_name_plural = "Sổ Quỹ Tiền Mặt/Ngân Hàng"; ordering = ['-ngay_lap']
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def __str__(self): return f"{self.ma_phieu} - {self.so_tien:,.0f}"

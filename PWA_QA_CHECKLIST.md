@@ -57,7 +57,11 @@ Mục tiêu: xác nhận SCMD Pro PWA hoạt động ổn định trên public e
 
 - Login/public shell hiển thị tên **SCMD**.
 - Tagline hiển thị đúng khi có không gian: **Nền tảng chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp**.
+<<<<<<< HEAD
 - Public entry và mobile shell dùng đúng SCMD Pro, không còn brand/copy cũ kiểu cyber-console.
+=======
+- Không còn `SCMD Pro`, `War Room`, `Sentinel`, `Tactical` trên public entry và mobile shell.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 - Icon/app name/manifest nếu sửa phải thống nhất theo SCMD.
 
 ## 8. Regression safety

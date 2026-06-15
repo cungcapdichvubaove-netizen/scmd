@@ -10,8 +10,12 @@ from django.utils import timezone
 from django.conf import settings
 from asgiref.sync import async_to_sync
 from channels.layers import get_channel_layer
+<<<<<<< HEAD
 from core.domain.geo import GeofenceEvaluator
 from operations.application.alive_check_policies import AliveCheckPhotoPolicy
+=======
+from core.domain.geo import validate_geofence
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from operations.models import KiemTraQuanSo
 from main.decorators import application_audit_log
 from main.models import AuditLog
@@ -78,6 +82,7 @@ class ProcessAliveCheckResponseUseCase:
     Thực hiện so khớp tọa độ GPS và Device ID để phát hiện gian lận.
     """
     @staticmethod
+<<<<<<< HEAD
     @application_audit_log(
         module='operations',
         model_name='KiemTraQuanSo',
@@ -85,6 +90,9 @@ class ProcessAliveCheckResponseUseCase:
         object_id_field='check_id'
     )
     def execute(check_id: str, lat: float, lon: float, device_id: str, user, anh_selfie=None) -> tuple[bool, str]:
+=======
+    def execute(check_id: str, lat: float, lon: float, device_id: str, anh_selfie=None) -> tuple[bool, str]:
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         tenant_id = settings.SCMD_ORGANIZATION_ID
         
         try:
@@ -100,13 +108,18 @@ class ProcessAliveCheckResponseUseCase:
                     return False, "Yêu cầu này đã được xử lý hoặc không còn hiệu lực."
 
                 muc_tieu = check_req.ca_truc.vi_tri_chot.muc_tieu
+<<<<<<< HEAD
                 geofence_result = GeofenceEvaluator.validate(
+=======
+                is_valid_geo, distance = validate_geofence(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                     user_lat=lat, 
                     user_lng=lon,
                     target_lat=muc_tieu.vi_do, 
                     target_lng=muc_tieu.kinh_do,
                     radius_m=muc_tieu.ban_kinh_cho_phep
                 )
+<<<<<<< HEAD
                 is_valid_geo = geofence_result.is_within_radius
                 distance = geofence_result.distance_meters
 
@@ -120,6 +133,15 @@ class ProcessAliveCheckResponseUseCase:
                 check_req.thoi_gian_phan_hoi = timezone.now()
                 check_req.toa_do_xac_thuc = f"{lat},{lon}|distance={round(distance, 2)}"
                 check_req.device_id_xac_thuc = device_id
+=======
+
+                nhan_vien = check_req.ca_truc.nhan_vien
+
+                check_req.thoi_gian_phan_hoi = timezone.now()
+                check_req.toa_do_xac_thuc = (
+                    f"{lat},{lon}|device={device_id}|distance={round(distance, 2)}"
+                )
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 if anh_selfie:
                     check_req.anh_xac_thuc = anh_selfie
 
@@ -132,6 +154,25 @@ class ProcessAliveCheckResponseUseCase:
 
                 check_req.save()
 
+<<<<<<< HEAD
+=======
+                # 7. Ghi Audit Log (Rule 8)
+                AuditLog.objects.create(
+                    action='UPDATE',
+                    module='operations',
+                    model_name='KiemTraQuanSo',
+                    object_id=str(check_req.id),
+                    note=f"Phản hồi Alive Check: {nhan_vien.ho_ten}. Kết quả: {check_req.trang_thai}",
+                    tenant_id=tenant_id,
+                    changes={
+                        "status": check_req.trang_thai,
+                        "distance": distance,
+                        "device_id": device_id,
+                        "is_valid_geo": is_valid_geo,
+                    }
+                )
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 return (check_req.trang_thai == 'OK'), result_msg
 
         except KiemTraQuanSo.DoesNotExist:
@@ -143,7 +184,11 @@ class ProcessAliveCheckResponseUseCase:
 class GetRecentAliveCheckViolationsUseCase:
     """
     UseCase: Truy vấn danh sách các vụ vi phạm điểm danh đột xuất mới nhất.
+<<<<<<< HEAD
     Hỗ trợ đối soát tại Bảng điều hành vận hành.
+=======
+    Hỗ trợ đối soát tại War Room.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """
     @staticmethod
     def execute(tenant_id: str, limit: int = 20):

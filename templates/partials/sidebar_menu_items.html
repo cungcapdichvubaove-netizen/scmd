@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% load navigation_access %}
 {% with current_app=request.resolver_match.app_name current_namespace=request.resolver_match.namespace current_url_name=request.resolver_match.url_name %}
 {% shell_route_allowed user 'dashboard:main' as can_access_overview %}
@@ -135,3 +136,112 @@
 </div>
 
 {% endwith %}
+=======
+<div class="mb-5">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
+        Tổng quan
+    </p>
+
+    <a href="{% url 'dashboard:main' %}" title="Tổng quan vận hành" class="scmd-nav-link {% if '/dashboard/' in request.path and '/operations/' not in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-th-large text-sm"></i>
+        </div>
+        <span class="sidebar-text">Tổng quan</span>
+    </a>
+</div>
+
+<div class="mb-5">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
+        Vận hành
+    </p>
+
+    <a href="{% url 'operations:dashboard_vanhanh' %}" title="Dashboard vận hành" class="scmd-nav-link {% if 'operations/dashboard' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-map-marked-alt text-sm"></i>
+        </div>
+        <span class="sidebar-text">Bản đồ live</span>
+    </a>
+
+    <a href="{% url 'operations:xep_lich' %}" title="Xếp lịch trực" class="scmd-nav-link {% if 'xep-lich' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="far fa-calendar-alt text-sm"></i>
+        </div>
+        <span class="sidebar-text">Xếp lịch trực</span>
+    </a>
+
+    <a href="{% url 'inspection:dashboard' %}" title="Thanh tra và tuần tra" class="scmd-nav-link {% if 'inspection' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-user-secret text-sm"></i>
+        </div>
+        <span class="sidebar-text">Thanh tra & Tuần tra</span>
+    </a>
+</div>
+
+<div class="mb-5">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
+        Kinh doanh
+    </p>
+    <a href="{% url 'clients:dashboard_crm' %}" title="CRM và hợp đồng" class="scmd-nav-link {% if 'clients' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-chart-pie text-sm"></i>
+        </div>
+        <span class="sidebar-text">CRM & Hợp đồng</span>
+    </a>
+</div>
+
+<div class="mb-5">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
+        Nhân sự
+    </p>
+    <a href="{% url 'users:dashboard' %}" title="Hồ sơ nhân viên và đào tạo" class="scmd-nav-link {% if 'users' in request.path and 'profile' not in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-users text-sm"></i>
+        </div>
+        <span class="sidebar-text">Hồ sơ & Đào tạo</span>
+    </a>
+</div>
+
+<div class="mb-5">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
+        Văn phòng số
+    </p>
+    <a href="{% url 'workflow:dashboard' %}" title="Công việc và đề xuất" class="scmd-nav-link {% if 'workflow' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-tasks text-sm"></i>
+        </div>
+        <span class="sidebar-text">Công việc & Đề xuất</span>
+    </a>
+</div>
+
+<div class="mb-5">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
+        Tài chính & Kho
+    </p>
+
+    <a href="{% url 'accounting:dashboard' %}" title="Kế toán và lương" class="scmd-nav-link {% if 'accounting' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group mb-1">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-file-invoice-dollar text-sm"></i>
+        </div>
+        <span class="sidebar-text">Kế toán & Lương</span>
+    </a>
+
+    <a href="{% url 'inventory:dashboard' %}" title="Kho và vật tư" class="scmd-nav-link {% if 'inventory' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-boxes text-sm"></i>
+        </div>
+        <span class="sidebar-text">Kho & Vật tư</span>
+    </a>
+</div>
+
+<div class="mb-5">
+    <p class="scmd-sidebar-section px-4 text-[10px] font-extrabold uppercase tracking-[0.2em] mb-3 sidebar-text opacity-80">
+        Báo cáo
+    </p>
+    <a href="{% url 'reports:report_dashboard' %}" title="Báo cáo tổng hợp" class="scmd-nav-link {% if 'reports' in request.path %}scmd-nav-link-active{% endif %} flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 group">
+        <div class="scmd-nav-icon w-8 h-8 flex items-center justify-center rounded-lg transition-colors">
+            <i class="fas fa-chart-line text-sm"></i>
+        </div>
+        <span class="sidebar-text">Báo cáo tổng hợp</span>
+    </a>
+</div>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

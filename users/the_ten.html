@@ -1,0 +1,18 @@
+<style>
+    @page { size: 54mm 86mm; margin: 0; }
+    .card { width: 54mm; height: 86mm; background: #1e293b; color: white; text-align: center; font-family: sans-serif; }
+    .header { padding: 10px; background: #0f172a; font-size: 10px; font-weight: bold; }
+    .avatar { width: 35mm; height: 45mm; margin: 10px auto; border: 2px solid white; object-fit: cover; }
+    .name { font-size: 14px; text-transform: uppercase; font-weight: bold; margin: 5px 0; }
+    .id { font-size: 12px; color: #94a3b8; }
+    .position { font-size: 10px; margin-top: 5px; color: #3b82f6; }
+    .footer { position: absolute; bottom: 5px; width: 100%; font-size: 8px; opacity: 0.7; }
+</style>
+<div class="card">
+    <div class="header">SECURITY COMMANDER (SCMD)</div>
+    <img src="{{ nv.avatar_url }}" class="avatar">
+    <div class="name">{{ nv.ho_ten }}</div>
+    <div class="id">ID: {{ nv.ma_nhan_vien }}</div>
+    <div class="position">{{ nv.chuc_danh|default:"NHÂN VIÊN AN NINH" }}</div>
+    <div class="footer">Ngày cấp: {{ now|date:"d/m/Y" }}</div>
+</div>

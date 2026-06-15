@@ -1,7 +1,11 @@
 # file: main/urls.py
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -12,12 +16,22 @@ Description: Định tuyến URL cho ứng dụng Main.
              UPDATED: Thêm Password Change views để fix lỗi NoReverseMatch.
 """
 
+<<<<<<< HEAD
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
+=======
+from django.urls import path
+from django.contrib.auth import views as auth_views
+from . import views
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 app_name = 'main'
 
@@ -25,8 +39,11 @@ urlpatterns = [
     # 1. Trang chủ & Điều hướng
     path('', views.homepage, name='homepage'),
     path('hub/', views.central_hub, name='central_hub'),
+<<<<<<< HEAD
     path('access-pending/', views.access_pending, name='access_pending'),
     path('api/v1/health/', views.healthcheck_view, name='healthcheck'),
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     # 2. Xác thực (Auth)
     path('login/', views.login_view, name='login'),
@@ -77,4 +94,8 @@ urlpatterns = [
 # Thêm đoạn này vào cuối file để hiển thị ảnh
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+<<<<<<< HEAD
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+=======
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

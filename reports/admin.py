@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
@@ -27,7 +31,11 @@ class BaoCaoAdmin(admin.ModelAdmin):
 
     def changelist_view(self, request, extra_context=None):
         """
+<<<<<<< HEAD
         Điều hướng trực tiếp tới bảng điều hành.
+=======
+        Điều hướng trực tiếp tới Dashboard.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         """
         try:
             # Ưu tiên URL chính xác trong urls.py
@@ -39,7 +47,11 @@ class BaoCaoAdmin(admin.ModelAdmin):
                 target_url = reverse("reports:dashboard")
                 return HttpResponseRedirect(target_url)
             except NoReverseMatch:
+<<<<<<< HEAD
                 self.message_user(request, _("Lỗi: Không tìm thấy trang bảng điều hành."), level='error')
+=======
+                self.message_user(request, _("Lỗi: Không tìm thấy trang Dashboard."), level='error')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 return super().changelist_view(request, extra_context)
 
     # --- GIẢI PHÁP CHO DOCKER: CHẶN TRUY VẤN DATABASE ---

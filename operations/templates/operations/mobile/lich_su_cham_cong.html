@@ -1,6 +1,11 @@
 {# file: operations/templates/operations/mobile/lich_su_cham_cong.html #}
+<<<<<<< HEAD
 {% extends "mobile/base.html" %}
 {% load static humanize custom_filters %}
+=======
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+{% load static humanize %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 {% block title %}Bảng công tháng {{ thang }}{% endblock %}
 
@@ -26,7 +31,11 @@
                 <div class="flex justify-between items-start">
                     <div>
                         <div class="font-bold text-slate-700">{{ item.ngay_truc|date:"d/m/Y" }}</div>
+<<<<<<< HEAD
                         <div class="text-xs text-slate-400">{{ item.ngay_truc|vn_weekday }}</div>
+=======
+                        <div class="text-xs text-slate-400">{{ item.ngay_truc|date:"l" }}</div>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                     </div>
                     {% if item.chamcong.thoi_gian_check_out %}
                         <span class="badge badge-success badge-sm text-white">Hoàn thành</span>
@@ -71,4 +80,8 @@
         {% endfor %}
     </div>
 </div>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

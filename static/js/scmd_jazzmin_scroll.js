@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /*
  * SCMD admin sidebar normalization for Jazzmin/AdminLTE.
  * Scope:
@@ -7,11 +8,20 @@
  * - refine user panel role label
  * - keep active item expanded and centered
  */
+=======
+/* File: static/js/scmd_jazzmin_scroll.js
+Description: Sidebar enhancement cho Jazzmin/AdminLTE.
+             Tính năng: làm sạch nhãn, phân nhóm menu, badge sidebar,
+             chuyển account card xuống footer, auto-expand, snap-scroll.
+             Updated: 2026-06-02 - admin sidebar shell refinement.
+*/
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 document.addEventListener("DOMContentLoaded", function () {
     "use strict";
 
     const sidebarContainer = document.querySelector(".sidebar");
+<<<<<<< HEAD
 
     const sharedTextMap = (window.SCMDAdminLocalization && window.SCMDAdminLocalization.textMap) || {};
     const jazzminTextMap = {
@@ -66,6 +76,18 @@ document.addEventListener("DOMContentLoaded", function () {
     function normalizeWhitespace(text) {
         return text.replace(/\s+/g, " ").trim();
     }
+=======
+    const TEXT_REPLACEMENTS = new Map([
+        ["Account", "Tài khoản"],
+        ["Change password", "Đổi mật khẩu"],
+        ["Log out", "Đăng xuất"],
+        ["See Profile", "Xem hồ sơ"],
+        ["Dashboard", "Bảng điều khiển"],
+        ["Jazzmin version", "Phiên bản Jazzmin"],
+        ["All rights reserved.", "Đã đăng ký mọi quyền."],
+        ["Choose language", "Chọn ngôn ngữ"],
+    ]);
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     function replaceExactText(root) {
         if (!root) {
@@ -89,15 +111,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.querySelectorAll('input[placeholder^="Search"]').forEach((input) => {
             const current = input.getAttribute("placeholder") || "";
+<<<<<<< HEAD
             input.setAttribute("placeholder", current.replace(/^Search\s*/u, "T\u00ecm ki\u1ebfm "));
 
             const aria = input.getAttribute("aria-label") || "";
             if (aria) {
                 input.setAttribute("aria-label", aria.replace(/^Search\s*/u, "T\u00ecm ki\u1ebfm "));
+=======
+            input.setAttribute("placeholder", current.replace(/^Search\s*/u, "Tìm kiếm "));
+            const aria = input.getAttribute("aria-label") || "";
+            if (aria) {
+                input.setAttribute("aria-label", aria.replace(/^Search\s*/u, "Tìm kiếm "));
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             }
         });
 
         document.querySelectorAll('[title="Choose language"]').forEach((node) => {
+<<<<<<< HEAD
             node.setAttribute("title", "Ch\u1ecdn ng\u00f4n ng\u1eef");
         });
 
@@ -114,6 +144,72 @@ document.addEventListener("DOMContentLoaded", function () {
                 option.textContent = TEXT_REPLACEMENTS.get(text);
             }
         });
+=======
+            node.setAttribute("title", "Chọn ngôn ngữ");
+        });
+    }
+
+    localizeAdminChrome();
+
+    if (!sidebarContainer) {
+        return;
+    }
+
+    const NAV_SECTION_MAP = [
+        {
+            title: "Tổng quan",
+            labels: ["Bảng điều khiển"],
+        },
+        {
+            title: "Vận hành",
+            labels: [
+                "Quản lý kinh doanh",
+                "Điều hành & giám sát",
+                "Thanh tra & tuần tra",
+            ],
+        },
+        {
+            title: "Nhân sự & tài chính",
+            labels: [
+                "Quản trị nhân sự",
+                "Tài chính & kế toán",
+                "Quản lý kho & vật tư",
+            ],
+        },
+        {
+            title: "Hệ thống",
+            labels: [
+                "Báo cáo & thống kê",
+                "Lịch trình tự động",
+                "Kết quả tác vụ",
+                "Văn phòng số",
+            ],
+        },
+        {
+            title: "Quản trị",
+            labels: ["Quản trị hệ thống", "Cấu hình chung"],
+        },
+    ];
+
+    const LABEL_REPLACEMENTS = {
+        "QUẢN TRỊ HỆ THỐNG": "Quản trị hệ thống",
+        "CẤU HÌNH CHUNG": "Cấu hình chung",
+        "QUẢN TRỊ NHÂN SỰ": "Quản trị nhân sự",
+        "QUẢN LÝ KINH DOANH": "Quản lý kinh doanh",
+        "ĐIỀU HÀNH & GIÁM SÁT": "Điều hành & giám sát",
+        "THANH TRA & TUẦN TRA": "Thanh tra & tuần tra",
+        "TÀI CHÍNH & KẾ TOÁN": "Tài chính & kế toán",
+        "QUẢN LÝ KHO & VẬT TƯ": "Quản lý kho & vật tư",
+        "VĂN PHÒNG SỐ": "Văn phòng số",
+        "BÁO CÁO & THỐNG KÊ": "Báo cáo & thống kê",
+        "LỊCH TRÌNH TỰ ĐỘNG": "Lịch trình tự động",
+        "KẾT QUẢ TÁC VỤ": "Kết quả tác vụ",
+        "DASHBOARD": "Bảng điều khiển",
+    };
+
+    function normalizeWhitespace(text) {
+        return text.replace(/\s+/g, " ").trim();
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     }
 
     function cleanLabel(rawText) {
@@ -128,6 +224,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const upper = normalized.toUpperCase();
+<<<<<<< HEAD
         return LABEL_REPLACEMENTS[upper] || normalized;
     }
 
@@ -162,6 +259,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function enhanceSidebarNavigation() {
         const navSidebar = sidebarContainer ? sidebarContainer.querySelector(".nav-sidebar") : null;
+=======
+        if (LABEL_REPLACEMENTS[upper]) {
+            return LABEL_REPLACEMENTS[upper];
+        }
+
+        return normalized;
+    }
+
+    function findLinkLabelNode(link) {
+        return link.querySelector("p, span");
+    }
+
+    function enhanceSidebarNavigation() {
+        const navSidebar = sidebarContainer.querySelector(".nav-sidebar");
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         if (!navSidebar) {
             return;
         }
@@ -172,7 +284,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const itemMetadata = topLevelItems.map((item) => {
             const link = item.querySelector(":scope > .nav-link");
+<<<<<<< HEAD
             const labelNode = link ? findLabelNode(link) : null;
+=======
+            const labelNode = link ? findLinkLabelNode(link) : null;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             const rawLabel = labelNode ? labelNode.textContent : "";
             const cleanedLabel = cleanLabel(rawLabel);
 
@@ -185,12 +301,21 @@ document.addEventListener("DOMContentLoaded", function () {
                 link.dataset.scmdLabel = cleanedLabel;
             }
 
+<<<<<<< HEAD
             item.querySelectorAll(".nav-treeview .nav-link").forEach((subLink) => {
                 const subLabelNode = findLabelNode(subLink);
                 if (!subLabelNode) {
                     return;
                 }
 
+=======
+            const subLinks = item.querySelectorAll(".nav-treeview .nav-link");
+            subLinks.forEach((subLink) => {
+                const subLabelNode = findLinkLabelNode(subLink);
+                if (!subLabelNode) {
+                    return;
+                }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 const subCleaned = cleanLabel(subLabelNode.textContent);
                 subLabelNode.textContent = subCleaned;
                 subLink.setAttribute("title", subCleaned);
@@ -199,12 +324,21 @@ document.addEventListener("DOMContentLoaded", function () {
             return { item, cleanedLabel };
         });
 
+<<<<<<< HEAD
         dedupeSidebarLinks(navSidebar);
 
         navSidebar.querySelectorAll(".scmd-sidebar-group").forEach((node) => node.remove());
 
         NAV_SECTION_MAP.forEach((section) => {
             const firstMatch = itemMetadata.find(({ cleanedLabel }) => section.labels.includes(cleanedLabel));
+=======
+        navSidebar.querySelectorAll(".scmd-sidebar-group").forEach((node) => node.remove());
+
+        NAV_SECTION_MAP.forEach((section) => {
+            const firstMatch = itemMetadata.find(
+                ({ cleanedLabel }) => section.labels.includes(cleanedLabel),
+            );
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             if (!firstMatch) {
                 return;
             }
@@ -217,6 +351,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function attachSidebarBadges() {
+<<<<<<< HEAD
         if (!sidebarContainer) {
             return;
         }
@@ -225,12 +360,21 @@ document.addEventListener("DOMContentLoaded", function () {
         const badgeConfig = {
             "L\u1ecbch tr\u00ecnh t\u1ef1 \u0111\u1ed9ng": runtime.periodicEnabled,
             "K\u1ebft qu\u1ea3 t\u00e1c v\u1ee5": runtime.taskAlerts,
+=======
+        const runtime = window.SCMDAdminSidebarData || {};
+        const badgeConfig = {
+            "Lịch trình tự động": runtime.periodicEnabled,
+            "Kết quả tác vụ": runtime.taskAlerts,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         };
 
         sidebarContainer.querySelectorAll(".nav-link[data-scmd-label]").forEach((link) => {
             const label = link.dataset.scmdLabel;
             const count = badgeConfig[label];
+<<<<<<< HEAD
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             if (!count || count < 1 || link.querySelector(".scmd-sidebar-badge")) {
                 return;
             }
@@ -243,6 +387,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function enhanceUserPanel() {
+<<<<<<< HEAD
         if (!sidebarContainer) {
             return;
         }
@@ -252,6 +397,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         const shellConfig = window.SCMDAdminShell || {};
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         const userPanel = sidebarContainer.querySelector(".user-panel");
         const nav = sidebarContainer.querySelector("nav.mt-2");
 
@@ -263,11 +410,16 @@ document.addEventListener("DOMContentLoaded", function () {
         footer.className = "scmd-sidebar-footer";
 
         const profileLink = userPanel.querySelector(".info a");
+<<<<<<< HEAD
+=======
+        const profileHref = profileLink ? profileLink.getAttribute("href") : null;
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         const infoNode = userPanel.querySelector(".info");
 
         if (infoNode && !infoNode.querySelector(".scmd-sidebar-role")) {
             const role = document.createElement("span");
             role.className = "scmd-sidebar-role";
+<<<<<<< HEAD
             role.textContent = "Quản trị kỹ thuật";
             infoNode.appendChild(role);
         }
@@ -470,10 +622,73 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
             markClosed();
+=======
+            role.textContent = "Quản trị viên";
+            infoNode.appendChild(role);
+        }
+
+        userPanel.classList.add("scmd-sidebar-user-toggle");
+        userPanel.setAttribute("tabindex", "0");
+
+        const menu = document.createElement("div");
+        menu.className = "scmd-sidebar-user-menu";
+
+        const links = [];
+        if (profileHref) {
+            links.push({ href: profileHref, label: "Hồ sơ", icon: "fas fa-id-badge" });
+        }
+        links.push({ href: "/admin/password_change/", label: "Đổi mật khẩu", icon: "fas fa-key" });
+        links.push({ href: "/admin/logout/", label: "Đăng xuất", icon: "fas fa-sign-out-alt", danger: true });
+
+        links.forEach((item) => {
+            const anchor = document.createElement("a");
+            anchor.href = item.href;
+            anchor.className = "scmd-sidebar-user-action";
+            if (item.danger) {
+                anchor.classList.add("is-danger");
+            }
+            anchor.innerHTML = `<i class="${item.icon}"></i><span>${item.label}</span>`;
+            menu.appendChild(anchor);
+        });
+
+        footer.appendChild(userPanel);
+        footer.appendChild(menu);
+        sidebarContainer.appendChild(footer);
+
+        const closeMenu = () => {
+            userPanel.classList.remove("is-open");
+            menu.classList.remove("is-open");
+        };
+
+        const toggleMenu = (event) => {
+            if (event.target.closest(".scmd-sidebar-user-action")) {
+                return;
+            }
+            event.preventDefault();
+            userPanel.classList.toggle("is-open");
+            menu.classList.toggle("is-open");
+        };
+
+        userPanel.addEventListener("click", toggleMenu);
+        userPanel.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+                toggleMenu(event);
+            }
+            if (event.key === "Escape") {
+                closeMenu();
+            }
+        });
+
+        document.addEventListener("click", (event) => {
+            if (!userPanel.contains(event.target) && !menu.contains(event.target)) {
+                closeMenu();
+            }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         });
     }
 
     function autoExpandAndScroll() {
+<<<<<<< HEAD
         if (!sidebarContainer) {
             return;
         }
@@ -482,6 +697,14 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!activeLink) {
             activeLink = sidebarContainer.querySelector(".nav-link.active");
         }
+=======
+        let activeLink = sidebarContainer.querySelector(".nav-treeview .nav-link.active");
+
+        if (!activeLink) {
+            activeLink = sidebarContainer.querySelector(".nav-link.active");
+        }
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         if (!activeLink) {
             return;
         }
@@ -522,8 +745,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     top: targetScrollTop,
                     behavior: "auto",
                 });
+<<<<<<< HEAD
             } catch (error) {
                 console.error("SCMD sidebar scroll error:", error);
+=======
+            } catch (err) {
+                console.error("SCMD sidebar scroll error:", err);
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             }
         };
 
@@ -532,6 +760,7 @@ document.addEventListener("DOMContentLoaded", function () {
         window.addEventListener("load", () => setTimeout(scrollToActive, 100));
     }
 
+<<<<<<< HEAD
     localizeAdminChrome();
     enhanceSidebarNavigation();
     attachSidebarBadges();
@@ -539,4 +768,11 @@ document.addEventListener("DOMContentLoaded", function () {
     enhanceSidebarAccountPopover();
     enhanceHeaderAccountMenu();
     autoExpandAndScroll();
+=======
+    enhanceSidebarNavigation();
+    attachSidebarBadges();
+    enhanceUserPanel();
+    autoExpandAndScroll();
+    localizeAdminChrome();
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 });

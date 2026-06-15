@@ -9,8 +9,13 @@
     --scmd-text: #E6F1FF;      /* Chữ chính (Trắng xanh) */
     --scmd-muted: #8892B0;     /* Chữ phụ (Xám xanh) */
     
+<<<<<<< HEAD
     --scmd-warning: #d97706;    /* Cam cảnh báo (Action) */
     --scmd-blue: #2563eb;      /* Xanh trạng thái */
+=======
+    --scmd-orange: #FF6B00;    /* Cam cảnh báo (Action) */
+    --scmd-cyan: #64FFDA;      /* Xanh Neon (Tín hiệu) */
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     
     --scmd-border: #1E2D3D;    /* Viền mờ */
 }

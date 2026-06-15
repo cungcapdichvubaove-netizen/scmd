@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -51,7 +55,10 @@ class SecurityCompanyScenarioTest(TestCase):
         )
         # Lấy user tự sinh ra để set password
         cls.user_ceo = cls.nv_ceo.user
+<<<<<<< HEAD
         assert cls.user_ceo is not None
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         cls.user_ceo.set_password('password123')
         cls.user_ceo.save()
 
@@ -63,7 +70,10 @@ class SecurityCompanyScenarioTest(TestCase):
             email="tp@scmd.vn"
         )
         cls.user_tp = cls.nv_tp.user
+<<<<<<< HEAD
         assert cls.user_tp is not None
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         cls.user_tp.set_password('password123')
         cls.user_tp.save()
 
@@ -75,7 +85,10 @@ class SecurityCompanyScenarioTest(TestCase):
             email="ns@scmd.vn"
         )
         cls.user_staff = cls.nv_staff.user
+<<<<<<< HEAD
         assert cls.user_staff is not None
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         cls.user_staff.set_password('password123')
         cls.user_staff.save()
 
@@ -111,14 +124,21 @@ class SecurityCompanyScenarioTest(TestCase):
         
         # BƯỚC 1: NV Nhân sự tạo tờ trình
         # Login bằng username tự sinh (thường là mã nhân viên)
+<<<<<<< HEAD
         assert self.user_staff is not None
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.client.login(username=self.user_staff.username, password='password123')
         create_url = reverse('workflow:proposal_create')
         data = {
             'loai_de_xuat': 'MUA_SAM',
             'tieu_de': 'Tờ trình mua máy in mới',
             'noi_dung': 'Máy cũ hỏng, xin mua Canon 2900 giá 3.5tr.',
+<<<<<<< HEAD
             'nguoi_duyet_hien_tai': self.nv_tp.pk, # Kính trình TP
+=======
+            'nguoi_duyet_hien_tai': self.nv_tp.id, # Kính trình TP
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'file_dinh_kem': ''
         }
         self.client.post(create_url, data)
@@ -130,6 +150,7 @@ class SecurityCompanyScenarioTest(TestCase):
 
         # BƯỚC 2: Trưởng phòng vào xem và CHUYỂN TIẾP lên CEO
         self.client.logout()
+<<<<<<< HEAD
         assert self.user_tp is not None
         self.client.login(username=self.user_tp.username, password='password123')
         
@@ -138,17 +159,33 @@ class SecurityCompanyScenarioTest(TestCase):
             'hanh_dong': 'CHUYEN_TIEP',
             'y_kien': 'Đồng ý chủ trương, kính chuyển Tổng Giám Đốc phê duyệt chi.',
             'nguoi_tiep_theo': self.nv_ceo.pk
+=======
+        self.client.login(username=self.user_tp.username, password='password123')
+        
+        action_url = reverse('workflow:proposal_action', args=[prop.id])
+        action_data = {
+            'hanh_dong': 'CHUYEN_TIEP',
+            'y_kien': 'Đồng ý chủ trương, kính chuyển Tổng Giám Đốc phê duyệt chi.',
+            'nguoi_tiep_theo': self.nv_ceo.id
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         }
         self.client.post(action_url, action_data)
         
         prop.refresh_from_db()
         self.assertEqual(prop.nguoi_duyet_hien_tai, self.nv_ceo)
+<<<<<<< HEAD
         self.assertEqual(getattr(prop, 'logs').count(), 2) 
+=======
+        self.assertEqual(prop.logs.count(), 2) 
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         print("✓ Trưởng phòng đã chuyển tiếp lên CEO.")
 
         # BƯỚC 3: CEO vào xem và PHÊ DUYỆT
         self.client.logout()
+<<<<<<< HEAD
         assert self.user_ceo is not None
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.client.login(username=self.user_ceo.username, password='password123')
         
         final_data = {
@@ -161,34 +198,56 @@ class SecurityCompanyScenarioTest(TestCase):
         prop.refresh_from_db()
         self.assertEqual(prop.trang_thai, 'DA_DUYET')
         self.assertIsNone(prop.nguoi_duyet_hien_tai) 
+<<<<<<< HEAD
         print(f"✓ CEO đã phê duyệt. Trạng thái cuối: {getattr(prop, 'get_trang_thai_display')()}")
+=======
+        print(f"✓ CEO đã phê duyệt. Trạng thái cuối: {prop.get_trang_thai_display()}")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     # --- TEST CASE 2: GIAO VIỆC CHO NHÂN SỰ (TASK) ---
     def test_task_assignment(self):
         print("\nTEST 2: GIAO VIỆC & PHỐI HỢP")
+<<<<<<< HEAD
         assert self.user_tp is not None
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         self.client.login(username=self.user_tp.username, password='password123')
         
         guards = NhanVien.objects.filter(chuc_danh__ten_chuc_danh="Nhân viên Bảo vệ")[:3]
         main_guard = guards[0]
+<<<<<<< HEAD
         support_guards = [guards[1].pk, guards[2].pk]
+=======
+        support_guards = [guards[1].id, guards[2].id]
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         
         create_url = reverse('workflow:task_create')
         data = {
             'tieu_de': 'Tăng cường tuần tra đêm Noel',
             'noi_dung': 'Trực chiến 100% quân số tại cổng chính.',
+<<<<<<< HEAD
             'nguoi_nhan': main_guard.pk,
             'nguoi_phoi_hop': support_guards,
             'muc_tieu': self.muc_tieu.pk,
+=======
+            'nguoi_nhan': main_guard.id,
+            'nguoi_phoi_hop': support_guards,
+            'muc_tieu': self.muc_tieu.id,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             'uu_tien': 'CAO',
             'han_chot': (timezone.now() + datetime.timedelta(days=1)).strftime('%Y-%m-%dT%H:%M')
         }
         self.client.post(create_url, data)
         
         task = Task.objects.first()
+<<<<<<< HEAD
         assert task is not None
         self.assertEqual(task.nguoi_nhan, main_guard)
         self.assertEqual(getattr(task, 'nguoi_phoi_hop').count(), 2)
+=======
+        self.assertEqual(task.nguoi_nhan, main_guard)
+        self.assertEqual(task.nguoi_phoi_hop.count(), 2)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         print(f"✓ Đã giao việc cho {main_guard.ho_ten} và 2 người phối hợp.")
 
     # --- TEST CASE 3: BẢO MẬT PHÂN QUYỀN ---
@@ -202,10 +261,16 @@ class SecurityCompanyScenarioTest(TestCase):
             trang_thai='CHO_DUYET'
         )
         
+<<<<<<< HEAD
         assert self.user_staff is not None
         self.client.login(username=self.user_staff.username, password='password123')
         
         action_url = reverse('workflow:proposal_action', args=[prop.pk])
+=======
+        self.client.login(username=self.user_staff.username, password='password123')
+        
+        action_url = reverse('workflow:proposal_action', args=[prop.id])
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         response = self.client.post(action_url, {
             'hanh_dong': 'DUYET_KET_THUC', 
             'y_kien': 'Hack duyệt!'
@@ -216,6 +281,7 @@ class SecurityCompanyScenarioTest(TestCase):
         
         messages = list(response.context['messages'])
         self.assertTrue(any("không có quyền" in str(m) for m in messages))
+<<<<<<< HEAD
         print("✓ HỆ THỐNG AN TOÀN: Nhân viên không thể duyệt thay CEO.")
 
     # --- TEST CASE 4: QUY TRÌNH TỪ CHỐI & YÊU CẦU SỬA ---
@@ -362,3 +428,6 @@ class SecurityCompanyScenarioTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Tờ trình in test")
         print("✓ Trang in tờ trình hiển thị đúng nội dung.")
+=======
+        print("✓ HỆ THỐNG AN TOÀN: Nhân viên không thể duyệt thay CEO.")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

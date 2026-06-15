@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
+<<<<<<< HEAD
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils import timezone
@@ -7,6 +8,12 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from .models import AuditLog, CompanyInfo, WorkerHeartbeat
+=======
+from django.utils.html import format_html
+from django.utils.translation import gettext_lazy as _
+
+from .models import AuditLog, WorkerHeartbeat
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 
 @admin.register(AuditLog)
@@ -60,7 +67,11 @@ class AuditLogAdmin(admin.ModelAdmin):
         return False
 
     def has_delete_permission(self, request, obj=None):
+<<<<<<< HEAD
         return False
+=======
+        return request.user.is_superuser
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     def get_queryset(self, request):
         return super().get_queryset(request).select_related("user")
@@ -75,6 +86,7 @@ class WorkerHeartbeatAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
+<<<<<<< HEAD
 
 
 
@@ -179,3 +191,5 @@ class CompanyInfoAdmin(admin.ModelAdmin):
             url,
             _("Chỉnh sửa")
         )
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

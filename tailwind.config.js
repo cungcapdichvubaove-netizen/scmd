@@ -1,5 +1,6 @@
 // file: tailwind.config.js
 
+<<<<<<< HEAD
 const scmdVar = (token) => `rgb(var(${token}) / <alpha-value>)`;
 
 const SCMD_BRAND_SCALE = Object.freeze({
@@ -26,10 +27,19 @@ module.exports = {
     "./templates/**/*.html",
     "./*/templates/**/*.html",
     "./*/static/**/*.js",
+=======
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './templates/**/*.html',
+    './*/templates/**/*.html',
+    './*/static/**/*.js',
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
   ],
   theme: {
     extend: {
       colors: {
+<<<<<<< HEAD
         navy: {
           950: SCMD_BRAND_SCALE[950],
           900: SCMD_BRAND_SCALE[900],
@@ -60,10 +70,34 @@ module.exports = {
           card: "#ffffff",
         },
         state: SCMD_STATE_COLORS,
+=======
+        brand: {
+          950: '#0f172a',
+          900: '#16233a',
+          800: '#20304d',
+          700: '#29456f',
+          600: '#31558c',
+          500: '#3b82f6',
+          400: '#60a5fa',
+        },
+        surface: {
+          base: '#eef4f8',
+          soft: '#f7fafc',
+          card: '#ffffff',
+        },
+        state: {
+          success: '#16a34a',
+          info: '#2563eb',
+          warning: '#d97706',
+          danger: '#dc2626',
+          neutral: '#64748b',
+        },
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
       },
     },
   },
   plugins: [
+<<<<<<< HEAD
     require("daisyui"),
   ],
   daisyui: {
@@ -71,3 +105,12 @@ module.exports = {
     darkTheme: "business",
   },
 };
+=======
+    require('daisyui'),
+  ],
+  daisyui: {
+    themes: ["business", "corporate"], // Thêm business và corporate
+    darkTheme: "business", // Quan trọng: Đặt business làm theme tối mặc định
+  },
+}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

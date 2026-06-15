@@ -1,4 +1,5 @@
 {% extends "admin/base.html" %}
+<<<<<<< HEAD
 {% load admin_console static %}
 
 {% block title %}Quản trị kỹ thuật SCMD{% endblock %}
@@ -6,11 +7,21 @@
 {% block extrahead %}
 {{ block.super }}
 {% admin_sidebar_runtime request.user as sidebar_runtime %}
+=======
+{% load admin_console %}
+
+{% block title %}SCMD Technical Console{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+{% admin_sidebar_runtime as sidebar_runtime %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 <script>
 window.SCMDAdminSidebarData = {
     periodicEnabled: {{ sidebar_runtime.periodic_enabled|default:0 }},
     taskAlerts: {{ sidebar_runtime.task_alerts|default:0 }}
 };
+<<<<<<< HEAD
 window.SCMDAdminShell = window.SCMDAdminShell || {};
 window.SCMDAdminShell.globalSearchUrl = "{% url 'admin_global_search' %}";
 window.SCMDAdminShell.adminIndexUrl = "{% url 'admin:index' %}";
@@ -19,4 +30,7 @@ window.SCMDAdminShell.logoutUrl = "{% url 'admin_logout_fix' %}";
 </script>
 <script src="{% static 'common/js/admin_localization.js' %}" defer></script>
 
+=======
+</script>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 {% endblock %}

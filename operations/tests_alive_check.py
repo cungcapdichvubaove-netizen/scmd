@@ -1,17 +1,26 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 File: operations/tests_alive_check.py
 Description: Unit Test cho các Use Cases của Alive Check.
 """
 
 from unittest.mock import patch, MagicMock
+<<<<<<< HEAD
 from django.test import TestCase, override_settings
+=======
+from django.test import TestCase
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.utils import timezone
 from django.conf import settings
 from django.contrib.auth.models import User
 
+<<<<<<< HEAD
 from main.models import AuditLog
 from users.models import NhanVien
 from operations.models import PhanCongCaTruc, ViTriChot, MucTieu, CaLamViec
@@ -21,6 +30,12 @@ from operations.application.alive_check_use_cases import (
 )
 from operations.models import KiemTraQuanSo
 from operations.tasks import operations_auto_expire_alive_check
+=======
+from users.models import NhanVien
+from operations.models import PhanCongCaTruc, ViTriChot, MucTieu, CaLamViec
+from operations.application.alive_check_use_cases import CreateAliveCheckUseCase
+from operations.models_alive_check import KiemTraQuanSo
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 class CreateAliveCheckUseCaseTest(TestCase):
     """
@@ -30,6 +45,7 @@ class CreateAliveCheckUseCaseTest(TestCase):
 
     def setUp(self):
         # Tạo dữ liệu cơ bản để làm tham chiếu FK (Infrastructure dependency)
+<<<<<<< HEAD
         self.user_guv = User.objects.create(username="guard1", email="guard1@scmd.vn")
         # Rule: Tận dụng profile do signal tạo hoặc dùng update_or_create để tránh duplicate user_id (P1)
         self.nv_guv, _ = NhanVien.objects.update_or_create(
@@ -52,6 +68,13 @@ class CreateAliveCheckUseCaseTest(TestCase):
                 "email": "manager1@scmd.vn"
             }
         )
+=======
+        self.user_guv = User.objects.create(username="guard1")
+        self.nv_guv = NhanVien.objects.create(user=self.user_guv, ho_ten="Bảo vệ A")
+        
+        self.user_mgr = User.objects.create(username="manager1")
+        self.nv_mgr = NhanVien.objects.create(user=self.user_mgr, ho_ten="Đội trưởng B")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         
         # Tạo context ca trực giả lập
         self.mt = MucTieu.objects.create(ten_muc_tieu="Mục tiêu Test", vi_do=10.0, kinh_do=106.0)
@@ -96,6 +119,7 @@ class CreateAliveCheckUseCaseTest(TestCase):
         )
         
         # 5. Kiểm tra dữ liệu bản ghi
+<<<<<<< HEAD
         self.assertEqual(check_req.trang_thai, 'PENDING')
         self.assertEqual(check_req.tenant_id, settings.SCMD_ORGANIZATION_ID)
 
@@ -197,3 +221,7 @@ class CreateAliveCheckUseCaseTest(TestCase):
             ).count(),
             1,
         )
+=======
+        self.assertEqual(check_req.trang_thai, 'CHO_XAC_NHAN')
+        self.assertEqual(check_req.tenant_id, settings.SCMD_ORGANIZATION_ID)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

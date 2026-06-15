@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿{% extends "base.html" %}
 {% load humanize %}
 {% load static %}
@@ -358,3 +359,162 @@
 {% endblock %}
 
 
+=======
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block title %}Quản trị Kinh doanh{% endblock %}
+
+{% block content %}
+<div class="w-full space-y-6">
+    
+    <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <i class="fas fa-briefcase text-indigo-600"></i> QUẢN TRỊ KINH DOANH
+            </h1>
+            <p class="text-sm text-slate-500 mt-1">Quản lý khách hàng, hợp đồng và doanh số.</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'clients:pipeline' %}" class="btn bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg shadow-sm flex items-center gap-2 transition-colors">
+                <i class="fas fa-columns"></i> Xem Pipeline
+            </a>
+            <a href="/admin/clients/khachhangtiemnang/add/" class="btn bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-md flex items-center gap-2 transition-colors">
+                <i class="fas fa-user-plus"></i> Thêm Khách hàng
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 group hover:border-indigo-300 transition-all">
+            <div class="w-12 h-12 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xl">
+                <i class="fas fa-users"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Tổng Khách hàng</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ total_leads }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 group hover:border-blue-300 transition-all">
+            <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                <i class="fas fa-funnel-dollar"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Cơ hội đang chạy</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ open_opportunities }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 group hover:border-green-300 transition-all">
+            <div class="w-12 h-12 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-xl">
+                <i class="fas fa-money-bill-wave"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">Doanh thu (Tháng)</p>
+                <h3 class="text-2xl font-black text-slate-800">{{ monthly_revenue|intcomma }}</h3>
+            </div>
+        </div>
+
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-100 flex items-center gap-4 border-l-4 {% if expiring_contracts %}border-l-red-500{% else %}border-l-green-500{% endif %}">
+            <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center text-xl animate-pulse">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-slate-400 uppercase">HĐ sắp hết hạn</p>
+                <h3 class="text-2xl font-black {% if expiring_contracts %}text-red-600{% else %}text-slate-800{% endif %}">
+                    {{ expiring_contracts.count }}
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-1 bg-white rounded-xl shadow-sm border border-slate-200 p-5 flex flex-col">
+            <h3 class="font-bold text-slate-700 mb-6 text-sm uppercase flex items-center gap-2">
+                <i class="fas fa-filter text-indigo-500"></i> Phễu Bán hàng
+            </h3>
+            <div class="relative h-64 w-full flex-1">
+                <canvas id="pipelineChart"></canvas>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <div class="px-5 py-4 border-b border-slate-100 bg-red-50 flex justify-between items-center">
+                <h3 class="font-bold text-red-800 text-sm uppercase">
+                    <i class="fas fa-exclamation-circle mr-2"></i> Cảnh báo Hợp đồng (30 ngày tới)
+                </h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left">
+                    <thead class="bg-white text-slate-500 font-semibold border-b border-slate-100 uppercase text-xs">
+                        <tr>
+                            <th class="px-5 py-3">Số HĐ</th>
+                            <th class="px-5 py-3">Khách hàng</th>
+                            <th class="px-5 py-3">Ngày hết hạn</th>
+                            <th class="px-5 py-3 text-right">Giá trị</th>
+                            <th class="px-5 py-3 text-right">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for hd in expiring_contracts %}
+                        <tr class="hover:bg-red-50/50 transition-colors">
+                            <td class="px-5 py-3 font-mono text-slate-600">{{ hd.so_hop_dong }}</td>
+                            <td class="px-5 py-3 font-bold text-slate-800">
+                                {{ hd.co_hoi.khach_hang_tiem_nang.ten_cong_ty|default:"Khách lẻ" }}
+                            </td>
+                            <td class="px-5 py-3 text-red-600 font-bold">{{ hd.ngay_het_han|date:"d/m/Y" }}</td>
+                            <td class="px-5 py-3 text-right font-mono">{{ hd.gia_tri|intcomma }}</td>
+                            <td class="px-5 py-3 text-right">
+                                <a href="/admin/clients/hopdong/{{ hd.id }}/change/" class="text-blue-600 hover:underline text-xs font-bold uppercase">
+                                    Tái ký
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="p-8 text-center text-slate-400">Không có hợp đồng nào sắp hết hạn.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const ctx = document.getElementById('pipelineChart');
+        if (ctx) {
+            new Chart(ctx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: {{ chart_labels|safe }},
+                    datasets: [{
+                        label: 'Số lượng',
+                        data: {{ chart_data|safe }},
+                        backgroundColor: [
+                            '#60a5fa', '#818cf8', '#f472b6', '#a78bfa', '#34d399'
+                        ],
+                        borderRadius: 4,
+                        barThickness: 20
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, grid: { display: false } },
+                        y: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

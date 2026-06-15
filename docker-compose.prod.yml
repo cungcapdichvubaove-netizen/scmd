@@ -1,4 +1,5 @@
 # docker-compose.prod.yml
+<<<<<<< HEAD
 # Production HTTPS contract:
 # - Public traffic must terminate TLS at an external load balancer / reverse proxy
 #   or at a hardened edge gateway before reaching this compose stack.
@@ -17,11 +18,14 @@ x-scmd-app-env: &scmd_app_env
   SCMD_ORGANIZATION_ID: ${SCMD_ORGANIZATION_ID}
   SCMD_DOCKER_COMPOSE: production
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 services:
   migrate:
     build: .
     container_name: scmd_migrate_prod
     command: ["/app/scripts/entrypoint.sh", "python", "manage.py", "migrate", "--noinput"]
+<<<<<<< HEAD
     user: "1000:1000"
     env_file:
       - .env
@@ -47,6 +51,14 @@ services:
     volumes:
       - static_volume:/app/staticfiles
       - media_volume:/app/media
+=======
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SCMD_ORGANIZATION_ID=${SCMD_ORGANIZATION_ID}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     depends_on:
       db:
         condition: service_healthy
@@ -59,7 +71,10 @@ services:
     build: .
     container_name: scmd_web_prod
     command: ["daphne", "-b", "0.0.0.0", "-p", "8000", "config.asgi:application"]
+<<<<<<< HEAD
     user: "1000:1000"
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     expose:
       - "8000" # Chỉ mở nội bộ cho Nginx thấy
     volumes:
@@ -68,9 +83,15 @@ services:
     env_file:
       - .env # Load biến môi trường từ file .env
     environment:
+<<<<<<< HEAD
       <<: *scmd_app_env
       SECURE_SSL_REDIRECT: ${SECURE_SSL_REDIRECT:-True}
       SCMD_COLLECTSTATIC_ON_START: "0"
+=======
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SCMD_ORGANIZATION_ID=${SCMD_ORGANIZATION_ID} # Load from .env for production
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     depends_on:
       db:
         condition: service_healthy
@@ -78,6 +99,7 @@ services:
         condition: service_healthy
     restart: always
     healthcheck:
+<<<<<<< HEAD
       test:
         [
           "CMD",
@@ -85,6 +107,9 @@ services:
           "-c",
           "import sys, urllib.request; response = urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health/', timeout=5); sys.exit(0 if response.status == 200 else 1)",
         ]
+=======
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health/"]
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
       interval: 30s
       timeout: 10s
       retries: 3
@@ -94,9 +119,13 @@ services:
     image: nginx:1.25-alpine
     container_name: scmd_nginx
     ports:
+<<<<<<< HEAD
       # Internal origin HTTP only. Production TLS must be terminated in front of
       # this compose stack and forward X-Forwarded-Proto=https.
       - "80:80"
+=======
+      - "80:80" # Mở cổng web 80 ra ngoài internet
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
       - static_volume:/app/staticfiles # Share volume để lấy file tĩnh
@@ -109,11 +138,16 @@ services:
   celery:
     build: .
     command: celery -A config worker -l info
+<<<<<<< HEAD
     user: "1000:1000"
     env_file:
       - .env
     environment:
       <<: *scmd_app_env
+=======
+    env_file:
+      - .env
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     depends_on:
       db:
         condition: service_healthy
@@ -125,11 +159,16 @@ services:
   celery_beat:
     build: .
     command: celery -A config beat -l info
+<<<<<<< HEAD
     user: "1000:1000"
     env_file:
       - .env
     environment:
       <<: *scmd_app_env
+=======
+    env_file:
+      - .env
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     depends_on:
       db:
         condition: service_healthy
@@ -142,9 +181,15 @@ services:
     image: postgis/postgis:15-3.3
     container_name: scmd_db_prod
     environment:
+<<<<<<< HEAD
       POSTGRES_DB: ${SQL_DATABASE}
       POSTGRES_USER: ${SQL_USER}
       POSTGRES_PASSWORD: ${SQL_PASSWORD}
+=======
+      - POSTGRES_DB=${SQL_DATABASE}
+      - POSTGRES_USER=${SQL_USER}
+      - POSTGRES_PASSWORD=${SQL_PASSWORD}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     volumes:
       - postgres_data_prod:/var/lib/postgresql/data
     restart: always

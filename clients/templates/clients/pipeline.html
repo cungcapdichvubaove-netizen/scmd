@@ -60,9 +60,13 @@
                 <div class="flex-1 overflow-y-auto p-3 space-y-3 custom-scrollbar">
                     {% for op in data.opportunities %}
                     <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm hover:shadow-[0_4px_12px_rgba(0,0,0,0.05)] hover:border-indigo-200 hover:-translate-y-0.5 cursor-pointer transition-all duration-300 group relative">
+<<<<<<< HEAD
                         {% if op.admin_change_url %}
                         <a href="{{ op.admin_change_url }}" class="absolute inset-0 z-10" aria-label="Mở chi tiết cơ hội {{ op.ten_co_hoi }}"></a>
                         {% endif %}
+=======
+                        <a href="/admin/clients/cohoikinhdoanh/{{ op.id }}/change/" class="absolute inset-0 z-10"></a>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                         
                         <div class="flex justify-between items-start mb-2">
                             <div class="text-sm font-bold text-slate-800 line-clamp-2 group-hover:text-indigo-600 transition-colors leading-tight">

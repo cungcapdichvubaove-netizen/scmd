@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2026 SCMD.co.ltd. All Rights Reserved.
 
@@ -9,7 +13,11 @@ Author: Mr. Anh
 Created Date: 2025-12-10
 Updated Date: 2026-05-16
 Version: v2.1.0-strict
+<<<<<<< HEAD
 Description: API Views cho mobile app và bảng điều hành vận hành.
+=======
+Description: API Views cho Mobile App & Dashboard War Room.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
              HARDENING: Enforce for_tenant(), standardized response format, moved business logic to UseCases.
 """
 
@@ -20,6 +28,7 @@ from rest_framework.decorators import action
 from django.utils import timezone
 from django.core.cache import cache
 from django.db.models import Count, Q
+<<<<<<< HEAD
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404
@@ -27,11 +36,24 @@ import logging
 
 from .models import PhanCongCaTruc, BaoCaoSuCo, ChamCong, MucTieu, ShiftChangeRequest, CaLamViec, ViTriChot
 from .access_policies import IncidentVisibilityPolicy, ShiftAccessPolicy, ShiftVisibilityPolicy
+=======
+from rolepermissions.checkers import has_role
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
+from django.http import Http404
+import logging
+
+from .models import PhanCongCaTruc, BaoCaoSuCo, ChamCong, MucTieu
+from .access_policies import ShiftAccessPolicy
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from mobile.serializers import (
     MobilePhanCongCaTrucSerializer, 
     MobileBaoCaoSuCoSerializer
 )
+<<<<<<< HEAD
 from operations.cache_utils import build_dashboard_cache_key
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from .api_serializers import (
     CheckInCheckOutSerializer, 
     DashboardFilterSerializer,
@@ -39,6 +61,7 @@ from .api_serializers import (
     AliveCheckResponseSerializer
 )
 from operations.application.alive_check_use_cases import GetRecentAliveCheckViolationsUseCase, ProcessAliveCheckResponseUseCase
+<<<<<<< HEAD
 from operations.application.attendance_use_cases import CheckInUseCase, CheckOutUseCase, GetSwapRateReportUseCase
 from main.dashboard_router import DashboardRouter
 from main.utils.api_helper import api_response, error_response
@@ -46,11 +69,20 @@ from operations.application.dashboard_use_cases import GetOperationsDashboardUse
 from operations.application.incident_reporting_use_cases import ReportIncidentUseCase
 from operations.application.shift_change_use_cases import ApplyShiftChangeRequestUseCase, ApproveShiftChangeRequestUseCase
 from operations.application.shift_change_permission_policy import ShiftChangePermissionPolicy
+=======
+from operations.application.attendance_use_cases import CheckInUseCase, CheckOutUseCase
+from main.utils.api_helper import api_response, error_response
+from operations.application.dashboard_use_cases import GetWarRoomDashboardUseCase
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 logger = logging.getLogger(__name__)
 
 # ==============================================================================
+<<<<<<< HEAD
 # 1. MOBILE APP APIS
+=======
+# 1. MOBILE APP APIS (LEGACY NAMES PRESERVED)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 # ==============================================================================
 
 class MobileCaTrucViewSet(viewsets.ReadOnlyModelViewSet):
@@ -64,17 +96,58 @@ class MobileCaTrucViewSet(viewsets.ReadOnlyModelViewSet):
         user = self.request.user
         if not hasattr(user, 'nhan_vien'):
             return PhanCongCaTruc.objects.none()
+<<<<<<< HEAD
 
         return (
             ShiftVisibilityPolicy.visible_shifts(user)
             .filter(ngay_truc__gte=timezone.now().date())
             .order_by('ngay_truc')
         )
+=======
+        
+        nv = user.nhan_vien
+        # Rule 4.1: BẮT BUỘC sử dụng for_tenant()
+        qs = PhanCongCaTruc.objects.for_tenant(settings.SCMD_ORGANIZATION_ID)
+
+        # 1. Ban Giám đốc & Kế toán: Thấy toàn bộ
+        if has_role(user, ['ban_giam_doc', 'ke_toan']):
+            return qs.filter(ngay_truc__gte=timezone.now().date()).order_by('ngay_truc')
+
+        # 2. Quản lý vùng: Lọc theo danh sách mục tiêu quản lý
+        # Giả định NhanVien có quan hệ m2m hoặc field phụ trách mục tiêu
+        if has_role(user, 'quan_ly_vung'):
+            # Logic: Lấy các mục tiêu mà NV này được phân quyền quản lý
+            # (Cần cập nhật model MucTieu để có field quanly_vung hoặc tương đương)
+            return qs.filter(
+                vi_tri_chot__muc_tieu__quan_ly_vung=nv,
+                ngay_truc__gte=timezone.now().date()
+            ).order_by('ngay_truc')
+
+        # 3. Đội trưởng: Thấy toàn bộ quân số tại mục tiêu mình đang trực
+        if has_role(user, 'doi_truong'):
+            # Lấy mục tiêu hiện tại của Đội trưởng
+            current_target_ids = PhanCongCaTruc.objects.filter(
+                nhan_vien=nv, 
+                ngay_truc=timezone.now().date()
+            ).values_list('vi_tri_chot__muc_tieu_id', flat=True)
+            
+            return qs.filter(
+                vi_tri_chot__muc_tieu_id__in=current_target_ids,
+                ngay_truc__gte=timezone.now().date()
+            ).order_by('ngay_truc')
+
+        # 4. Bảo vệ: Chỉ thấy lịch của chính mình
+        return qs.filter(nhan_vien=nv, ngay_truc__gte=timezone.now().date()).order_by('ngay_truc')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
     @action(detail=True, methods=['post'])
     def check_out(self, request, pk=None):
         """
+<<<<<<< HEAD
         API Check-out (Action custom cho Mobile App)
+=======
+        API Check-out (Action custom cho Mobile App cũ)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         """
         try:
             ca_truc = self.get_object()
@@ -87,6 +160,7 @@ class MobileCaTrucViewSet(viewsets.ReadOnlyModelViewSet):
                 status_code=status.HTTP_403_FORBIDDEN,
             )
 
+<<<<<<< HEAD
         # Refactor: Sử dụng Serializer để đồng bộ validation GPS/Ảnh (Rule 6.2)
         serializer = CheckInCheckOutSerializer(data=request.data)
         if not serializer.is_valid():
@@ -97,19 +171,33 @@ class MobileCaTrucViewSet(viewsets.ReadOnlyModelViewSet):
             )
         
         valid_data = serializer.validated_data
+=======
+        anh = request.FILES.get('image')
+        lat = request.data.get('latitude')
+        lng = request.data.get('longitude')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         
         try:
             success, msg, data, err_code = CheckOutUseCase.execute(
                 phan_cong=ca_truc,
+<<<<<<< HEAD
                 lat=valid_data.get('lat'), 
                 lng=valid_data.get('lng'),
                 image=valid_data.get('image'),
+=======
+                lat=lat, lng=lng,
+                image=anh,
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
                 ip=request.META.get('REMOTE_ADDR'),
                 device_info=request.META.get('HTTP_USER_AGENT', ''),
                 user=request.user
             )
         except Exception:
+<<<<<<< HEAD
             logger.exception("Unexpected error while executing mobile checkout action")
+=======
+            logger.exception("Unexpected error while executing legacy mobile checkout action")
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             return error_response(
                 "Khong the xu ly check-out luc nay. Vui long thu lai hoac lien he quan tri.",
                 error_code="INTERNAL_ERROR",
@@ -124,13 +212,18 @@ class MobileCaTrucViewSet(viewsets.ReadOnlyModelViewSet):
 class MobileBaoCaoSuCoViewSet(viewsets.ModelViewSet):
     """
     API danh sach/tao bao cao su co cho mobile app.
+<<<<<<< HEAD
     Giu nguyen contract router `mobile/su-co`.
+=======
+    Giu nguyen contract router legacy `mobile/su-co`.
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     """
     serializer_class = MobileBaoCaoSuCoSerializer
     permission_classes = [permissions.IsAuthenticated]
     http_method_names = ['get', 'post', 'head', 'options']
 
     def get_queryset(self):
+<<<<<<< HEAD
         return (
             IncidentVisibilityPolicy.visible_incidents(self.request.user)
             .select_related('nhan_vien_bao_cao', 'muc_tieu', 'ca_truc')
@@ -168,6 +261,26 @@ class MobileBaoCaoSuCoViewSet(viewsets.ModelViewSet):
             nhan_vien_bao_cao=nhan_vien,
             muc_tieu=muc_tieu,
             ca_truc=ca_truc,
+=======
+        qs = (
+            BaoCaoSuCo.objects
+            .for_tenant(settings.SCMD_ORGANIZATION_ID)
+            .select_related('nhan_vien_bao_cao', 'muc_tieu', 'ca_truc')
+            .order_by('-created_at')
+        )
+        user = self.request.user
+        if has_role(user, ['ban_giam_doc', 'ke_toan']):
+            return qs
+        if not hasattr(user, 'nhan_vien'):
+            return qs.none()
+        return qs.filter(nhan_vien_bao_cao=user.nhan_vien)
+
+    def perform_create(self, serializer):
+        nhan_vien = getattr(self.request.user, 'nhan_vien', None)
+        serializer.save(
+            tenant_id=settings.SCMD_ORGANIZATION_ID,
+            nhan_vien_bao_cao=nhan_vien
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
 
 
@@ -198,6 +311,7 @@ class CheckInAPI(APIView):
                 status_code=status.HTTP_403_FORBIDDEN,
             )
 
+<<<<<<< HEAD
         serializer = CheckInCheckOutSerializer(
             data=request.data,
             context={
@@ -215,6 +329,8 @@ class CheckInAPI(APIView):
             )
         data = serializer.validated_data
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         try:
             success, msg, payload, err_code = CheckInUseCase.execute(
                 phan_cong=phan_cong,
@@ -265,6 +381,7 @@ class CheckOutAPI(APIView):
                 status_code=status.HTTP_403_FORBIDDEN,
             )
 
+<<<<<<< HEAD
         serializer = CheckInCheckOutSerializer(
             data=request.data,
             context={
@@ -282,6 +399,8 @@ class CheckOutAPI(APIView):
             )
         data = serializer.validated_data
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         try:
             success, msg, payload, err_code = CheckOutUseCase.execute(
                 phan_cong=phan_cong,
@@ -309,7 +428,11 @@ class MobileAliveCheckResponseAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
+<<<<<<< HEAD
         serializer = AliveCheckResponseSerializer(data=request.data, context={'request': request})
+=======
+        serializer = AliveCheckResponseSerializer(data=request.data)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         if not serializer.is_valid():
             return error_response(
                 message="Du lieu alive check khong hop le.",
@@ -324,15 +447,20 @@ class MobileAliveCheckResponseAPIView(APIView):
             lat=data['lat'],
             lon=data['lon'],
             device_id=data['device_id'],
+<<<<<<< HEAD
             user=request.user,
             anh_selfie=data.get('anh_selfie'),
             ip_address=request.META.get('REMOTE_ADDR'),
             user_agent=request.META.get('HTTP_USER_AGENT', '')
+=======
+            anh_selfie=data.get('anh_selfie')
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         )
         if success:
             return api_response(message=msg)
         return error_response(message=msg, error_code="ALIVE_CHECK_FAILED")
 
+<<<<<<< HEAD
 
 
 class MobileShiftChangeRequestAPIView(APIView):
@@ -481,11 +609,18 @@ class SwapRateReportAPIView(APIView):
         return Response(result)
 
 
+=======
+# ==============================================================================
+# 3. DASHBOARD & MAP APIS (WAR ROOM DATA)
+# ==============================================================================
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 class DashboardDataAPIView(APIView):
     """
     API cung cấp dữ liệu tổng hợp cho Dashboard bản đồ.
     Trả về cấu trúc chuẩn: { stats, markers, incidents, last_activity }
     """
+<<<<<<< HEAD
     permission_classes = [permissions.IsAuthenticated]
 
     @staticmethod
@@ -512,11 +647,28 @@ class DashboardDataAPIView(APIView):
                 error_code="INVALID_PARAMS", 
                 status_code=status.HTTP_400_BAD_REQUEST
             ))
+=======
+    permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
+
+    def get(self, request):
+        """
+        Xử lý yêu cầu lấy dữ liệu War Room Dashboard.
+        Thực thi Site Scoping và Tenant Isolation qua Use Case.
+        """
+        filter_serializer = DashboardFilterSerializer(data=request.query_params)
+        if not filter_serializer.is_valid():
+            return error_response(
+                message=filter_serializer.errors, 
+                error_code="INVALID_PARAMS", 
+                status_code=status.HTTP_400_BAD_REQUEST
+            )
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         
         params = filter_serializer.validated_data
         target_date = params.get('date') or timezone.now().date()
         muc_tieu_id = params.get('muc_tieu_id')
         
+<<<<<<< HEAD
         # SSOT: cache key theo organization + quyền/scope đã resolve; không nhận tenant từ request.
         cache_key = build_dashboard_cache_key(
             user=request.user,
@@ -533,6 +685,18 @@ class DashboardDataAPIView(APIView):
         # 2. Gọi Use Case để lấy dữ liệu đã được lọc theo quyền hạn (Site Scoping)
         # Use Case này đã xử lý phân quyền cho BGĐ, Quản lý vùng và Đội trưởng.
         result = GetOperationsDashboardUseCase.execute(
+=======
+        # SSOT: Thiết lập Cache Key dựa trên User và Params (Tenant Isolation)
+        cache_key = f"dashboard_data_u{request.user.id}_d{target_date}_m{muc_tieu_id or 'all'}"
+        cached_data = cache.get(cache_key)
+        
+        if cached_data:
+            return Response(cached_data)
+
+        # 2. Gọi Use Case để lấy dữ liệu đã được lọc theo quyền hạn (Site Scoping)
+        # Use Case này đã xử lý phân quyền cho BGĐ, Quản lý vùng và Đội trưởng.
+        result = GetWarRoomDashboardUseCase.execute(
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             user=request.user,
             tenant_id=settings.SCMD_ORGANIZATION_ID,
             target_date=target_date,
@@ -540,6 +704,7 @@ class DashboardDataAPIView(APIView):
         )
 
         if "error" in result:
+<<<<<<< HEAD
             return self._no_store(error_response(
                 message=result["error"], 
                 error_code="UNAUTHORIZED_ACCESS", 
@@ -552,6 +717,20 @@ class DashboardDataAPIView(APIView):
         cache.set(cache_key, response_data, 60)
 
         return self._no_store(Response(response_data))
+=======
+            return error_response(
+                message=result["error"], 
+                error_code="UNAUTHORIZED_ACCESS", 
+                status_code=status.HTTP_403_FORBIDDEN
+            )
+
+        response_data = result
+
+        # Lưu vào Redis với TTL 60 giây (Cân bằng giữa hiệu năng và tính real-time)
+        cache.set(cache_key, response_data, 60)
+
+        return Response(response_data)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 
 class AliveCheckViolationAPIView(APIView):
     """
@@ -561,9 +740,14 @@ class AliveCheckViolationAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
 
     def get(self, request):
+<<<<<<< HEAD
         # SCMD Pro - Single-organization guard (WHITEPAPER.md 9).
         # Enforce organization scope from settings SSOT to ensure data isolation integrity.
         tenant_id = settings.SCMD_ORGANIZATION_ID
+=======
+        # Rule 4.1: Lấy tenant_id từ Auth Context
+        tenant_id = getattr(request.user, 'tenant_id', settings.SCMD_ORGANIZATION_ID)
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         
         violations = GetRecentAliveCheckViolationsUseCase.execute(tenant_id)
         serializer = AliveCheckViolationSerializer(violations, many=True)

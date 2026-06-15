@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 SCMD Pro
+=======
+Security Command (SCMD) System
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 ------------------------------
 Copyright (c) 2025 SCMD.co.ltd. All Rights Reserved.
 
@@ -42,6 +46,7 @@ class BaoCaoSuCoForm(forms.ModelForm):
 class BaoCaoDeXuatForm(forms.ModelForm):
     class Meta:
         model = BaoCaoDeXuat
+<<<<<<< HEAD
         fields = ['loai_de_xuat', 'tieu_de', 'noi_dung', 'hinh_anh']
         widgets = {
             'loai_de_xuat': forms.Select(attrs={'class': 'select select-bordered w-full'}),
@@ -49,3 +54,10 @@ class BaoCaoDeXuatForm(forms.ModelForm):
             'noi_dung': forms.Textarea(attrs={'class': 'textarea textarea-bordered w-full h-32'}),
             'hinh_anh': forms.FileInput(attrs={'class': 'file-input file-input-bordered w-full text-sm', 'accept': 'image/*'}),
         }
+=======
+        fields = ['tieu_de', 'noi_dung']
+        widgets = {
+            'tieu_de': forms.TextInput(attrs={'class': 'input input-bordered w-full'}),
+            'noi_dung': forms.Textarea(attrs={'class': 'textarea textarea-bordered w-full h-32'}),
+        }
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

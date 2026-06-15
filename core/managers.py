@@ -1,16 +1,27 @@
 # -*- coding: utf-8 -*-
 """
+<<<<<<< HEAD
 Shared organization-scope managers for the single-organization SCMD Pro runtime.
 """
 
 import logging
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist, ImproperlyConfigured, ValidationError
+=======
+Shared organization-scope managers for the single-organization SCMD ERP runtime.
+"""
+
+import logging
+
+from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 from django.db import models
 
 logger = logging.getLogger(__name__)
 
 
+<<<<<<< HEAD
 def organization_id():
     """Return the fixed organization scope for single-organization runtime data."""
     if not hasattr(settings, "SCMD_ORGANIZATION_ID"):
@@ -18,6 +29,8 @@ def organization_id():
     return settings.SCMD_ORGANIZATION_ID
 
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 class TenantAwareManager(models.Manager):
     """
     Legacy-name SSOT for organization-scoped queries.
@@ -26,6 +39,7 @@ class TenantAwareManager(models.Manager):
     schema field name, but it is enforced against `SCMD_ORGANIZATION_ID`.
     """
 
+<<<<<<< HEAD
     @staticmethod
     def _organization_id():
         if not hasattr(settings, "SCMD_ORGANIZATION_ID"):
@@ -85,6 +99,8 @@ class TenantAwareManager(models.Manager):
         selected_ids = queryset.values_list("pk", flat=True)
         return self.for_current().filter(pk__in=selected_ids)
 
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
     def for_tenant(self, tenant_id):
         if not hasattr(settings, "SCMD_ORGANIZATION_ID"):
             raise ImproperlyConfigured(
@@ -110,6 +126,7 @@ class TenantAwareManager(models.Manager):
 
 
 OrganizationScopedManager = TenantAwareManager
+<<<<<<< HEAD
 
 
 
@@ -207,3 +224,5 @@ class ChiTietLuongManager(TenantAwareManager):
 
     def get_queryset(self):
         return super().get_queryset().select_related("nhan_vien", "bang_luong")
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

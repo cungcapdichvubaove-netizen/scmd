@@ -1,17 +1,26 @@
 {# file: operations/templates/operations/mobile/de_xuat_list.html #}
+<<<<<<< HEAD
 {% extends "mobile/base.html" %}
+=======
+{% extends "operations/mobile/base_mobile_revamped.html" %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 {% load static humanize %}
 
 {% block title %}Đề xuất của tôi{% endblock %}
 
 {% block content %}
 <div class="space-y-4 fade-in">
+<<<<<<< HEAD
     <div class="flex items-center justify-between rounded-xl border border-slate-100 bg-white p-4 shadow-sm">
+=======
+    <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-100">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         <div class="flex items-center gap-3">
             <a href="{% url 'operations:mobile_dashboard' %}" class="btn btn-circle btn-ghost btn-sm">
                 <i class="fas fa-arrow-left text-lg"></i>
             </a>
             <div>
+<<<<<<< HEAD
                 <h1 class="text-lg font-bold leading-none text-slate-800">Đề xuất</h1>
                 <span class="text-[10px] font-bold uppercase text-slate-400">Nghiệp vụ hiện trường</span>
             </div>
@@ -22,12 +31,25 @@
             </a>
             <div class="h-8 w-8 rounded border border-slate-100 bg-slate-50 p-0.5">
                 <img src="{% static 'img/brand/logo-symbol-blue.png' %}" alt="SCMD Pro" class="h-full w-full object-contain">
+=======
+                <h1 class="text-lg font-bold text-slate-800 leading-none">Đề Xuất</h1>
+                <span class="text-[10px] text-slate-400 font-bold uppercase">Nghiệp vụ</span>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="{% url 'operations:mobile_de_xuat_create' %}" class="btn btn-sm bg-blue-600 border-none text-white gap-2 shadow-sm">
+                <i class="fas fa-plus"></i> Tạo mới
+            </a>
+            <div class="w-8 h-8 bg-slate-50 rounded p-0.5 border border-slate-100">
+                <img src="{% static 'img/logo_moi.png' %}" class="w-full h-full object-contain">
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
             </div>
         </div>
     </div>
 
     <div class="space-y-3">
         {% for dx in ds_de_xuat %}
+<<<<<<< HEAD
         <a href="{% url 'operations:mobile_de_xuat_detail' dx.id %}" class="block rounded-xl border border-slate-100 bg-white shadow-sm transition-transform active:scale-[0.98]">
             <div class="p-4">
                 <div class="mb-1 flex items-start justify-between gap-3">
@@ -47,8 +69,35 @@
             </div>
             <p class="text-sm font-medium text-slate-600">Chưa có đề xuất nào được gửi.</p>
             <p class="mt-1 text-xs text-slate-500">Tạo đề xuất mới khi cần xin vật tư, hỗ trợ hoặc phản ánh nhu cầu hiện trường.</p>
+=======
+        <a href="{% url 'operations:mobile_de_xuat_detail' dx.id %}" class="block card bg-white shadow-sm border border-slate-100 active:scale-[0.98] transition-transform">
+            <div class="card-body p-4">
+                <div class="flex justify-between items-start mb-1">
+                    <span class="badge badge-sm font-bold 
+                        {% if dx.trang_thai == 'DA_DUYET' %}badge-success text-white
+                        {% elif dx.trang_thai == 'TU_CHOI' %}badge-error text-white
+                        {% else %}badge-warning text-white{% endif %}">
+                        {{ dx.get_trang_thai_display }}
+                    </span>
+                    <span class="text-xs text-slate-400 font-mono">{{ dx.ngay_gui|date:"d/m" }}</span>
+                </div>
+                <h3 class="font-bold text-slate-800 line-clamp-1">{{ dx.tieu_de }}</h3>
+                <p class="text-xs text-slate-500 mt-1 line-clamp-1">{{ dx.noi_dung }}</p>
+            </div>
+        </a>
+        {% empty %}
+        <div class="text-center py-12 opacity-60">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fas fa-folder-open text-3xl text-slate-400"></i>
+            </div>
+            <p class="text-sm font-medium">Bạn chưa gửi đề xuất nào.</p>
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
         </div>
         {% endfor %}
     </div>
 </div>
+<<<<<<< HEAD
 {% endblock %}
+=======
+{% endblock %}
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34

@@ -1,5 +1,6 @@
 # UI_SYSTEM_REFACTOR_SPEC.md — SCMD Pro UI/System Refactor Specification
 
+<<<<<<< HEAD
 Version: 3.5.0-access-scope-docs-v4
 Status: **Active implementation spec — included as UI governance dependency for Access Scope docs v4**
 Updated: 2026-06-08
@@ -11,6 +12,14 @@ Patch note — access-scope-docs-v4:
 - Included in the Access Scope documentation patch so AI/coder agents have the UI/brand governance file referenced by `DOCUMENTATION.md`, `WHITEPAPER.md` and `.cursorrules`.
 - No runtime UI implementation is implied by this docs-only patch.
 
+=======
+Version: 3.5.0
+Status: **Active implementation spec**
+Updated: 2026-06-03
+
+Tài liệu này map công việc refactor UI, brand language và frontend/runtime surface vào các file thực tế trong Django repository. Mục tiêu là đưa SCMD Pro về đúng định vị: phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp, không phải cyber dashboard hay war-room demo.
+
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 Patch note 3.5.0:
 - Chuẩn hóa định vị thương hiệu mới: **SCMD** là công ty/thương hiệu mẹ; **SCMD Pro** là tên user-facing của sản phẩm; tagline là **Phần mềm chỉ huy và quản trị doanh nghiệp dịch vụ bảo vệ chuyên nghiệp**.
 - `SCMD ERP` và các tên cũ phải được đổi thành `SCMD Pro` trên UI sản phẩm; `SCMD` chỉ dùng cho công ty/thương hiệu mẹ, pháp lý, copyright, about/vendor.
@@ -178,7 +187,10 @@ Acceptance:
 ### 3.6 Visual Tokens
 
 ```text
+<<<<<<< HEAD
 theme/tailwind.config.js
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 static/common/css/brand_system.css
 tailwind.config.js
 theme/static_src/src/styles.css
@@ -273,7 +285,11 @@ Commands:
 grep -R "cdn.tailwindcss.com" -n .
 grep -R "Security Command\|Sentinel Command\|War Room\|Tactical\|SCMD Pro" -n templates static main dashboard users operations accounting clients
 grep -R "cyber-\|neon\|glow" -n templates static
+<<<<<<< HEAD
 grep -RInP "[\\x{FFFD}]|Ã|Â" templates static main dashboard users operations accounting clients
+=======
+grep -R "�\|Ã\|Â" -n templates static main dashboard users operations accounting clients
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
 find static/ -name "*.py"
 find . -path "*/templates/*" -name "*.py"
 ```
@@ -438,6 +454,7 @@ Không nên sửa toàn bộ UI trong một PR lớn. Nên chia:
 7. `ui/mojibake-cleanup-owned-files`
 
 Mỗi PR phải có screenshot trước/sau hoặc mô tả QA nếu không có screenshot.
+<<<<<<< HEAD
 
 ---
 
@@ -509,3 +526,5 @@ Every async or computed dashboard region must distinguish these states:
 | Error | `.scmd-state--error` | Data source failed or is temporarily unavailable |
 
 Skeleton animation must respect `prefers-reduced-motion`.
+=======
+>>>>>>> 51661ed7e1165a088e9f7635fb9a4a3d23400f34
